@@ -1,7 +1,3 @@
-## Git Workflow
-
-Do NOT push commits. Only commit locally.
-
 ## Tech Stack
 
 - **Framework**: React 18 + TypeScript, built with Vite
@@ -37,3 +33,12 @@ Bounded contexts: `exercises/`, `sessions/`, `planning/` (each as subfolders in 
 One OpenSpec change = one Epic (one bounded context or phase).
 Do not mix bounded contexts in a single change.
 Current changes in order: `app-foundation` → `exercise-library` → `training-plans` → `session-tracking` → `analytics`.
+
+## After implementation Workflow
+* Always run all tests
+* Always verify in the UI
+* Always commit
+
+## Git Workflow
+
+Do NOT push commits. Only commit locally.
