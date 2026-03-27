@@ -11,7 +11,7 @@
 - [x] 2.1 Install and configure `vite-plugin-pwa`
 - [x] 2.2 Create `manifest.json` with app name, `display: "standalone"`, theme colour, and 192×192 + 512×512 icons
 - [x] 2.3 Configure Service Worker via `vite-plugin-pwa` to cache the app shell (Workbox `generateSW` strategy)
-- [ ] 2.4 Verify app is installable in Safari on iPhone (standalone launch, icon visible)
+- [x] 2.4 Verify app is installable in Safari on iPhone (standalone launch, icon visible)
 
 ## 3. Testing Infrastructure
 
@@ -32,4 +32,4 @@
 
 - [x] 5.1 Create `.github/workflows/ci.yml` with jobs: install → vitest → playwright
 - [x] 5.2 Cache `node_modules` and Playwright browsers in the workflow
-- [ ] 5.3 Push to GitHub and confirm the Actions workflow runs and goes green
+- [x] 5.3 Push to GitHub and confirm the Actions workflow runs and goes green
