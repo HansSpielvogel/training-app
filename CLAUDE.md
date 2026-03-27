@@ -34,6 +34,16 @@ One OpenSpec change = one Epic (one bounded context or phase).
 Do not mix bounded contexts in a single change.
 Current changes in order: `app-foundation` → `exercise-library` → `training-plans` → `session-tracking` → `analytics`.
 
+## Project Context (Memory)
+
+See memory files for durable project context (delete once info is superseded by code/specs):
+- `project_app-concept.md` — purpose, target user, UI principles
+- `project_domain-model.md` — entities, aggregates, Weight type, session modification
+- `project_training-flow.md` — session UX flow, variation picking, set logging
+- `project_roadmap.md` — phase breakdown, seeding plan
+- `project_sport-extensibility.md` — SessionSummary interface, no generic Exercise
+- `project_progress.md` — current change status (keep updated)
+
 ## After implementation Workflow
 * Always run all tests
 * Always verify in the UI
