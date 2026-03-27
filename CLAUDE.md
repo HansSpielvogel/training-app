@@ -39,6 +39,3 @@ Current changes in order: `app-foundation` → `exercise-library` → `training-
 * Always verify in the UI
 * Always commit
 
-## Git Workflow
-
-Do NOT push commits. Only commit locally.
