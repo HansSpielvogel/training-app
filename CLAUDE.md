@@ -37,5 +37,5 @@ Current changes in order: `app-foundation` → `exercise-library` → `training-
 ## After implementation Workflow
 * Always run all tests
 * Always verify in the UI
-* Always commit
+* Always commit and push
 
