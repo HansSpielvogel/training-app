@@ -25,6 +25,7 @@ presentation/   ← React components and hooks
 - `application/` may import from `domain/` only
 - `infrastructure/` implements interfaces defined in `domain/`
 - `presentation/` calls `application/` only — never imports from `domain/` or `infrastructure/` directly
+  - **Exception**: hooks are the composition root and instantiate repositories directly from `infrastructure/`. This is intentional — do not refactor it away.
 
 Bounded contexts: `exercises/`, `sessions/`, `planning/` (each as subfolders in `domain/` and `application/`).
 
@@ -36,16 +37,18 @@ Current changes in order: `app-foundation` → `exercise-library` → `training-
 
 ## Project Context (Memory)
 
-See memory files for durable project context (delete once info is superseded by code/specs):
-- `project_app-concept.md` — purpose, target user, UI principles
-- `project_domain-model.md` — entities, aggregates, Weight type, session modification
-- `project_training-flow.md` — session UX flow, variation picking, set logging
-- `project_roadmap.md` — phase breakdown, seeding plan
-- `project_sport-extensibility.md` — SessionSummary interface, no generic Exercise
-- `project_progress.md` — current change status (keep updated)
+Versioned memory lives in `openspec/memory/`. Delete a file once its content is fully superseded by code or specs.
+
+- `openspec/memory/project_progress.md` — current change status (keep updated)
+- `openspec/memory/project_app-concept.md` — purpose, target user, UI principles
+- `openspec/memory/project_domain-model.md` — entities, aggregates, Weight type, session modification
+- `openspec/memory/project_training-flow.md` — session UX flow, variation picking, set logging
+- `openspec/memory/project_roadmap.md` — phase breakdown, seeding plan
+- `openspec/memory/project_sport-extensibility.md` — SessionSummary interface, no generic Exercise
 
 ## After implementation Workflow
 * Always run all tests
 * Always verify in the UI
 * Always commit and push
+* Always update this claude.md file, also with new insights
 
