@@ -52,17 +52,17 @@ export function TrainingPlanDetailScreen() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="px-4 py-4 border-b border-gray-200 bg-white flex items-center gap-3">
+      <header className="px-4 py-4 border-b border-gray-200 bg-white flex items-center gap-3" style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}>
         <button
           onClick={() => navigate('/training-plans')}
-          className="p-1 text-gray-500 hover:text-gray-800"
+          className="p-2 text-gray-500 hover:text-gray-800"
           aria-label="Back"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="flex-1 text-xl font-semibold text-gray-900">{plan.name}</h1>
+        <h1 className="flex-1 min-w-0 truncate text-xl font-semibold text-gray-900">{plan.name}</h1>
         <button onClick={() => setMode({ type: 'renamingPlan', currentName: plan.name })} className="p-2 text-gray-400 hover:text-blue-600" aria-label="Rename plan">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

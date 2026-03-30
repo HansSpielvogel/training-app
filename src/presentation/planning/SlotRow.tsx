@@ -14,21 +14,25 @@ export function SlotRow({ slot, isFirst, isLast, onToggleOptional, onMoveUp, onM
   return (
     <div className="flex items-center px-4 py-3 border-b border-gray-100">
       <span className="flex-1 text-sm text-gray-800">{slot.muscleGroupName}</span>
-      {slot.optional && (
-        <span className="mr-2 px-1.5 py-0.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded">
-          Evtl
-        </span>
-      )}
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleOptional}
-          className={`px-2 py-1 text-xs rounded border ${
+          className={`flex items-center gap-1 px-2 py-1 text-xs rounded border min-h-[36px] ${
             slot.optional
-              ? 'text-amber-700 border-amber-300 bg-amber-50'
+              ? 'text-amber-800 border-amber-300 bg-amber-100 font-medium'
               : 'text-gray-400 border-gray-200 bg-gray-50'
           }`}
           aria-label={slot.optional ? 'Mark as required' : 'Mark as optional'}
         >
+          <span className={`w-3 h-3 rounded-sm border flex items-center justify-center flex-shrink-0 ${
+            slot.optional ? 'bg-amber-500 border-amber-500' : 'border-gray-300'
+          }`}>
+            {slot.optional && (
+              <svg className="w-2.5 h-2.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+              </svg>
+            )}
+          </span>
           Evtl
         </button>
         <button

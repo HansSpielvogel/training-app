@@ -52,7 +52,7 @@ export function EntryRow({
         <div className="flex-1 min-w-0">
           <span className="text-sm font-medium text-gray-800">{muscleGroupName}</span>
           {entry.optional && (
-            <span className="ml-2 px-1.5 py-0.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded">Evtl</span>
+            <span className="ml-2 px-1.5 py-0.5 text-xs font-medium text-amber-800 bg-amber-100 border border-amber-300 rounded">Evtl</span>
           )}
           {exerciseName && (
             <span className="ml-2 text-xs text-gray-500">{exerciseName}</span>

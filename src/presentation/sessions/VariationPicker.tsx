@@ -49,7 +49,7 @@ export function VariationPicker({ suggestion, recentVariations, allExercises, on
           <p className="text-xs text-gray-400 mb-1">Suggested rotation:</p>
           <button
             onClick={() => onSelect(suggestion.id)}
-            className="px-3 py-2.5 text-sm bg-green-50 text-green-700 rounded-full border border-green-300 font-medium"
+            className="px-3 py-2.5 text-sm bg-green-50 text-green-700 rounded-full border border-green-300 font-medium min-h-[44px] flex items-center"
           >
             {suggestion.name}
           </button>
@@ -60,7 +60,7 @@ export function VariationPicker({ suggestion, recentVariations, allExercises, on
           <button
             key={ex.id}
             onClick={() => onSelect(ex.id)}
-            className="px-3 py-2.5 text-sm bg-blue-50 text-blue-700 rounded-full border border-blue-200 font-medium"
+            className="px-3 py-2.5 text-sm bg-blue-50 text-blue-700 rounded-full border border-blue-200 font-medium min-h-[44px] flex items-center"
           >
             {ex.name}
           </button>
@@ -68,7 +68,7 @@ export function VariationPicker({ suggestion, recentVariations, allExercises, on
         {hasMore && (
           <button
             onClick={() => setShowFullList(true)}
-            className="px-3 py-2.5 text-sm bg-gray-100 text-gray-600 rounded-full border border-gray-200"
+            className="px-3 py-2.5 text-sm bg-gray-100 text-gray-600 rounded-full border border-gray-200 min-h-[44px] flex items-center"
           >
             Other…
           </button>

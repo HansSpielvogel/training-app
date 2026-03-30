@@ -37,18 +37,19 @@ export function SessionStartScreen() {
         ) : (
           <div>
             {plans.map((plan) => (
-              <div key={plan.id} className="flex items-center px-4 py-3 border-b border-gray-100">
-                <div className="flex-1">
+              <button
+                key={plan.id}
+                onClick={() => handleStart(plan.id)}
+                className="w-full flex items-center px-4 py-3 border-b border-gray-100 active:bg-gray-50 min-h-[56px]"
+              >
+                <div className="flex-1 text-left">
                   <span className="text-sm font-medium text-gray-800">{plan.name}</span>
                   <span className="ml-2 text-xs text-gray-400">{plan.slotCount} slots</span>
                 </div>
-                <button
-                  onClick={() => handleStart(plan.id)}
-                  className="px-4 py-2.5 bg-blue-600 text-white text-sm rounded-lg font-medium"
-                >
+                <span className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg font-medium">
                   Start
-                </button>
-              </div>
+                </span>
+              </button>
             ))}
           </div>
         )}

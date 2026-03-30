@@ -81,16 +81,16 @@ export function ActiveSessionScreen() {
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}
       >
         <div className="flex items-center justify-between">
-          <h1 className="text-xl font-semibold text-gray-900">{session.planName}</h1>
+          <h1 className="flex-1 min-w-0 truncate text-xl font-semibold text-gray-900">{session.planName}</h1>
           <button
             onClick={() => { setConfirmAbandon(true); setConfirmFinish(false) }}
-            className="text-sm text-gray-400 hover:text-red-500"
+            className="ml-3 p-2 text-sm text-gray-400 hover:text-red-500 min-h-[44px] flex items-center"
           >
             Abandon
           </button>
         </div>
         {!hasAnyActivity && (
-          <p className="text-xs text-gray-400 mt-0.5">Tap a slot to log sets</p>
+          <p className="text-sm text-gray-500 mt-0.5">Tap a slot to log sets</p>
         )}
       </header>
 
