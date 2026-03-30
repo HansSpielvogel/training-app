@@ -6,13 +6,13 @@ type: project
 
 ## Change Sequence
 
-`app-foundation` ✓ → `exercise-library` ✓ → `training-plans` → `session-tracking` → `analytics`
+`app-foundation` ✓ → `exercise-library` ✓ → `training-plans` ✓ → `session-tracking` → `analytics`
 
 ## Phase 1 — MVP (exercise-library + training-plans + session-tracking)
 
 Must-haves before the app is usable:
 - MuscleGroup and ExerciseDefinition CRUD ✓
-- Training plan creation (static, no dynamic rotation logic yet)
+- Training plan creation (static, no dynamic rotation logic yet) ✓
 - Session logging: pick plan, pick variation, log sets with weight + reps
 - "Last 4 variations" display per muscle group slot
 - JSON export/import for backup ✓
@@ -41,5 +41,6 @@ Must-haves before the app is usable:
 
 ## Seeding
 
-Exercise library seeded: `openspec/seed/exercise-library.json` (16 muscle groups, 53 exercises).
-Training plans not yet seeded — plan structure is documented in `openspec/memory/project_training-plans-data.md`.
+Both seed files auto-run on first boot (empty-table guard, idempotent):
+- `openspec/seed/exercise-library.json` — 16 muscle groups, 53 exercises
+- `openspec/seed/training-plans.json` — Hans's 5 plans with ordered muscle group slots
