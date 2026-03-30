@@ -10,7 +10,7 @@ type: project
 
 Full sequence: `app-foundation` ✓ → `exercise-library` ✓ → `training-plans` → `session-tracking` → `analytics`
 
-**Seeding:** Now that exercise-library is done, Hans should provide his existing exercises text file so we can seed the DB via JSON import before starting training-plans.
+**Seeding done:** `openspec/seed/exercise-library.json` — 16 muscle groups, 53 exercises. Import via UI before or during training-plans development.
 
 **Why:** One change per bounded context per the change strategy in CLAUDE.md.
 

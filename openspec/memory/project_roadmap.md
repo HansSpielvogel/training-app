@@ -24,6 +24,8 @@ Must-haves before the app is usable:
 - Asymmetric weight type (`{ kind: 'asymmetric'; left; right }`)
 - Session modification during training (add/remove MuscleGroups, temp or permanent)
 - App suggests variation based on rotation logic (smart rotation)
+- Optional plan slots (mark "Evtl" exercises in plan — may or may not be done)
+- Alternating exercise variant: left/right alternating reps, shorter rest (e.g. Oblique Crunch 4×11 mit 36s)
 
 ## Phase 3 — Analytics Change
 
@@ -39,4 +41,5 @@ Must-haves before the app is usable:
 
 ## Seeding
 
-Hans has existing training plans in a text file. Now that `exercise-library` is done, he will provide the file and we will pre-fill the database with his current exercises and plans via a seed JSON import before starting `training-plans`.
+Exercise library seeded: `openspec/seed/exercise-library.json` (16 muscle groups, 53 exercises).
+Training plans not yet seeded — plan structure is documented in `openspec/memory/project_training-plans-data.md`.
