@@ -86,7 +86,7 @@ export function useActiveSession() {
     const sessions = await sessionRepo.listCompleted()
     const suggestionId = computeRotationSuggestion(muscleGroupId, sessions)
     if (!suggestionId) return null
-    return exerciseRepo.findById(suggestionId) ?? null
+    return (await exerciseRepo.findById(suggestionId)) ?? null
   }, [sessionRepo, exerciseRepo])
 
   const getLastSets = useCallback(
