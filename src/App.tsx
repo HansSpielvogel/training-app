@@ -6,6 +6,7 @@ import { TrainingPlansScreen } from './presentation/planning/TrainingPlansScreen
 import { TrainingPlanDetailScreen } from './presentation/planning/TrainingPlanDetailScreen'
 import { SessionStartScreen } from './presentation/sessions/SessionStartScreen'
 import { ActiveSessionScreen } from './presentation/sessions/ActiveSessionScreen'
+import { AnalyticsScreen } from './presentation/analytics/AnalyticsScreen'
 import { ErrorBoundary } from './presentation/shared/ErrorBoundary'
 import { UpdateBanner } from './presentation/shared/UpdateBanner'
 import { seedTrainingPlans } from '@application/planning'
@@ -36,6 +37,7 @@ export default function App() {
               <Route path="/training-plans/:id" element={<TrainingPlanDetailScreen />} />
               <Route path="/muscle-groups" element={<MuscleGroupsPage />} />
               <Route path="/exercise-definitions" element={<ExerciseDefinitionsPage />} />
+              <Route path="/analytics" element={<AnalyticsScreen />} />
             </Routes>
           </ErrorBoundary>
         </div>
@@ -98,6 +100,20 @@ export default function App() {
                 d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
             </svg>
             Exercises
+          </NavLink>
+          <NavLink
+            to="/analytics"
+            className={({ isActive }) =>
+              `flex-1 flex flex-col items-center py-3 text-xs font-medium ${
+                isActive ? 'text-blue-600' : 'text-gray-500'
+              }`
+            }
+          >
+            <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+            </svg>
+            Stats
           </NavLink>
         </nav>
         <UpdateBanner />

@@ -24,13 +24,13 @@ Must-haves before the app is usable:
 - Asymmetric weight type (`{ kind: 'asymmetric'; left; right }`)
 - Session modification during training (add/remove MuscleGroups, temp or permanent)
 - App suggests variation based on rotation logic (smart rotation)
-- Optional plan slots (mark "Evtl" exercises in plan — may or may not be done)
-- Alternating exercise variant: left/right alternating reps, shorter rest (e.g. Oblique Crunch 4×11 mit 36s)
+- Optional plan slots with a hint (mark "Evtl" exercises in plan — may or may not be done)
 - Abandon active session from `ActiveSessionScreen`: confirmation prompt with data-loss warning, returns to plan selection
 - Quick-sets mode per slot: enter weight+reps once → logs N identical sets; N defined on ExerciseDefinition (exercises screen, default 3); toggle to single-set mode per slot during session when sets differ
 
 ## Phase 3 — Analytics Change
 
+- Alternating exercise variant: left/right alternating reps, shorter rest (e.g. Oblique Crunch 4×11 mit 36s)
 - Weight progression graph per ExerciseDefinition
 - Graph per MuscleGroup (aggregate view)
 - Training overview: calendar/timeline of when, which plan, how many exercises

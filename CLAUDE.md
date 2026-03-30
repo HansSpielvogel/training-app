@@ -48,5 +48,5 @@ Versioned memory lives in `openspec/memory/`. Delete a file once its content is 
 
 ## After Implementation Workflow
 
-Run `/after-impl` — the skill handles tests, UI verification, ui-review, CLAUDE.md update, commit and push.
+**IMPORTANT: You MUST run `/after-impl` when implementation tasks are done.** Do NOT consider the work complete until you have run it. It handles tests, UI verification, ui-review, CLAUDE.md update, commit and push.
 
