@@ -8,6 +8,7 @@ export type { TrainingPlanDetail, PlanSlotDetail } from './getTrainingPlan'
 export { addPlanSlot } from './addPlanSlot'
 export { removePlanSlot } from './removePlanSlot'
 export { movePlanSlot } from './movePlanSlot'
+export { updateSlotOptional } from './updateSlotOptional'
 export { seedTrainingPlans } from './seedTrainingPlans'
 
 // Re-export domain types so presentation doesn't import domain directly

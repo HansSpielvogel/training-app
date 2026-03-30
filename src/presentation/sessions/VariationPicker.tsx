@@ -2,12 +2,13 @@ import { useState } from 'react'
 import type { ExerciseDefinition } from '@application/exercises'
 
 interface Props {
+  suggestion: ExerciseDefinition | null
   recentVariations: ExerciseDefinition[]
   allExercises: ExerciseDefinition[]
   onSelect: (exerciseDefinitionId: string) => void
 }
 
-export function VariationPicker({ recentVariations, allExercises, onSelect }: Props) {
+export function VariationPicker({ suggestion, recentVariations, allExercises, onSelect }: Props) {
   const [showFullList, setShowFullList] = useState(false)
 
   // Show up to 3 chips: recent first, then fill from the rest
@@ -42,24 +43,37 @@ export function VariationPicker({ recentVariations, allExercises, onSelect }: Pr
   }
 
   return (
-    <div className="flex flex-wrap gap-2">
-      {chips.map((ex) => (
-        <button
-          key={ex.id}
-          onClick={() => onSelect(ex.id)}
-          className="px-3 py-2.5 text-sm bg-blue-50 text-blue-700 rounded-full border border-blue-200 font-medium"
-        >
-          {ex.name}
-        </button>
-      ))}
-      {hasMore && (
-        <button
-          onClick={() => setShowFullList(true)}
-          className="px-3 py-2.5 text-sm bg-gray-100 text-gray-600 rounded-full border border-gray-200"
-        >
-          Other…
-        </button>
+    <div className="space-y-2">
+      {suggestion && (
+        <div>
+          <p className="text-xs text-gray-400 mb-1">Suggested rotation:</p>
+          <button
+            onClick={() => onSelect(suggestion.id)}
+            className="px-3 py-2.5 text-sm bg-green-50 text-green-700 rounded-full border border-green-300 font-medium"
+          >
+            {suggestion.name}
+          </button>
+        </div>
       )}
+      <div className="flex flex-wrap gap-2">
+        {chips.map((ex) => (
+          <button
+            key={ex.id}
+            onClick={() => onSelect(ex.id)}
+            className="px-3 py-2.5 text-sm bg-blue-50 text-blue-700 rounded-full border border-blue-200 font-medium"
+          >
+            {ex.name}
+          </button>
+        ))}
+        {hasMore && (
+          <button
+            onClick={() => setShowFullList(true)}
+            className="px-3 py-2.5 text-sm bg-gray-100 text-gray-600 rounded-full border border-gray-200"
+          >
+            Other…
+          </button>
+        )}
+      </div>
     </div>
   )
 }

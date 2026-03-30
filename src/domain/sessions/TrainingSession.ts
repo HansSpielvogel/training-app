@@ -7,6 +7,7 @@ export interface SessionSet {
 
 export interface SessionEntry {
   readonly muscleGroupId: string
+  readonly optional?: boolean
   readonly exerciseDefinitionId?: string
   readonly sets: readonly SessionSet[]
 }

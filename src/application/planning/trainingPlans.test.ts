@@ -12,6 +12,7 @@ import { getTrainingPlan } from './getTrainingPlan'
 import { addPlanSlot } from './addPlanSlot'
 import { removePlanSlot } from './removePlanSlot'
 import { movePlanSlot } from './movePlanSlot'
+import { updateSlotOptional } from './updateSlotOptional'
 import { seedTrainingPlans } from './seedTrainingPlans'
 
 let repo: DexieTrainingPlanRepository
@@ -176,6 +177,35 @@ describe('movePlanSlot', () => {
     await addPlanSlot(repo, plan.id, 'mg-1')
     const [slot] = await repo.listSlotsByPlan(plan.id)
     await expect(movePlanSlot(repo, plan.id, slot.id, 'up')).resolves.not.toThrow()
+  })
+})
+
+describe('updateSlotOptional', () => {
+  it('persists optional: true and getTrainingPlan reflects the flag', async () => {
+    await createTrainingPlan(repo, 'Core')
+    await muscleGroupRepo.save({ id: 'mg-1', name: 'Bauch' })
+    const [plan] = await repo.listPlans()
+    await addPlanSlot(repo, plan.id, 'mg-1')
+    const [slot] = await repo.listSlotsByPlan(plan.id)
+
+    await updateSlotOptional(repo, slot.id, true)
+
+    const detail = await getTrainingPlan(repo, muscleGroupRepo, plan.id)
+    expect(detail?.slots[0].optional).toBe(true)
+  })
+
+  it('persists optional: false when toggled back', async () => {
+    await createTrainingPlan(repo, 'Core')
+    await muscleGroupRepo.save({ id: 'mg-1', name: 'Bauch' })
+    const [plan] = await repo.listPlans()
+    await addPlanSlot(repo, plan.id, 'mg-1')
+    const [slot] = await repo.listSlotsByPlan(plan.id)
+
+    await updateSlotOptional(repo, slot.id, true)
+    await updateSlotOptional(repo, slot.id, false)
+
+    const detail = await getTrainingPlan(repo, muscleGroupRepo, plan.id)
+    expect(detail?.slots[0].optional).toBe(false)
   })
 })
 

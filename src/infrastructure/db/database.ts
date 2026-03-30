@@ -26,6 +26,7 @@ export class TrainingDatabase extends Dexie {
     this.version(4).stores({
       trainingSessions: 'id, status',
     })
+    this.version(5).stores({})
   }
 }
 

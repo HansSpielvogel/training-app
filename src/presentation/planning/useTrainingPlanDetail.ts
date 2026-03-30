@@ -4,6 +4,7 @@ import {
   addPlanSlot,
   removePlanSlot,
   movePlanSlot,
+  updateSlotOptional,
   renameTrainingPlan,
   deleteTrainingPlan,
 } from '@application/planning'
@@ -43,9 +44,14 @@ export function useTrainingPlanDetail(planId: string) {
     await refresh()
   }, [repo, planId, refresh])
 
+  const toggleSlotOptional = useCallback(async (slotId: string, optional: boolean) => {
+    await updateSlotOptional(repo, slotId, optional)
+    await refresh()
+  }, [repo, refresh])
+
   const deletePlan = useCallback(async () => {
     await deleteTrainingPlan(repo, planId)
   }, [repo, planId])
 
-  return { plan, addSlot, removeSlot, moveSlot, renamePlan, deletePlan }
+  return { plan, addSlot, removeSlot, moveSlot, toggleSlotOptional, renamePlan, deletePlan }
 }

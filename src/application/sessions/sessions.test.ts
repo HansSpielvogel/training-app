@@ -11,7 +11,8 @@ import { addSet } from './addSet'
 import { removeLastSet } from './removeLastSet'
 import { completeSession } from './completeSession'
 import { getLastVariationsForMuscleGroup } from './getLastVariationsForMuscleGroup'
-import { addPlanSlot } from '@application/planning'
+import { computeRotationSuggestion } from './computeRotationSuggestion'
+import { addPlanSlot, updateSlotOptional } from '@application/planning'
 
 let sessionRepo: DexieTrainingSessionRepository
 let planRepo: DexieTrainingPlanRepository
@@ -57,6 +58,17 @@ describe('startSession', () => {
 
   it('throws for unknown plan', async () => {
     await expect(startSession(sessionRepo, planRepo, 'unknown')).rejects.toThrow('Plan not found')
+  })
+
+  it('propagates optional flag from plan slot to session entry', async () => {
+    const plan = await seedPlanWithSlots()
+    const [slot] = await planRepo.listSlotsByPlan(plan.id)
+    await updateSlotOptional(planRepo, slot.id, true)
+
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+
+    expect(session.entries[0].optional).toBe(true)
+    expect(session.entries[1].optional).toBe(false)
   })
 })
 
@@ -185,5 +197,38 @@ describe('getLastVariationsForMuscleGroup', () => {
   it('returns empty array when no completed sessions', async () => {
     const ids = await getLastVariationsForMuscleGroup(sessionRepo, 'mg-chest', 4)
     expect(ids).toHaveLength(0)
+  })
+})
+
+describe('computeRotationSuggestion (integration)', () => {
+  it('returns a suggestion when qualifying history exists', async () => {
+    const plan = await seedPlanWithSlots()
+
+    const s1 = await startSession(sessionRepo, planRepo, plan.id)
+    await assignVariation(sessionRepo, s1.id, 0, 'ex-benchpress')
+    await completeSession(sessionRepo, s1.id)
+
+    const s2 = await startSession(sessionRepo, planRepo, plan.id)
+    await assignVariation(sessionRepo, s2.id, 0, 'ex-incline')
+    await completeSession(sessionRepo, s2.id)
+
+    const s3 = await startSession(sessionRepo, planRepo, plan.id)
+    await assignVariation(sessionRepo, s3.id, 0, 'ex-incline')
+    await completeSession(sessionRepo, s3.id)
+
+    const sessions = await sessionRepo.listCompleted()
+    // Most recent: ex-incline (used 2x); candidate: ex-benchpress (1x) → suggest ex-benchpress
+    expect(computeRotationSuggestion('mg-chest', sessions)).toBe('ex-benchpress')
+  })
+
+  it('returns null when conditions are not met (only 1 distinct exercise)', async () => {
+    const plan = await seedPlanWithSlots()
+
+    const s1 = await startSession(sessionRepo, planRepo, plan.id)
+    await assignVariation(sessionRepo, s1.id, 0, 'ex-benchpress')
+    await completeSession(sessionRepo, s1.id)
+
+    const sessions = await sessionRepo.listCompleted()
+    expect(computeRotationSuggestion('mg-chest', sessions)).toBeNull()
   })
 })

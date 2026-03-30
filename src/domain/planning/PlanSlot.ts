@@ -3,6 +3,7 @@ export interface PlanSlot {
   readonly planId: string
   readonly muscleGroupId: string
   readonly order: number
+  readonly optional?: boolean
 }
 
 export function createPlanSlot(id: string, planId: string, muscleGroupId: string, order: number): PlanSlot {

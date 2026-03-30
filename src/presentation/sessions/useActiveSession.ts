@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
-import type { TrainingSession } from '@application/sessions'
+import type { TrainingSession, SessionSet } from '@application/sessions'
 import type { Weight } from '@application/sessions'
 import type { ExerciseDefinition } from '@application/exercises'
 import {
@@ -11,6 +11,8 @@ import {
   completeSession,
   abandonSession,
   getLastVariationsForMuscleGroup,
+  getLastSetsForExercise,
+  computeRotationSuggestion,
 } from '@application/sessions'
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
 import { DexieTrainingPlanRepository } from '@infrastructure/planning/DexieTrainingPlanRepository'
@@ -80,6 +82,19 @@ export function useActiveSession() {
     return exercises.filter((e): e is ExerciseDefinition => e !== undefined)
   }, [sessionRepo, exerciseRepo])
 
+  const getRotationSuggestion = useCallback(async (muscleGroupId: string): Promise<ExerciseDefinition | null> => {
+    const sessions = await sessionRepo.listCompleted()
+    const suggestionId = computeRotationSuggestion(muscleGroupId, sessions)
+    if (!suggestionId) return null
+    return exerciseRepo.findById(suggestionId) ?? null
+  }, [sessionRepo, exerciseRepo])
+
+  const getLastSets = useCallback(
+    (exerciseDefinitionId: string): Promise<SessionSet[] | null> =>
+      getLastSetsForExercise(sessionRepo, exerciseDefinitionId),
+    [sessionRepo],
+  )
+
   const getExercisesForMuscleGroup = useCallback(
     (muscleGroupId: string): Promise<ExerciseDefinition[]> =>
       exerciseRepo.listByMuscleGroup(muscleGroupId),
@@ -97,6 +112,8 @@ export function useActiveSession() {
     complete,
     abandon,
     getRecentVariations,
+    getRotationSuggestion,
+    getLastSets,
     getExercisesForMuscleGroup,
   }
 }

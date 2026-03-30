@@ -6,6 +6,8 @@ export { removeLastSet } from './removeLastSet'
 export { completeSession } from './completeSession'
 export { abandonSession } from './abandonSession'
 export { getLastVariationsForMuscleGroup } from './getLastVariationsForMuscleGroup'
+export { getLastSetsForExercise } from './getLastSetsForExercise'
+export { computeRotationSuggestion } from './computeRotationSuggestion'
 
 export type { TrainingSession, SessionEntry, SessionSet, SessionStatus } from '@domain/sessions/TrainingSession'
 export type { Weight } from '@domain/shared/Weight'

@@ -4,16 +4,33 @@ interface SlotRowProps {
   slot: PlanSlotDetail
   isFirst: boolean
   isLast: boolean
+  onToggleOptional: () => void
   onMoveUp: () => void
   onMoveDown: () => void
   onDelete: () => void
 }
 
-export function SlotRow({ slot, isFirst, isLast, onMoveUp, onMoveDown, onDelete }: SlotRowProps) {
+export function SlotRow({ slot, isFirst, isLast, onToggleOptional, onMoveUp, onMoveDown, onDelete }: SlotRowProps) {
   return (
     <div className="flex items-center px-4 py-3 border-b border-gray-100">
       <span className="flex-1 text-sm text-gray-800">{slot.muscleGroupName}</span>
+      {slot.optional && (
+        <span className="mr-2 px-1.5 py-0.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded">
+          Evtl
+        </span>
+      )}
       <div className="flex items-center gap-3">
+        <button
+          onClick={onToggleOptional}
+          className={`px-2 py-1 text-xs rounded border ${
+            slot.optional
+              ? 'text-amber-700 border-amber-300 bg-amber-50'
+              : 'text-gray-400 border-gray-200 bg-gray-50'
+          }`}
+          aria-label={slot.optional ? 'Mark as required' : 'Mark as optional'}
+        >
+          Evtl
+        </button>
         <button
           onClick={onMoveUp}
           disabled={isFirst}

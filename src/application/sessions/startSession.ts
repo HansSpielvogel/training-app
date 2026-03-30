@@ -19,6 +19,7 @@ export async function startSession(
     startedAt: new Date(),
     entries: slots.map((slot) => ({
       muscleGroupId: slot.muscleGroupId,
+      optional: slot.optional ?? false,
       sets: [],
     })),
   }

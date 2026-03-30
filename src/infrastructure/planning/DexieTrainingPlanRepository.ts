@@ -33,11 +33,14 @@ export class DexieTrainingPlanRepository implements ITrainingPlanRepository {
   }
 
   async listSlotsByPlan(planId: string): Promise<PlanSlot[]> {
-    return this.db.planSlots.where('planId').equals(planId).sortBy('order')
+    const rows = await this.db.planSlots.where('planId').equals(planId).sortBy('order')
+    return rows.map((row) => ({ ...row, optional: row.optional ?? false }))
   }
 
   async findSlotById(id: string): Promise<PlanSlot | undefined> {
-    return this.db.planSlots.get(id)
+    const row = await this.db.planSlots.get(id)
+    if (!row) return undefined
+    return { ...row, optional: row.optional ?? false }
   }
 
   async saveSlot(slot: PlanSlot): Promise<void> {

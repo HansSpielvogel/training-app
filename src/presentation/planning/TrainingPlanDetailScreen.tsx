@@ -17,7 +17,7 @@ type Mode =
 export function TrainingPlanDetailScreen() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { plan, addSlot, removeSlot, moveSlot, renamePlan, deletePlan } = useTrainingPlanDetail(id!)
+  const { plan, addSlot, removeSlot, moveSlot, toggleSlotOptional, renamePlan, deletePlan } = useTrainingPlanDetail(id!)
   const { muscleGroups } = useMuscleGroups()
   const [mode, setMode] = useState<Mode>({ type: 'list' })
   const [renameError, setRenameError] = useState<string>()
@@ -119,6 +119,7 @@ export function TrainingPlanDetailScreen() {
                     slot={slot}
                     isFirst={index === 0}
                     isLast={index === plan.slots.length - 1}
+                    onToggleOptional={() => toggleSlotOptional(slot.id, !slot.optional)}
                     onMoveUp={() => moveSlot(slot.id, 'up')}
                     onMoveDown={() => moveSlot(slot.id, 'down')}
                     onDelete={() => setMode({ type: 'deletingSlot', slotId: slot.id, name: slot.muscleGroupName })}

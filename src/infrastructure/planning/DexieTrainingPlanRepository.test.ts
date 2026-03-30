@@ -74,7 +74,7 @@ describe('slots', () => {
   it('findSlotById', async () => {
     await repo.savePlan(plan('p1', 'Core'))
     await repo.saveSlot(slot('s1', 'p1', 'mg-a', 0))
-    expect(await repo.findSlotById('s1')).toEqual(slot('s1', 'p1', 'mg-a', 0))
+    expect(await repo.findSlotById('s1')).toEqual({ ...slot('s1', 'p1', 'mg-a', 0), optional: false })
   })
 
   it('saveSlots (bulk)', async () => {

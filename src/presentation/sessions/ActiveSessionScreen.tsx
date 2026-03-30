@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { Weight } from '@application/sessions'
+import type { Weight, SessionSet } from '@application/sessions'
 import { useActiveSession } from './useActiveSession'
 import { useMuscleGroups } from '../exercises/useMuscleGroups'
 import { EntryRow } from './EntryRow'
@@ -8,11 +8,12 @@ import type { EntryExerciseData } from './EntryRow'
 
 export function ActiveSessionScreen() {
   const navigate = useNavigate()
-  const { session, loading, assign, clearVariation, addSet, removeLastSet, complete, abandon, getRecentVariations, getExercisesForMuscleGroup } =
+  const { session, loading, assign, clearVariation, addSet, removeLastSet, complete, abandon, getRecentVariations, getRotationSuggestion, getLastSets, getExercisesForMuscleGroup } =
     useActiveSession()
   const { muscleGroups } = useMuscleGroups()
   const [exerciseDataMap, setExerciseDataMap] = useState<Record<number, EntryExerciseData>>({})
   const [exerciseNames, setExerciseNames] = useState<Record<string, string>>({})
+  const [lastSetsMap, setLastSetsMap] = useState<Record<number, SessionSet[] | null>>({})
   const [confirmFinish, setConfirmFinish] = useState(false)
   const [confirmAbandon, setConfirmAbandon] = useState(false)
 
@@ -21,11 +22,15 @@ export function ActiveSessionScreen() {
   }, [session, loading, navigate])
 
   async function loadExerciseData(entryIndex: number, muscleGroupId: string) {
-    const [recent, all] = await Promise.all([
+    const exerciseDefinitionId = session?.entries[entryIndex]?.exerciseDefinitionId
+    const [recent, all, suggestion, lastSets] = await Promise.all([
       getRecentVariations(muscleGroupId),
       getExercisesForMuscleGroup(muscleGroupId),
+      getRotationSuggestion(muscleGroupId),
+      exerciseDefinitionId ? getLastSets(exerciseDefinitionId) : Promise.resolve(null),
     ])
-    setExerciseDataMap((prev) => ({ ...prev, [entryIndex]: { recent, all } }))
+    setExerciseDataMap((prev) => ({ ...prev, [entryIndex]: { recent, all, suggestion } }))
+    setLastSetsMap((prev) => ({ ...prev, [entryIndex]: lastSets }))
 
     const nameMap: Record<string, string> = {}
     for (const ex of [...recent, ...all]) nameMap[ex.id] = ex.name
@@ -36,9 +41,13 @@ export function ActiveSessionScreen() {
     await assign(entryIndex, exerciseDefinitionId)
     const entry = session?.entries[entryIndex]
     if (entry) {
-      const allExercises = await getExercisesForMuscleGroup(entry.muscleGroupId)
+      const [allExercises, lastSets] = await Promise.all([
+        getExercisesForMuscleGroup(entry.muscleGroupId),
+        getLastSets(exerciseDefinitionId),
+      ])
       const ex = allExercises.find((e) => e.id === exerciseDefinitionId)
       if (ex) setExerciseNames((prev) => ({ ...prev, [ex.id]: ex.name }))
+      setLastSetsMap((prev) => ({ ...prev, [entryIndex]: lastSets }))
     }
   }
 
@@ -114,9 +123,10 @@ export function ActiveSessionScreen() {
             muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
             exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
             exerciseData={exerciseDataMap[i] ?? null}
+            lastSets={lastSetsMap[i] ?? null}
             onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
             onAssign={(id) => handleAssign(i, id)}
-            onClearVariation={() => clearVariation(i)}
+            onClearVariation={() => { clearVariation(i); setLastSetsMap((prev) => ({ ...prev, [i]: null })) }}
             onAddSet={(weight: Weight, reps: number) => addSet(i, weight, reps)}
             onRemoveLast={() => removeLastSet(i)}
           />

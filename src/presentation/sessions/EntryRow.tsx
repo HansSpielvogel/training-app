@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import type { ExerciseDefinition } from '@application/exercises'
-import type { SessionEntry, Weight } from '@application/sessions'
+import type { SessionEntry, SessionSet, Weight } from '@application/sessions'
 import { VariationPicker } from './VariationPicker'
 import { SetLogger } from './SetLogger'
 
 export interface EntryExerciseData {
   recent: ExerciseDefinition[]
   all: ExerciseDefinition[]
+  suggestion: ExerciseDefinition | null
 }
 
 interface EntryRowProps {
@@ -14,6 +15,7 @@ interface EntryRowProps {
   muscleGroupName: string
   exerciseName?: string
   exerciseData: EntryExerciseData | null
+  lastSets: SessionSet[] | null
   onLoadExerciseData: () => void
   onAssign: (exerciseDefinitionId: string) => void
   onClearVariation: () => void
@@ -26,6 +28,7 @@ export function EntryRow({
   muscleGroupName,
   exerciseName,
   exerciseData,
+  lastSets,
   onLoadExerciseData,
   onAssign,
   onClearVariation,
@@ -48,6 +51,9 @@ export function EntryRow({
       >
         <div className="flex-1 min-w-0">
           <span className="text-sm font-medium text-gray-800">{muscleGroupName}</span>
+          {entry.optional && (
+            <span className="ml-2 px-1.5 py-0.5 text-xs font-medium text-amber-700 bg-amber-50 border border-amber-200 rounded">Evtl</span>
+          )}
           {exerciseName && (
             <span className="ml-2 text-xs text-gray-500">{exerciseName}</span>
           )}
@@ -81,6 +87,7 @@ export function EntryRow({
           {!entry.exerciseDefinitionId ? (
             exerciseData ? (
               <VariationPicker
+                suggestion={exerciseData.suggestion}
                 recentVariations={exerciseData.recent}
                 allExercises={exerciseData.all}
                 onSelect={(id) => { onAssign(id) }}
@@ -91,6 +98,7 @@ export function EntryRow({
           ) : (
             <SetLogger
               sets={entry.sets}
+              lastSets={lastSets}
               onAdd={onAddSet}
               onRemoveLast={onRemoveLast}
             />

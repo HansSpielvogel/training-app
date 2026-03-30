@@ -7,6 +7,7 @@ export interface PlanSlotDetail {
   muscleGroupId: string
   muscleGroupName: string
   order: number
+  optional: boolean
 }
 
 export interface TrainingPlanDetail extends TrainingPlan {
@@ -29,6 +30,7 @@ export async function getTrainingPlan(
         muscleGroupId: slot.muscleGroupId,
         muscleGroupName: mg?.name ?? slot.muscleGroupId,
         order: slot.order,
+        optional: slot.optional ?? false,
       }
     }),
   )

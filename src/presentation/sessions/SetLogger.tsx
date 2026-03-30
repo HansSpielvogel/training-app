@@ -11,11 +11,12 @@ function formatWeight(w: Weight): string {
 
 interface Props {
   sets: readonly SessionSet[]
+  lastSets: SessionSet[] | null
   onAdd: (weight: Weight, reps: number) => void
   onRemoveLast: () => void
 }
 
-export function SetLogger({ sets, onAdd, onRemoveLast }: Props) {
+export function SetLogger({ sets, lastSets, onAdd, onRemoveLast }: Props) {
   const [weightInput, setWeightInput] = useState('')
   const [repsInput, setRepsInput] = useState('')
   const [weightError, setWeightError] = useState<string>()
@@ -38,6 +39,11 @@ export function SetLogger({ sets, onAdd, onRemoveLast }: Props) {
 
   return (
     <div className="space-y-2">
+      {lastSets && lastSets.length > 0 && (
+        <p className="text-sm text-gray-500">
+          Last: {lastSets.map((s) => `${formatWeight(s.weight)}×${s.reps}`).join('  ')}
+        </p>
+      )}
       <div className="flex gap-2 items-start">
         <div className="flex-1">
           <input
