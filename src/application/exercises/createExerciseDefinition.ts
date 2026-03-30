@@ -8,10 +8,11 @@ export async function createExerciseDefinition(
   repo: IExerciseDefinitionRepository,
   name: string,
   muscleGroupIds: string[],
+  notes?: string,
 ): Promise<void> {
   const trimmed = name.trim()
   if (!trimmed) throw new Error('Name cannot be empty')
   const existing = await repo.findByName(trimmed)
   if (existing) throw new DuplicateExerciseNameError(trimmed)
-  await repo.save(createEntity(crypto.randomUUID(), trimmed, muscleGroupIds))
+  await repo.save(createEntity(crypto.randomUUID(), trimmed, muscleGroupIds, notes))
 }

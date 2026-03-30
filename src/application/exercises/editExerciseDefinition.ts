@@ -9,6 +9,7 @@ export async function editExerciseDefinition(
   id: string,
   name: string,
   muscleGroupIds: string[],
+  notes?: string,
 ): Promise<void> {
   const trimmed = name.trim()
   if (!trimmed) throw new Error('Name cannot be empty')
@@ -16,5 +17,5 @@ export async function editExerciseDefinition(
   if (existing && existing.id !== id) throw new DuplicateExerciseNameError(trimmed)
   const entity = await repo.findById(id)
   if (!entity) throw new Error(`Exercise definition not found: ${id}`)
-  await repo.save(createEntity(id, trimmed, muscleGroupIds))
+  await repo.save(createEntity(id, trimmed, muscleGroupIds, notes !== undefined ? notes : entity.notes))
 }

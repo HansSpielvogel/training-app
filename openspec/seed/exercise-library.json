@@ -1,0 +1,90 @@
+{
+  "version": 1,
+  "muscleGroups": [
+    { "id": "mg-schultern",    "name": "Schultern" },
+    { "id": "mg-h-schulter",   "name": "Hintere Schulter" },
+    { "id": "mg-schulterrot",  "name": "Schulterrotation" },
+    { "id": "mg-ruecken-b",    "name": "Rücken Breite" },
+    { "id": "mg-ruecken-d",    "name": "Rücken Dicke" },
+    { "id": "mg-unterer-r",    "name": "Unterer Rücken" },
+    { "id": "mg-bizeps",       "name": "Bizeps" },
+    { "id": "mg-trizeps",      "name": "Trizeps" },
+    { "id": "mg-trapez",       "name": "Trapez" },
+    { "id": "mg-bauch",        "name": "Bauch" },
+    { "id": "mg-gesaess",      "name": "Gesäß" },
+    { "id": "mg-ov",           "name": "Oberschenkel Vorderseite" },
+    { "id": "mg-or",           "name": "Oberschenkel Rückseite" },
+    { "id": "mg-waden",        "name": "Waden" },
+    { "id": "mg-beine-a",      "name": "Beine Außen" },
+    { "id": "mg-beine-i",      "name": "Beine Innen" }
+  ],
+  "exerciseDefinitions": [
+    { "id": "ex-seitheben-kh",       "name": "Seitheben KH",                    "muscleGroupIds": ["mg-schultern"] },
+    { "id": "ex-seitheben-seilzug",  "name": "Seitheben Seilzug",               "muscleGroupIds": ["mg-schultern"] },
+    { "id": "ex-seitheben-maschine", "name": "Seitheben Maschine",              "muscleGroupIds": ["mg-schultern"], "notes": "Höhe 7" },
+    { "id": "ex-sd-kh",              "name": "Schulterdrücken KH",              "muscleGroupIds": ["mg-schultern", "mg-trizeps"] },
+    { "id": "ex-sd-lh",              "name": "Schulterdrücken LH",              "muscleGroupIds": ["mg-schultern", "mg-trizeps"] },
+    { "id": "ex-sd-maschine",        "name": "Schulterdrücken Maschine",        "muscleGroupIds": ["mg-schultern", "mg-trizeps"] },
+
+    { "id": "ex-rf-kh",              "name": "Reverse Flys KH",                 "muscleGroupIds": ["mg-h-schulter"] },
+    { "id": "ex-rf-kh-sb",           "name": "Reverse Flys KH Schrägbank",      "muscleGroupIds": ["mg-h-schulter"] },
+    { "id": "ex-rf-kabelzug",        "name": "Reverse Flys Kabelzug",           "muscleGroupIds": ["mg-h-schulter"] },
+    { "id": "ex-facepulls",          "name": "Facepulls",                       "muscleGroupIds": ["mg-h-schulter"] },
+
+    { "id": "ex-schulterrot",        "name": "Schulterrotation KH",             "muscleGroupIds": ["mg-schulterrot"] },
+
+    { "id": "ex-klimmzug",           "name": "Klimmzug",                        "muscleGroupIds": ["mg-ruecken-b", "mg-bizeps"] },
+    { "id": "ex-neg-klimmzug",       "name": "Negativer Klimmzug",              "muscleGroupIds": ["mg-ruecken-b"] },
+    { "id": "ex-latzug",             "name": "Latzug",                          "muscleGroupIds": ["mg-ruecken-b"] },
+    { "id": "ex-iso-lat",            "name": "Iso-Lat Maschine",                "muscleGroupIds": ["mg-ruecken-b"] },
+    { "id": "ex-ueberzuege",         "name": "Überzüge Seilzug stehend",        "muscleGroupIds": ["mg-ruecken-b"] },
+
+    { "id": "ex-rudern-seilzug",     "name": "Rudern Seilzug",                  "muscleGroupIds": ["mg-ruecken-d"] },
+    { "id": "ex-rudern-lh",          "name": "Rudern LH",                       "muscleGroupIds": ["mg-ruecken-d"] },
+    { "id": "ex-rudern-tbar",        "name": "Rudern T-Bar Maschine",           "muscleGroupIds": ["mg-ruecken-d"] },
+    { "id": "ex-row-maschine",       "name": "Row Maschine",                    "muscleGroupIds": ["mg-ruecken-d"] },
+    { "id": "ex-rudern-mts",         "name": "Rudern MTS",                      "muscleGroupIds": ["mg-ruecken-d"] },
+
+    { "id": "ex-hyperextension",     "name": "Hyperextension",                  "muscleGroupIds": ["mg-unterer-r", "mg-gesaess"] },
+    { "id": "ex-rueckenstrecker",    "name": "Rückenstrecker Maschine",         "muscleGroupIds": ["mg-unterer-r"] },
+    { "id": "ex-kreuzheben",         "name": "Kreuzheben",                      "muscleGroupIds": ["mg-unterer-r", "mg-or"] },
+
+    { "id": "ex-bizeps-kh",          "name": "Bizeps KH",                       "muscleGroupIds": ["mg-bizeps"] },
+    { "id": "ex-bizeps-seil",        "name": "Bizeps Seilzug Seil",             "muscleGroupIds": ["mg-bizeps"] },
+    { "id": "ex-bizeps-stange",      "name": "Bizeps Seilzug Stange",           "muscleGroupIds": ["mg-bizeps"] },
+    { "id": "ex-bizeps-mts",         "name": "Bizeps MTS",                      "muscleGroupIds": ["mg-bizeps"] },
+
+    { "id": "ex-trizeps-rueckw",     "name": "Trizeps Seilzug rückwärts",       "muscleGroupIds": ["mg-trizeps"] },
+    { "id": "ex-trizeps-stange",     "name": "Trizeps Seilzug Stange",          "muscleGroupIds": ["mg-trizeps"] },
+    { "id": "ex-dipps",              "name": "Dipps",                           "muscleGroupIds": ["mg-trizeps"] },
+
+    { "id": "ex-schulterz-kh",       "name": "Schulterzucken KH",               "muscleGroupIds": ["mg-trapez"] },
+    { "id": "ex-schulterz-seilzug",  "name": "Schulterzucken Seilzug",          "muscleGroupIds": ["mg-trapez"] },
+
+    { "id": "ex-oblique-crunch",     "name": "Oblique Crunch",                  "muscleGroupIds": ["mg-bauch"] },
+    { "id": "ex-bauch-seite-kh",     "name": "Bauch Seite KH",                  "muscleGroupIds": ["mg-bauch"] },
+    { "id": "ex-bauch-seite-seilzug","name": "Bauch Seite Seilzug",             "muscleGroupIds": ["mg-bauch"] },
+    { "id": "ex-ausrollen",          "name": "Ausrollen",                       "muscleGroupIds": ["mg-bauch"] },
+    { "id": "ex-torso-rotation",     "name": "Torso Rotation",                  "muscleGroupIds": ["mg-bauch"] },
+
+    { "id": "ex-glute-drive",        "name": "Glute Drive",                     "muscleGroupIds": ["mg-gesaess"] },
+
+    { "id": "ex-kniebeugen-lh",      "name": "Kniebeugen LH",                   "muscleGroupIds": ["mg-ov", "mg-gesaess"] },
+    { "id": "ex-kniebeugen-msch",    "name": "Kniebeugen Maschine mit Scheiben","muscleGroupIds": ["mg-ov", "mg-gesaess"] },
+    { "id": "ex-kniebeugen-m",       "name": "Kniebeugen Maschine",             "muscleGroupIds": ["mg-ov", "mg-gesaess"] },
+    { "id": "ex-ausfallschritt",     "name": "Ausfallschritt KH",               "muscleGroupIds": ["mg-ov", "mg-gesaess"] },
+    { "id": "ex-einbeinig-rolle",    "name": "Einbeinig Rolle",                 "muscleGroupIds": ["mg-ov", "mg-gesaess"] },
+    { "id": "ex-kasten-einbeinig",   "name": "Auf Kasten steigen einbeinig",    "muscleGroupIds": ["mg-ov", "mg-gesaess"] },
+    { "id": "ex-schlitten",          "name": "Schlitten schieben",              "muscleGroupIds": ["mg-ov", "mg-gesaess"] },
+
+    { "id": "ex-leg-curl-lieg",      "name": "Leg Curl liegend",                "muscleGroupIds": ["mg-or"] },
+    { "id": "ex-leg-curl-sitz",      "name": "Leg Curl sitzend",                "muscleGroupIds": ["mg-or"] },
+    { "id": "ex-leg-curl-knied",     "name": "Leg Curl kniend",                 "muscleGroupIds": ["mg-or"] },
+
+    { "id": "ex-unterschenkel-sch",  "name": "Unterschenkel Maschine mit Scheiben", "muscleGroupIds": ["mg-waden"] },
+    { "id": "ex-unterschenkel-m",    "name": "Unterschenkel Maschine",          "muscleGroupIds": ["mg-waden"] },
+
+    { "id": "ex-abduktor",           "name": "Bein Abduktor",                   "muscleGroupIds": ["mg-beine-a"] },
+    { "id": "ex-adduktor",           "name": "Adduktor",                        "muscleGroupIds": ["mg-beine-i"] }
+  ]
+}
