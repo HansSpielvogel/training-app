@@ -25,7 +25,7 @@ export default function App() {
   }, [])
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/training-app">
       <div id="app-root" className="flex flex-col h-screen bg-gray-50">
         <div className="flex-1 overflow-hidden">
           <ErrorBoundary>
