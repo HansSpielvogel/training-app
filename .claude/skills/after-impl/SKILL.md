@@ -9,13 +9,21 @@ Run these steps in order after finishing any implementation task.
 
 ## Steps
 
-### 1. Run tests
+### 1. Run tests and build
 
 ```bash
 npm test
 ```
 
 If tests fail: stop, report the failures, fix them before continuing.
+
+Also run the production build to catch TypeScript errors that `vitest` skips:
+
+```bash
+npm run build
+```
+
+If the build fails: fix all TypeScript errors before continuing. `npm test` uses esbuild (no type-checking), so type errors only surface in `tsc -b` during build.
 
 Also run E2E if changes touch flows covered by Playwright:
 
