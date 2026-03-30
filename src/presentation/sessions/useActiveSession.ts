@@ -9,6 +9,7 @@ import {
   addSet,
   removeLastSet,
   completeSession,
+  abandonSession,
   getLastVariationsForMuscleGroup,
 } from '@application/sessions'
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
@@ -67,6 +68,12 @@ export function useActiveSession() {
     setSession(null)
   }, [session, sessionRepo])
 
+  const abandon = useCallback(async () => {
+    if (!session) return
+    await abandonSession(sessionRepo, session.id)
+    setSession(null)
+  }, [session, sessionRepo])
+
   const getRecentVariations = useCallback(async (muscleGroupId: string): Promise<ExerciseDefinition[]> => {
     const ids = await getLastVariationsForMuscleGroup(sessionRepo, muscleGroupId, 4)
     const exercises = await Promise.all(ids.map((id) => exerciseRepo.findById(id)))
@@ -88,6 +95,7 @@ export function useActiveSession() {
     addSet: addSetFn,
     removeLastSet: removeLastSetFn,
     complete,
+    abandon,
     getRecentVariations,
     getExercisesForMuscleGroup,
   }

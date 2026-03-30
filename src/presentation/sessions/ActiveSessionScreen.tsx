@@ -8,12 +8,13 @@ import type { EntryExerciseData } from './EntryRow'
 
 export function ActiveSessionScreen() {
   const navigate = useNavigate()
-  const { session, loading, assign, clearVariation, addSet, removeLastSet, complete, getRecentVariations, getExercisesForMuscleGroup } =
+  const { session, loading, assign, clearVariation, addSet, removeLastSet, complete, abandon, getRecentVariations, getExercisesForMuscleGroup } =
     useActiveSession()
   const { muscleGroups } = useMuscleGroups()
   const [exerciseDataMap, setExerciseDataMap] = useState<Record<number, EntryExerciseData>>({})
   const [exerciseNames, setExerciseNames] = useState<Record<string, string>>({})
   const [confirmFinish, setConfirmFinish] = useState(false)
+  const [confirmAbandon, setConfirmAbandon] = useState(false)
 
   useEffect(() => {
     if (!loading && !session) navigate('/sessions', { replace: true })
@@ -46,6 +47,11 @@ export function ActiveSessionScreen() {
     navigate('/sessions', { replace: true })
   }
 
+  async function handleAbandon() {
+    await abandon()
+    navigate('/sessions', { replace: true })
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -65,11 +71,40 @@ export function ActiveSessionScreen() {
         className="px-4 py-4 border-b border-gray-200 bg-white"
         style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}
       >
-        <h1 className="text-xl font-semibold text-gray-900">{session.planName}</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold text-gray-900">{session.planName}</h1>
+          <button
+            onClick={() => { setConfirmAbandon(true); setConfirmFinish(false) }}
+            className="text-sm text-gray-400 hover:text-red-500"
+          >
+            Abandon
+          </button>
+        </div>
         {!hasAnyActivity && (
           <p className="text-xs text-gray-400 mt-0.5">Tap a slot to log sets</p>
         )}
       </header>
+
+      {confirmAbandon && (
+        <div className="px-4 py-3 bg-red-50 border-b border-red-200">
+          <p className="text-sm font-medium text-red-800 mb-0.5">Abandon this session?</p>
+          <p className="text-xs text-red-600 mb-3">All logged sets will be lost.</p>
+          <div className="flex gap-2">
+            <button
+              onClick={handleAbandon}
+              className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg font-medium"
+            >
+              Abandon
+            </button>
+            <button
+              onClick={() => setConfirmAbandon(false)}
+              className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium"
+            >
+              Keep Going
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto">
         {session.entries.map((entry, i) => (
@@ -106,7 +141,7 @@ export function ActiveSessionScreen() {
           </div>
         ) : (
           <button
-            onClick={() => setConfirmFinish(true)}
+            onClick={() => { setConfirmFinish(true); setConfirmAbandon(false) }}
             className="w-full py-3 bg-green-600 text-white rounded-lg font-medium text-sm"
           >
             Finish Workout

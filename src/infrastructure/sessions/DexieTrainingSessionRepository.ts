@@ -9,6 +9,10 @@ export class DexieTrainingSessionRepository implements ITrainingSessionRepositor
     await this.db.trainingSessions.put(session)
   }
 
+  async delete(id: string): Promise<void> {
+    await this.db.trainingSessions.delete(id)
+  }
+
   async getById(id: string): Promise<TrainingSession | undefined> {
     return this.db.trainingSessions.get(id)
   }

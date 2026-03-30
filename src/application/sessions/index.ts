@@ -4,6 +4,7 @@ export { clearVariation } from './clearVariation'
 export { addSet } from './addSet'
 export { removeLastSet } from './removeLastSet'
 export { completeSession } from './completeSession'
+export { abandonSession } from './abandonSession'
 export { getLastVariationsForMuscleGroup } from './getLastVariationsForMuscleGroup'
 
 export type { TrainingSession, SessionEntry, SessionSet, SessionStatus } from '@domain/sessions/TrainingSession'
