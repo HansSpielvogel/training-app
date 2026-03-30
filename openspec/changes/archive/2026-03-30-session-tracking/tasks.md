@@ -35,4 +35,4 @@
 
 - [x] 5.1 Add Sessions route/tab to app navigation (entry point → `SessionStartScreen`)
 - [x] 5.2 When `SessionStartScreen` detects an in-progress session, navigate directly to `ActiveSessionScreen`
-- [ ] 5.3 Verify end-to-end flow manually: start → pick variation → log 3 sets → complete → session persisted
+- [x] 5.3 Verify end-to-end flow manually: start → pick variation → log 3 sets → complete → session persisted
