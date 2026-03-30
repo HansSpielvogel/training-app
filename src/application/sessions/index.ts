@@ -1,3 +1,4 @@
+export { seedSessions } from './seedSessions'
 export { startSession } from './startSession'
 export { assignVariation } from './assignVariation'
 export { clearVariation } from './clearVariation'

@@ -6,6 +6,8 @@ export interface PlanSlot {
   readonly optional?: boolean
 }
 
-export function createPlanSlot(id: string, planId: string, muscleGroupId: string, order: number): PlanSlot {
-  return { id, planId, muscleGroupId, order }
+export function createPlanSlot(id: string, planId: string, muscleGroupId: string, order: number, optional?: boolean): PlanSlot {
+  const slot: PlanSlot = { id, planId, muscleGroupId, order }
+  if (optional) return { ...slot, optional: true }
+  return slot
 }

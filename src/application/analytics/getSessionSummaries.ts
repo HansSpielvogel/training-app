@@ -8,7 +8,7 @@ export async function getSessionSummaries(
   return sessions
     .map(session => ({
       id: session.id,
-      date: session.completedAt ?? session.startedAt,
+      date: new Date(session.completedAt ?? session.startedAt),
       planName: session.planName,
       exerciseCount: session.entries.filter(e => e.sets.length > 0).length,
     }))

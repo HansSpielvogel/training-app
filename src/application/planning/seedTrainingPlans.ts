@@ -11,7 +11,7 @@ export async function seedTrainingPlans(repo: ITrainingPlanRepository): Promise<
   for (const planData of seedData.trainingPlans) {
     const plan = createTrainingPlan(planData.id, planData.name, now)
     await repo.savePlan(plan)
-    const slots = planData.slots.map((s) => createPlanSlot(s.id, plan.id, s.muscleGroupId, s.order))
+    const slots = planData.slots.map((s) => createPlanSlot(s.id, plan.id, s.muscleGroupId, s.order, (s as any).optional))
     await repo.saveSlots(slots)
   }
 }

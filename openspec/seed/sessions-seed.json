@@ -1,0 +1,238 @@
+{
+  "version": 1,
+  "sessions": [
+    {
+      "id": "seed-session-oberkoerper-a",
+      "planId": "plan-oberkoerper-a",
+      "planName": "Oberkörper A",
+      "status": "completed",
+      "startedAt": "2026-03-01T09:00:00.000Z",
+      "completedAt": "2026-03-01T10:30:00.000Z",
+      "entries": [
+        {
+          "muscleGroupId": "mg-h-schulter",
+          "exerciseDefinitionId": "ex-rf-kh",
+          "sets": [{ "weight": { "kind": "single", "value": 40 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-ruecken-b",
+          "exerciseDefinitionId": "ex-klimmzug",
+          "sets": [{ "weight": { "kind": "single", "value": -12.5 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-schultern",
+          "exerciseDefinitionId": "ex-sd-kh",
+          "sets": [{ "weight": { "kind": "single", "value": 14 }, "reps": 12 }]
+        },
+        {
+          "muscleGroupId": "mg-schulterrot",
+          "exerciseDefinitionId": "ex-schulterrot",
+          "optional": true,
+          "sets": [{ "weight": { "kind": "single", "value": 6 }, "reps": 11 }]
+        },
+        {
+          "muscleGroupId": "mg-bizeps",
+          "exerciseDefinitionId": "ex-bizeps-kh",
+          "sets": [{ "weight": { "kind": "single", "value": 12 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-schultern",
+          "exerciseDefinitionId": "ex-seitheben-kh",
+          "sets": [{ "weight": { "kind": "single", "value": 6 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-trizeps",
+          "exerciseDefinitionId": "ex-trizeps-rueckw",
+          "sets": [{ "weight": { "kind": "stacked", "base": 21.25, "added": 2.5 }, "reps": 12 }]
+        },
+        {
+          "muscleGroupId": "mg-trapez",
+          "exerciseDefinitionId": "ex-schulterz-kh",
+          "optional": true,
+          "sets": [{ "weight": { "kind": "single", "value": 22 }, "reps": 12 }]
+        }
+      ]
+    },
+    {
+      "id": "seed-session-oberkoerper-b",
+      "planId": "plan-oberkoerper-b",
+      "planName": "Oberkörper B",
+      "status": "completed",
+      "startedAt": "2026-03-03T09:00:00.000Z",
+      "completedAt": "2026-03-03T10:30:00.000Z",
+      "entries": [
+        {
+          "muscleGroupId": "mg-h-schulter",
+          "exerciseDefinitionId": "ex-rf-kabelzug",
+          "sets": [{ "weight": { "kind": "stacked", "base": 5, "added": 1.25 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-trizeps",
+          "exerciseDefinitionId": "ex-dipps",
+          "sets": [{ "weight": { "kind": "single", "value": -4.5 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-schultern",
+          "exerciseDefinitionId": "ex-seitheben-seilzug",
+          "sets": [{ "weight": { "kind": "stacked", "base": 2.5, "added": 1 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-ruecken-d",
+          "exerciseDefinitionId": "ex-rudern-seilzug",
+          "sets": [{ "weight": { "kind": "single", "value": 50 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-schultern",
+          "exerciseDefinitionId": "ex-sd-lh",
+          "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 10 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-ruecken-b",
+          "exerciseDefinitionId": "ex-ueberzuege",
+          "sets": [{ "weight": { "kind": "single", "value": 28.75 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-bizeps",
+          "exerciseDefinitionId": "ex-bizeps-seil",
+          "sets": [{ "weight": { "kind": "stacked", "base": 21.25, "added": 1.25 }, "reps": 10 }]
+        }
+      ]
+    },
+    {
+      "id": "seed-session-core",
+      "planId": "plan-core",
+      "planName": "Core",
+      "status": "completed",
+      "startedAt": "2026-03-05T09:00:00.000Z",
+      "completedAt": "2026-03-05T10:00:00.000Z",
+      "entries": [
+        {
+          "muscleGroupId": "mg-bauch",
+          "exerciseDefinitionId": "ex-oblique-crunch",
+          "sets": [{ "weight": { "kind": "single", "value": 12.5 }, "reps": 11 }]
+        },
+        {
+          "muscleGroupId": "mg-gesaess",
+          "exerciseDefinitionId": "ex-glute-drive",
+          "sets": [{ "weight": { "kind": "single", "value": 35 }, "reps": 14 }]
+        },
+        {
+          "muscleGroupId": "mg-bauch",
+          "exerciseDefinitionId": "ex-bauch-seite-kh",
+          "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 8 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-bauch",
+          "exerciseDefinitionId": "ex-ausrollen",
+          "sets": [{ "weight": { "kind": "single", "value": 0 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-unterer-r",
+          "exerciseDefinitionId": "ex-hyperextension",
+          "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 8 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-bauch",
+          "exerciseDefinitionId": "ex-torso-rotation",
+          "sets": [{ "weight": { "kind": "stacked", "base": 31.5, "added": 2.3 }, "reps": 11 }]
+        },
+        {
+          "muscleGroupId": "mg-unterer-r",
+          "exerciseDefinitionId": "ex-rueckenstrecker",
+          "sets": [{ "weight": { "kind": "stacked", "base": 67.5, "added": 2.3 }, "reps": 12 }]
+        }
+      ]
+    },
+    {
+      "id": "seed-session-beine-po",
+      "planId": "plan-beine-po",
+      "planName": "Beine & Po",
+      "status": "completed",
+      "startedAt": "2026-03-07T09:00:00.000Z",
+      "completedAt": "2026-03-07T10:30:00.000Z",
+      "entries": [
+        {
+          "muscleGroupId": "mg-unterer-r",
+          "exerciseDefinitionId": "ex-hyperextension",
+          "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 9 }, "reps": 11 }]
+        },
+        {
+          "muscleGroupId": "mg-ov",
+          "exerciseDefinitionId": "ex-kniebeugen-lh",
+          "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 47.5 }, "reps": 13 }]
+        },
+        {
+          "muscleGroupId": "mg-unterer-r",
+          "exerciseDefinitionId": "ex-kreuzheben",
+          "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 60 }, "reps": 12 }]
+        },
+        {
+          "muscleGroupId": "mg-waden",
+          "exerciseDefinitionId": "ex-unterschenkel-sch",
+          "sets": [{ "weight": { "kind": "single", "value": 85 }, "reps": 14 }]
+        },
+        {
+          "muscleGroupId": "mg-gesaess",
+          "exerciseDefinitionId": "ex-glute-drive",
+          "sets": [{ "weight": { "kind": "single", "value": 35 }, "reps": 14 }]
+        },
+        {
+          "muscleGroupId": "mg-ov",
+          "exerciseDefinitionId": "ex-ausfallschritt",
+          "optional": true,
+          "sets": [{ "weight": { "kind": "single", "value": 12 }, "reps": 14 }]
+        },
+        {
+          "muscleGroupId": "mg-beine-a",
+          "exerciseDefinitionId": "ex-abduktor",
+          "sets": [{ "weight": { "kind": "stacked", "base": 31.5, "added": 6.8 }, "reps": 11 }]
+        },
+        {
+          "muscleGroupId": "mg-or",
+          "exerciseDefinitionId": "ex-leg-curl-lieg",
+          "sets": [{ "weight": { "kind": "stacked", "base": 32, "added": 2.5 }, "reps": 12 }]
+        }
+      ]
+    },
+    {
+      "id": "seed-session-core-beine",
+      "planId": "plan-core-beine",
+      "planName": "Core+Beine",
+      "status": "completed",
+      "startedAt": "2026-03-10T09:00:00.000Z",
+      "completedAt": "2026-03-10T10:00:00.000Z",
+      "entries": [
+        {
+          "muscleGroupId": "mg-bauch",
+          "exerciseDefinitionId": "ex-oblique-crunch",
+          "sets": [{ "weight": { "kind": "single", "value": 12.5 }, "reps": 11 }]
+        },
+        {
+          "muscleGroupId": "mg-ov",
+          "exerciseDefinitionId": "ex-kniebeugen-lh",
+          "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 47.5 }, "reps": 13 }]
+        },
+        {
+          "muscleGroupId": "mg-bauch",
+          "exerciseDefinitionId": "ex-bauch-seite-kh",
+          "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 8 }, "reps": 10 }]
+        },
+        {
+          "muscleGroupId": "mg-gesaess",
+          "exerciseDefinitionId": "ex-glute-drive",
+          "sets": [{ "weight": { "kind": "single", "value": 35 }, "reps": 14 }]
+        },
+        {
+          "muscleGroupId": "mg-beine-a",
+          "exerciseDefinitionId": "ex-abduktor",
+          "sets": [{ "weight": { "kind": "stacked", "base": 31.5, "added": 6.8 }, "reps": 11 }]
+        },
+        {
+          "muscleGroupId": "mg-or",
+          "exerciseDefinitionId": "ex-leg-curl-lieg",
+          "sets": [{ "weight": { "kind": "stacked", "base": 32, "added": 2.5 }, "reps": 12 }]
+        }
+      ]
+    }
+  ]
+}

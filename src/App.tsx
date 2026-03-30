@@ -11,17 +11,21 @@ import { ErrorBoundary } from './presentation/shared/ErrorBoundary'
 import { UpdateBanner } from './presentation/shared/UpdateBanner'
 import { seedTrainingPlans } from '@application/planning'
 import { seedExerciseLibrary } from '@application/exercises'
+import { seedSessions } from '@application/sessions'
 import { DexieTrainingPlanRepository } from '@infrastructure/planning/DexieTrainingPlanRepository'
 import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscleGroupRepository'
 import { DexieExerciseDefinitionRepository } from '@infrastructure/exercises/DexieExerciseDefinitionRepository'
+import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
 
 export default function App() {
   useEffect(() => {
     const planRepo = new DexieTrainingPlanRepository()
     const muscleGroupRepo = new DexieMuscleGroupRepository()
     const exerciseRepo = new DexieExerciseDefinitionRepository()
+    const sessionRepo = new DexieTrainingSessionRepository()
     seedExerciseLibrary(muscleGroupRepo, exerciseRepo)
     seedTrainingPlans(planRepo)
+    seedSessions(sessionRepo)
   }, [])
 
   return (

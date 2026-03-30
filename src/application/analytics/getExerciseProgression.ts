@@ -32,7 +32,7 @@ export async function getExerciseProgression(
     }
 
     points.push({
-      date: session.completedAt ?? session.startedAt,
+      date: new Date(session.completedAt ?? session.startedAt),
       weight: maxWeight,
       weightUnit,
     })

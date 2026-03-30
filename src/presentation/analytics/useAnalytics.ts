@@ -30,6 +30,7 @@ export function useAnalytics() {
       setSessionSummaries(summaries)
       setMuscleGroupVolumes(volumes)
       setExercises(exList)
+    }).finally(() => {
       setLoading(false)
     })
   }, [sessionRepo, muscleGroupRepo, exerciseRepo])
