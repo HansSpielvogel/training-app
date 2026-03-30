@@ -68,6 +68,12 @@ describe('createExerciseDefinition', () => {
   it('throws on empty name', async () => {
     await expect(createExerciseDefinition(repo, '', ['mg1'])).rejects.toThrow('Name cannot be empty')
   })
+
+  it('persists defaultSets when provided', async () => {
+    await createExerciseDefinition(repo, 'Squat', ['mg1'], undefined, 5)
+    const saved = (await repo.list())[0]
+    expect(saved.defaultSets).toBe(5)
+  })
 })
 
 describe('editExerciseDefinition', () => {
@@ -95,6 +101,19 @@ describe('editExerciseDefinition', () => {
     await expect(editExerciseDefinition(repo, '1', 'bench', ['mg1'])).rejects.toThrow(
       DuplicateExerciseNameError,
     )
+  })
+
+  it('persists defaultSets when provided on edit', async () => {
+    await editExerciseDefinition(repo, '1', 'Squat', ['mg1'], undefined, 4)
+    const updated = await repo.findById('1')
+    expect(updated?.defaultSets).toBe(4)
+  })
+
+  it('preserves existing defaultSets when not supplied on edit', async () => {
+    await editExerciseDefinition(repo, '1', 'Squat', ['mg1'], undefined, 2)
+    await editExerciseDefinition(repo, '1', 'Squat', ['mg1'])
+    const updated = await repo.findById('1')
+    expect(updated?.defaultSets).toBe(2)
   })
 })
 

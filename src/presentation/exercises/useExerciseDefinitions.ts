@@ -23,13 +23,13 @@ export function useExerciseDefinitions(filterMuscleGroupId?: string) {
 
   useEffect(() => { refresh() }, [refresh])
 
-  const create = useCallback(async (name: string, muscleGroupIds: string[], notes?: string) => {
-    await createExerciseDefinition(exerciseRepo, name, muscleGroupIds, notes)
+  const create = useCallback(async (name: string, muscleGroupIds: string[], notes?: string, defaultSets?: number) => {
+    await createExerciseDefinition(exerciseRepo, name, muscleGroupIds, notes, defaultSets)
     await refresh()
   }, [exerciseRepo, refresh])
 
-  const update = useCallback(async (id: string, name: string, muscleGroupIds: string[], notes?: string) => {
-    await editExerciseDefinition(exerciseRepo, id, name, muscleGroupIds, notes)
+  const update = useCallback(async (id: string, name: string, muscleGroupIds: string[], notes?: string, defaultSets?: number) => {
+    await editExerciseDefinition(exerciseRepo, id, name, muscleGroupIds, notes, defaultSets)
     await refresh()
   }, [exerciseRepo, refresh])
 

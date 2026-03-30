@@ -52,9 +52,9 @@ export function useActiveSession() {
     await refresh()
   }, [session, sessionRepo, refresh])
 
-  const addSetFn = useCallback(async (entryIndex: number, weight: Weight, reps: number) => {
+  const addSetFn = useCallback(async (entryIndex: number, weight: Weight, reps: number, count: number = 1) => {
     if (!session) return
-    await addSet(sessionRepo, session.id, entryIndex, weight, reps)
+    for (let i = 0; i < count; i++) await addSet(sessionRepo, session.id, entryIndex, weight, reps)
     await refresh()
   }, [session, sessionRepo, refresh])
 

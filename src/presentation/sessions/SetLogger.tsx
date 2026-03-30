@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { SessionSet } from '@application/sessions'
 import type { Weight } from '@application/sessions'
 import { parseWeight } from '@application/sessions'
+import { DEFAULT_SET_COUNT } from '@domain/exercises/ExerciseDefinition'
 
 function formatWeight(w: Weight): string {
   if (w.kind === 'single') return String(w.value)
@@ -12,27 +13,44 @@ function formatWeight(w: Weight): string {
 interface Props {
   sets: readonly SessionSet[]
   lastSets: SessionSet[] | null
-  onAdd: (weight: Weight, reps: number) => void
+  defaultSets?: number
+  onAdd: (weight: Weight, reps: number, count: number) => void
   onRemoveLast: () => void
 }
 
-export function SetLogger({ sets, lastSets, onAdd, onRemoveLast }: Props) {
+export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: Props) {
+  const n = defaultSets ?? DEFAULT_SET_COUNT
+  const [mode, setMode] = useState<'quick' | 'individual'>('quick')
   const [weightInput, setWeightInput] = useState('')
   const [repsInput, setRepsInput] = useState('')
   const [weightError, setWeightError] = useState<string>()
 
-  function handleAdd() {
+  function parseInputs(): { weight: Weight; reps: number } | null {
     setWeightError(undefined)
     let weight: Weight
     try {
       weight = parseWeight(weightInput)
     } catch {
       setWeightError('Invalid weight (e.g. 22.5, 2x15, 31.5+2.3)')
-      return
+      return null
     }
     const reps = parseInt(repsInput, 10)
-    if (!reps || reps <= 0) return
-    onAdd(weight, reps)
+    if (!reps || reps <= 0) return null
+    return { weight, reps }
+  }
+
+  function handleQuickAdd() {
+    const parsed = parseInputs()
+    if (!parsed) return
+    onAdd(parsed.weight, parsed.reps, n)
+    setWeightInput('')
+    setRepsInput('')
+  }
+
+  function handleIndividualAdd() {
+    const parsed = parseInputs()
+    if (!parsed) return
+    onAdd(parsed.weight, parsed.reps, 1)
     setWeightInput('')
     setRepsInput('')
   }
@@ -64,14 +82,31 @@ export function SetLogger({ sets, lastSets, onAdd, onRemoveLast }: Props) {
           onChange={(e) => setRepsInput(e.target.value)}
           className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-md"
         />
-        <button
-          onClick={handleAdd}
-          disabled={!weightInput || !repsInput}
-          className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md disabled:opacity-40"
-        >
-          Add
-        </button>
+        {mode === 'quick' ? (
+          <button
+            onClick={handleQuickAdd}
+            disabled={!weightInput || !repsInput}
+            className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md disabled:opacity-40 whitespace-nowrap"
+          >
+            Log {n}×
+          </button>
+        ) : (
+          <button
+            onClick={handleIndividualAdd}
+            disabled={!weightInput || !repsInput}
+            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md disabled:opacity-40"
+          >
+            Add
+          </button>
+        )}
       </div>
+
+      <button
+        onClick={() => setMode(mode === 'quick' ? 'individual' : 'quick')}
+        className="text-xs text-gray-400 underline"
+      >
+        {mode === 'quick' ? 'Individual sets' : 'Quick sets'}
+      </button>
 
       {sets.length > 0 && (
         <div className="space-y-1">

@@ -127,7 +127,8 @@ export function ActiveSessionScreen() {
             onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
             onAssign={(id) => handleAssign(i, id)}
             onClearVariation={() => { clearVariation(i); setLastSetsMap((prev) => ({ ...prev, [i]: null })) }}
-            onAddSet={(weight: Weight, reps: number) => addSet(i, weight, reps)}
+            defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
+            onAddSet={(weight: Weight, reps: number, count: number) => addSet(i, weight, reps, count)}
             onRemoveLast={() => removeLastSet(i)}
           />
         ))}

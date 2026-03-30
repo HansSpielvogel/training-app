@@ -16,10 +16,11 @@ interface EntryRowProps {
   exerciseName?: string
   exerciseData: EntryExerciseData | null
   lastSets: SessionSet[] | null
+  defaultSets?: number
   onLoadExerciseData: () => void
   onAssign: (exerciseDefinitionId: string) => void
   onClearVariation: () => void
-  onAddSet: (weight: Weight, reps: number) => void
+  onAddSet: (weight: Weight, reps: number, count: number) => void
   onRemoveLast: () => void
 }
 
@@ -29,6 +30,7 @@ export function EntryRow({
   exerciseName,
   exerciseData,
   lastSets,
+  defaultSets,
   onLoadExerciseData,
   onAssign,
   onClearVariation,
@@ -99,6 +101,7 @@ export function EntryRow({
             <SetLogger
               sets={entry.sets}
               lastSets={lastSets}
+              defaultSets={defaultSets}
               onAdd={onAddSet}
               onRemoveLast={onRemoveLast}
             />

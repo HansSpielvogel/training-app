@@ -27,10 +27,10 @@ export function ExerciseDefinitionsPage() {
     return muscleGroups.find((mg) => mg.id === id)?.name ?? id
   }
 
-  async function handleCreate(name: string, muscleGroupIds: string[]) {
+  async function handleCreate(name: string, muscleGroupIds: string[], defaultSets: number) {
     setFormError(undefined)
     try {
-      await create(name, muscleGroupIds)
+      await create(name, muscleGroupIds, undefined, defaultSets)
       setMode({ type: 'list' })
     } catch (err) {
       if (err instanceof DuplicateExerciseNameError) setFormError('An exercise with this name already exists')
@@ -39,10 +39,10 @@ export function ExerciseDefinitionsPage() {
     }
   }
 
-  async function handleUpdate(id: string, name: string, muscleGroupIds: string[]) {
+  async function handleUpdate(id: string, name: string, muscleGroupIds: string[], defaultSets: number) {
     setFormError(undefined)
     try {
-      await update(id, name, muscleGroupIds)
+      await update(id, name, muscleGroupIds, undefined, defaultSets)
       setMode({ type: 'list' })
     } catch (err) {
       if (err instanceof DuplicateExerciseNameError) setFormError('An exercise with this name already exists')
@@ -147,9 +147,9 @@ export function ExerciseDefinitionsPage() {
                 {mode.type === 'editing' && mode.exercise.id === ed.id ? (
                   <div className="p-3">
                     <ExerciseForm
-                      initial={{ name: mode.exercise.name, muscleGroupIds: mode.exercise.muscleGroupIds }}
+                      initial={{ name: mode.exercise.name, muscleGroupIds: mode.exercise.muscleGroupIds, defaultSets: mode.exercise.defaultSets }}
                       muscleGroups={muscleGroups}
-                      onSubmit={(name, ids) => handleUpdate(ed.id, name, ids)}
+                      onSubmit={(name, ids, sets) => handleUpdate(ed.id, name, ids, sets)}
                       onCancel={reset}
                       error={formError}
                     />
@@ -177,7 +177,7 @@ export function ExerciseDefinitionsPage() {
           <div className="p-3">
             <ExerciseForm
               muscleGroups={muscleGroups}
-              onSubmit={handleCreate}
+              onSubmit={(name, ids, sets) => handleCreate(name, ids, sets)}
               onCancel={reset}
               error={formError}
             />

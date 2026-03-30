@@ -41,6 +41,11 @@ Note: abandon active session is already implemented.
 - Graph per MuscleGroup (aggregate view) ✓
 - Training overview: calendar/timeline of when, which plan, how many exercises ✓
 
+## Phase 4 more user input
+
+- Add a save and discard button when editing a training plan, delete the return arrow
+- button to finish an exercise, after entering the sets one can finish this exercise and the exercise is marked finished in the active session
+
 ## Future (not scheduled)
 
 - AI suggestions based on history

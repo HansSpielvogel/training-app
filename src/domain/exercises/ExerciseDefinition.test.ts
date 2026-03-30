@@ -29,6 +29,20 @@ describe('createExerciseDefinition', () => {
   it('rejects empty muscleGroupIds', () => {
     expect(() => createExerciseDefinition('1', 'Squat', [])).toThrow(NoMuscleGroupError)
   })
+
+  it('stores defaultSets when provided', () => {
+    const ed = createExerciseDefinition('1', 'Squat', ['mg1'], undefined, 4)
+    expect(ed.defaultSets).toBe(4)
+  })
+
+  it('omits defaultSets when not provided', () => {
+    const ed = createExerciseDefinition('1', 'Squat', ['mg1'])
+    expect(ed.defaultSets).toBeUndefined()
+  })
+
+  it('rejects defaultSets less than 1', () => {
+    expect(() => createExerciseDefinition('1', 'Squat', ['mg1'], undefined, 0)).toThrow('defaultSets must be at least 1')
+  })
 })
 
 describe('DuplicateExerciseNameError', () => {
