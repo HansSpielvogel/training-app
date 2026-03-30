@@ -4,6 +4,8 @@ import { MuscleGroupsPage } from './presentation/exercises/MuscleGroupsPage'
 import { ExerciseDefinitionsPage } from './presentation/exercises/ExerciseDefinitionsPage'
 import { TrainingPlansScreen } from './presentation/planning/TrainingPlansScreen'
 import { TrainingPlanDetailScreen } from './presentation/planning/TrainingPlanDetailScreen'
+import { SessionStartScreen } from './presentation/sessions/SessionStartScreen'
+import { ActiveSessionScreen } from './presentation/sessions/ActiveSessionScreen'
 import { ErrorBoundary } from './presentation/shared/ErrorBoundary'
 import { UpdateBanner } from './presentation/shared/UpdateBanner'
 import { seedTrainingPlans } from '@application/planning'
@@ -27,7 +29,9 @@ export default function App() {
         <div className="flex-1 overflow-hidden">
           <ErrorBoundary>
             <Routes>
-              <Route path="/" element={<Navigate to="/training-plans" replace />} />
+              <Route path="/" element={<Navigate to="/sessions" replace />} />
+              <Route path="/sessions" element={<SessionStartScreen />} />
+              <Route path="/sessions/active" element={<ActiveSessionScreen />} />
               <Route path="/training-plans" element={<TrainingPlansScreen />} />
               <Route path="/training-plans/:id" element={<TrainingPlanDetailScreen />} />
               <Route path="/muscle-groups" element={<MuscleGroupsPage />} />
@@ -39,6 +43,20 @@ export default function App() {
           className="flex border-t border-gray-200 bg-white"
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
+          <NavLink
+            to="/sessions"
+            className={({ isActive }) =>
+              `flex-1 flex flex-col items-center py-3 text-xs font-medium ${
+                isActive ? 'text-blue-600' : 'text-gray-500'
+              }`
+            }
+          >
+            <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            Train
+          </NavLink>
           <NavLink
             to="/training-plans"
             className={({ isActive }) =>

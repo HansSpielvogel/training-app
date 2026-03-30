@@ -26,6 +26,8 @@ Must-haves before the app is usable:
 - App suggests variation based on rotation logic (smart rotation)
 - Optional plan slots (mark "Evtl" exercises in plan — may or may not be done)
 - Alternating exercise variant: left/right alternating reps, shorter rest (e.g. Oblique Crunch 4×11 mit 36s)
+- Abandon active session from `ActiveSessionScreen`: confirmation prompt with data-loss warning, returns to plan selection
+- Quick-sets mode per slot: enter weight+reps once → logs N identical sets; N defined on ExerciseDefinition (exercises screen, default 3); toggle to single-set mode per slot during session when sets differ
 
 ## Phase 3 — Analytics Change
 
