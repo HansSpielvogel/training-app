@@ -4,10 +4,10 @@ description: Which OpenSpec changes are done and what's next
 type: project
 ---
 
-`app-foundation` ✓ archived. `exercise-library` ✓ implemented (pending archive). `training-plans` ✓ implemented (pending archive). `session-tracking` ✓ implemented (pending archive).
+`app-foundation` ✓ archived. `exercise-library` ✓ implemented (pending archive). `training-plans` ✓ implemented (pending archive). `session-tracking` ✓ implemented (pending archive). `analytics` ✓ implemented (pending archive).
 
-**Next change:** `analytics`
+**Next changes (in order):** `exercise-variants` → `plan-enhancements` → `session-enhancements`
 
-Full sequence: `app-foundation` ✓ → `exercise-library` ✓ → `training-plans` ✓ → `session-tracking` ✓ → `analytics`
+`exercise-variants` and `plan-enhancements` are independent; `session-enhancements` depends on both.
 
 **Why:** One change per bounded context per the change strategy in CLAUDE.md.

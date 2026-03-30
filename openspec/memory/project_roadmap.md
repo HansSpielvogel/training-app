@@ -6,34 +6,40 @@ type: project
 
 ## Change Sequence
 
-`app-foundation` ✓ → `exercise-library` ✓ → `training-plans` ✓ → `session-tracking` → `analytics`
+`app-foundation` ✓ → `exercise-library` ✓ → `training-plans` ✓ → `session-tracking` ✓ → `analytics` ✓ → `exercise-variants` → `plan-enhancements` → `session-enhancements`
 
-## Phase 1 — MVP (exercise-library + training-plans + session-tracking)
+## Phase 1 — MVP ✓
 
-Must-haves before the app is usable:
 - MuscleGroup and ExerciseDefinition CRUD ✓
-- Training plan creation (static, no dynamic rotation logic yet) ✓
-- Session logging: pick plan, pick variation, log sets with weight + reps
-- "Last 4 variations" display per muscle group slot
+- Training plan creation ✓
+- Session logging: pick plan, pick variation, log sets with weight + reps ✓
+- "Last 4 variations" display per muscle group slot ✓
 - JSON export/import for backup ✓
 
-## Phase 2
+## Phase 2 — 3 grouped changes
 
-- Session history list (view past workouts)
-- RPE tracking (how hard was it — 1–10)
+**Change: `exercise-variants`** (exercises/ bounded context)
 - Asymmetric weight type (`{ kind: 'asymmetric'; left; right }`)
-- Session modification during training (add/remove MuscleGroups, temp or permanent)
-- App suggests variation based on rotation logic (smart rotation)
-- Optional plan slots with a hint (mark "Evtl" exercises in plan — may or may not be done)
-- Abandon active session from `ActiveSessionScreen`: confirmation prompt with data-loss warning, returns to plan selection
-- Quick-sets mode per slot: enter weight+reps once → logs N identical sets; N defined on ExerciseDefinition (exercises screen, default 3); toggle to single-set mode per slot during session when sets differ
+- Alternating exercise variant: flag + rest time override on ExerciseDefinition; shown as hint in active session (e.g. 4 sets alternating left/right, 36s rest)
+- Quick-sets default N on ExerciseDefinition (default 3); used by session-enhancements
 
-## Phase 3 — Analytics Change
+**Change: `plan-enhancements`** (planning/ bounded context)
+- Optional plan slots: "Evtl" flag on PlanSlot; shown as hint in active session; not doing an exercise = simply not logging sets for it
+- Smart rotation suggestion: look at last 5 sessions, suggest variation used least that is not the most recent; no suggestion if all equally used or only 1 exercise in the muscle group
 
-- Alternating exercise variant: left/right alternating reps, shorter rest (e.g. Oblique Crunch 4×11 mit 36s)
-- Weight progression graph per ExerciseDefinition
-- Graph per MuscleGroup (aggregate view)
-- Training overview: calendar/timeline of when, which plan, how many exercises
+**Change: `session-enhancements`** (sessions/ bounded context — depends on exercise-variants + plan-enhancements)
+- RPE tracking: 1–10 effort rating per session
+- Quick-sets mode per slot: enter weight+reps once → logs N identical sets; toggle to single-set mode per slot when sets differ
+- Temp session modification: add/remove muscle groups during active session only (not saved to plan)
+- Display hints: alternating rest time (from exercise-variants), Evtl label (from plan-enhancements)
+
+Note: abandon active session is already implemented.
+
+## Phase 3 — Analytics ✓
+
+- Weight progression graph per ExerciseDefinition ✓
+- Graph per MuscleGroup (aggregate view) ✓
+- Training overview: calendar/timeline of when, which plan, how many exercises ✓
 
 ## Future (not scheduled)
 
