@@ -49,6 +49,7 @@ Versioned memory lives in `openspec/memory/`. Delete a file once its content is 
 ## After implementation Workflow
 * Always run all tests
 * Always verify in the UI
-* Always commit and push
+* After significant UI changes, run `/ui-review` to capture iPhone screenshots and critique the design
 * Always update this claude.md file, also with new insights
+* Always commit and push
 

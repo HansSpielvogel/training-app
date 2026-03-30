@@ -1,0 +1,15 @@
+export { listTrainingPlans } from './listTrainingPlans'
+export type { TrainingPlanSummary } from './listTrainingPlans'
+export { createTrainingPlan } from './createTrainingPlan'
+export { renameTrainingPlan } from './renameTrainingPlan'
+export { deleteTrainingPlan } from './deleteTrainingPlan'
+export { getTrainingPlan } from './getTrainingPlan'
+export type { TrainingPlanDetail, PlanSlotDetail } from './getTrainingPlan'
+export { addPlanSlot } from './addPlanSlot'
+export { removePlanSlot } from './removePlanSlot'
+export { movePlanSlot } from './movePlanSlot'
+export { seedTrainingPlans } from './seedTrainingPlans'
+
+// Re-export domain types so presentation doesn't import domain directly
+export type { TrainingPlan } from '@domain/planning/TrainingPlan'
+export { DuplicatePlanNameError } from '@domain/planning/TrainingPlan'
