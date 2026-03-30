@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { DuplicateNameError, MuscleGroupInUseError } from '@application/exercises'
 import type { MuscleGroup } from '@application/exercises'
 import { useMuscleGroups } from './useMuscleGroups'
+import { InlineEditForm } from '../shared/InlineEditForm'
+import { ConfirmDeleteDialog } from '../shared/ConfirmDeleteDialog'
 
 type Mode =
   | { type: 'list' }
@@ -9,57 +11,13 @@ type Mode =
   | { type: 'editing'; id: string; currentName: string }
   | { type: 'deleting'; id: string; name: string }
 
-function InlineForm({
-  initial,
-  onSubmit,
-  onCancel,
-  error,
-}: {
-  initial?: string
-  onSubmit: (name: string) => void
-  onCancel: () => void
-  error?: string
-}) {
-  const [value, setValue] = useState(initial ?? '')
-  return (
-    <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-      <input
-        autoFocus
-        type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        onKeyDown={(e) => e.key === 'Enter' && onSubmit(value)}
-        className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        placeholder="Muscle group name"
-      />
-      {error && <p className="mt-1 text-xs text-red-600">{error}</p>}
-      <div className="mt-2 flex gap-2">
-        <button
-          onClick={() => onSubmit(value)}
-          className="flex-1 py-2 bg-blue-600 text-white text-sm rounded-md font-medium"
-        >
-          Save
-        </button>
-        <button
-          onClick={onCancel}
-          className="flex-1 py-2 bg-gray-100 text-gray-700 text-sm rounded-md font-medium"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  )
-}
-
-function MuscleGroupRow({
-  mg,
-  onEdit,
-  onDelete,
-}: {
+interface MuscleGroupRowProps {
   mg: MuscleGroup
   onEdit: () => void
   onDelete: () => void
-}) {
+}
+
+function MuscleGroupRow({ mg, onEdit, onDelete }: MuscleGroupRowProps) {
   return (
     <div className="flex items-center px-4 py-3 border-b border-gray-100">
       <span className="flex-1 text-sm text-gray-800">{mg.name}</span>
@@ -155,32 +113,21 @@ export function MuscleGroupsPage() {
               <div key={mg.id}>
                 {mode.type === 'editing' && mode.id === mg.id ? (
                   <div className="p-3">
-                    <InlineForm
+                    <InlineEditForm
                       initial={mode.currentName}
+                      placeholder="Muscle group name"
                       onSubmit={(name) => handleRename(mg.id, name)}
                       onCancel={reset}
                       error={formError}
                     />
                   </div>
                 ) : mode.type === 'deleting' && mode.id === mg.id ? (
-                  <div className="px-4 py-3 border-b border-gray-100 bg-red-50">
-                    <p className="text-sm text-gray-700 mb-2">Delete <strong>{mg.name}</strong>?</p>
-                    {deleteError && <p className="text-xs text-red-600 mb-2">{deleteError}</p>}
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleDelete(mg.id)}
-                        className="px-4 py-1.5 bg-red-600 text-white text-sm rounded-md"
-                      >
-                        Delete
-                      </button>
-                      <button
-                        onClick={reset}
-                        className="px-4 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-md"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
+                  <ConfirmDeleteDialog
+                    itemName={mg.name}
+                    onConfirm={() => handleDelete(mg.id)}
+                    onCancel={reset}
+                    error={deleteError}
+                  />
                 ) : (
                   <MuscleGroupRow
                     mg={mg}
@@ -195,7 +142,8 @@ export function MuscleGroupsPage() {
 
         {mode.type === 'adding' && (
           <div className="p-3">
-            <InlineForm
+            <InlineEditForm
+              placeholder="Muscle group name"
               onSubmit={handleCreate}
               onCancel={reset}
               error={formError}

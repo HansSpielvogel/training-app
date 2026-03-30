@@ -1,12 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import type { PlanSlotDetail } from '@application/planning'
 import { DuplicatePlanNameError } from '@application/planning'
 import { useTrainingPlanDetail } from './useTrainingPlanDetail'
-import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscleGroupRepository'
-import type { MuscleGroup } from '@application/exercises'
-
-const muscleGroupRepo = new DexieMuscleGroupRepository()
+import { useMuscleGroups } from '../exercises/useMuscleGroups'
+import { InlineEditForm } from '../shared/InlineEditForm'
+import { ConfirmDeleteDialog } from '../shared/ConfirmDeleteDialog'
 
 type Mode =
   | { type: 'list' }
@@ -15,21 +14,16 @@ type Mode =
   | { type: 'renamingPlan'; currentName: string }
   | { type: 'deletingPlan' }
 
-function SlotRow({
-  slot,
-  isFirst,
-  isLast,
-  onMoveUp,
-  onMoveDown,
-  onDelete,
-}: {
+interface SlotRowProps {
   slot: PlanSlotDetail
   isFirst: boolean
   isLast: boolean
   onMoveUp: () => void
   onMoveDown: () => void
   onDelete: () => void
-}) {
+}
+
+function SlotRow({ slot, isFirst, isLast, onMoveUp, onMoveDown, onDelete }: SlotRowProps) {
   return (
     <div className="flex items-center px-4 py-3 border-b border-gray-100">
       <span className="flex-1 text-sm text-gray-800">{slot.muscleGroupName}</span>
@@ -73,14 +67,9 @@ export function TrainingPlanDetailScreen() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
   const { plan, addSlot, removeSlot, moveSlot, renamePlan, deletePlan } = useTrainingPlanDetail(id!)
+  const { muscleGroups } = useMuscleGroups()
   const [mode, setMode] = useState<Mode>({ type: 'list' })
-  const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([])
   const [renameError, setRenameError] = useState<string>()
-  const [renameValue, setRenameValue] = useState('')
-
-  useEffect(() => {
-    muscleGroupRepo.list().then(setMuscleGroups)
-  }, [])
 
   if (!plan) return null
 
@@ -94,10 +83,10 @@ export function TrainingPlanDetailScreen() {
     setMode({ type: 'list' })
   }
 
-  async function handleRename() {
+  async function handleRename(name: string) {
     setRenameError(undefined)
     try {
-      await renamePlan(renameValue)
+      await renamePlan(name)
       setMode({ type: 'list' })
     } catch (err) {
       if (err instanceof DuplicatePlanNameError) setRenameError('A plan with this name already exists')
@@ -108,12 +97,6 @@ export function TrainingPlanDetailScreen() {
   async function handleDeletePlan() {
     await deletePlan()
     navigate('/training-plans')
-  }
-
-  function startRename() {
-    setRenameValue(plan!.name)
-    setRenameError(undefined)
-    setMode({ type: 'renamingPlan', currentName: plan!.name })
   }
 
   return (
@@ -129,7 +112,7 @@ export function TrainingPlanDetailScreen() {
           </svg>
         </button>
         <h1 className="flex-1 text-xl font-semibold text-gray-900">{plan.name}</h1>
-        <button onClick={startRename} className="p-2 text-gray-400 hover:text-blue-600" aria-label="Rename plan">
+        <button onClick={() => setMode({ type: 'renamingPlan', currentName: plan.name })} className="p-2 text-gray-400 hover:text-blue-600" aria-label="Rename plan">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -145,30 +128,22 @@ export function TrainingPlanDetailScreen() {
 
       {mode.type === 'renamingPlan' && (
         <div className="p-3 bg-blue-50 border-b border-blue-200">
-          <input
-            autoFocus
-            type="text"
-            value={renameValue}
-            onChange={(e) => setRenameValue(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleRename()}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          <InlineEditForm
+            initial={mode.currentName}
+            onSubmit={handleRename}
+            onCancel={() => setMode({ type: 'list' })}
+            error={renameError}
           />
-          {renameError && <p className="mt-1 text-xs text-red-600">{renameError}</p>}
-          <div className="mt-2 flex gap-2">
-            <button onClick={handleRename} className="flex-1 py-2 bg-blue-600 text-white text-sm rounded-md font-medium">Save</button>
-            <button onClick={() => setMode({ type: 'list' })} className="flex-1 py-2 bg-gray-100 text-gray-700 text-sm rounded-md font-medium">Cancel</button>
-          </div>
         </div>
       )}
 
       {mode.type === 'deletingPlan' && (
-        <div className="px-4 py-3 bg-red-50 border-b border-red-200">
-          <p className="text-sm text-gray-700 mb-2">Delete <strong>{plan.name}</strong> and all its slots?</p>
-          <div className="flex gap-2">
-            <button onClick={handleDeletePlan} className="px-4 py-1.5 bg-red-600 text-white text-sm rounded-md">Delete</button>
-            <button onClick={() => setMode({ type: 'list' })} className="px-4 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-md">Cancel</button>
-          </div>
-        </div>
+        <ConfirmDeleteDialog
+          itemName={plan.name}
+          messageSuffix=" and all its slots"
+          onConfirm={handleDeletePlan}
+          onCancel={() => setMode({ type: 'list' })}
+        />
       )}
 
       <div className="flex-1 overflow-y-auto">
@@ -182,23 +157,12 @@ export function TrainingPlanDetailScreen() {
             {plan.slots.map((slot, index) => (
               <div key={slot.id}>
                 {mode.type === 'deletingSlot' && mode.slotId === slot.id ? (
-                  <div className="px-4 py-3 border-b border-gray-100 bg-red-50">
-                    <p className="text-sm text-gray-700 mb-2">Remove <strong>{slot.muscleGroupName}</strong>?</p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleDeleteSlot(slot.id)}
-                        className="px-4 py-1.5 bg-red-600 text-white text-sm rounded-md"
-                      >
-                        Remove
-                      </button>
-                      <button
-                        onClick={() => setMode({ type: 'list' })}
-                        className="px-4 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-md"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
+                  <ConfirmDeleteDialog
+                    itemName={slot.muscleGroupName}
+                    confirmLabel="Remove"
+                    onConfirm={() => handleDeleteSlot(slot.id)}
+                    onCancel={() => setMode({ type: 'list' })}
+                  />
                 ) : (
                   <SlotRow
                     slot={slot}

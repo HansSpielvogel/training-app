@@ -4,18 +4,19 @@ import { MuscleGroupsPage } from './presentation/exercises/MuscleGroupsPage'
 import { ExerciseDefinitionsPage } from './presentation/exercises/ExerciseDefinitionsPage'
 import { TrainingPlansScreen } from './presentation/planning/TrainingPlansScreen'
 import { TrainingPlanDetailScreen } from './presentation/planning/TrainingPlanDetailScreen'
+import { ErrorBoundary } from './presentation/shared/ErrorBoundary'
+import { UpdateBanner } from './presentation/shared/UpdateBanner'
 import { seedTrainingPlans } from '@application/planning'
 import { seedExerciseLibrary } from '@application/exercises'
 import { DexieTrainingPlanRepository } from '@infrastructure/planning/DexieTrainingPlanRepository'
 import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscleGroupRepository'
 import { DexieExerciseDefinitionRepository } from '@infrastructure/exercises/DexieExerciseDefinitionRepository'
 
-const planRepo = new DexieTrainingPlanRepository()
-const muscleGroupRepo = new DexieMuscleGroupRepository()
-const exerciseRepo = new DexieExerciseDefinitionRepository()
-
 export default function App() {
   useEffect(() => {
+    const planRepo = new DexieTrainingPlanRepository()
+    const muscleGroupRepo = new DexieMuscleGroupRepository()
+    const exerciseRepo = new DexieExerciseDefinitionRepository()
     seedExerciseLibrary(muscleGroupRepo, exerciseRepo)
     seedTrainingPlans(planRepo)
   }, [])
@@ -24,15 +25,20 @@ export default function App() {
     <BrowserRouter>
       <div id="app-root" className="flex flex-col h-screen bg-gray-50">
         <div className="flex-1 overflow-hidden">
-          <Routes>
-            <Route path="/" element={<Navigate to="/training-plans" replace />} />
-            <Route path="/training-plans" element={<TrainingPlansScreen />} />
-            <Route path="/training-plans/:id" element={<TrainingPlanDetailScreen />} />
-            <Route path="/muscle-groups" element={<MuscleGroupsPage />} />
-            <Route path="/exercise-definitions" element={<ExerciseDefinitionsPage />} />
-          </Routes>
+          <ErrorBoundary>
+            <Routes>
+              <Route path="/" element={<Navigate to="/training-plans" replace />} />
+              <Route path="/training-plans" element={<TrainingPlansScreen />} />
+              <Route path="/training-plans/:id" element={<TrainingPlanDetailScreen />} />
+              <Route path="/muscle-groups" element={<MuscleGroupsPage />} />
+              <Route path="/exercise-definitions" element={<ExerciseDefinitionsPage />} />
+            </Routes>
+          </ErrorBoundary>
         </div>
-        <nav className="flex border-t border-gray-200 bg-white">
+        <nav
+          className="flex border-t border-gray-200 bg-white"
+          style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        >
           <NavLink
             to="/training-plans"
             className={({ isActive }) =>
@@ -76,6 +82,7 @@ export default function App() {
             Exercises
           </NavLink>
         </nav>
+        <UpdateBanner />
       </div>
     </BrowserRouter>
   )

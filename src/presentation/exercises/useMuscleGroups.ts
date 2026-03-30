@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import type { MuscleGroup } from '@application/exercises'
 import {
   listMuscleGroups,
@@ -10,32 +10,31 @@ import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscl
 import { DexieExerciseDefinitionRepository } from '@infrastructure/exercises/DexieExerciseDefinitionRepository'
 
 // Hooks are the composition root — they wire use cases to repositories
-const muscleGroupRepo = new DexieMuscleGroupRepository()
-const exerciseRepo = new DexieExerciseDefinitionRepository()
-
 export function useMuscleGroups() {
+  const muscleGroupRepo = useRef(new DexieMuscleGroupRepository()).current
+  const exerciseRepo = useRef(new DexieExerciseDefinitionRepository()).current
   const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([])
 
   const refresh = useCallback(async () => {
     setMuscleGroups(await listMuscleGroups(muscleGroupRepo))
-  }, [])
+  }, [muscleGroupRepo])
 
   useEffect(() => { refresh() }, [refresh])
 
   const create = useCallback(async (name: string) => {
     await createMuscleGroup(muscleGroupRepo, name)
     await refresh()
-  }, [refresh])
+  }, [muscleGroupRepo, refresh])
 
   const rename = useCallback(async (id: string, newName: string) => {
     await renameMuscleGroup(muscleGroupRepo, id, newName)
     await refresh()
-  }, [refresh])
+  }, [muscleGroupRepo, refresh])
 
   const remove = useCallback(async (id: string) => {
     await deleteMuscleGroup(muscleGroupRepo, exerciseRepo, id)
     await refresh()
-  }, [refresh])
+  }, [muscleGroupRepo, exerciseRepo, refresh])
 
   return { muscleGroups, create, rename, remove }
 }
