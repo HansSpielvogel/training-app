@@ -36,4 +36,10 @@ playwright-report
 
 # TypeScript
 *.tsbuildinfo
-/.claude/
+.claude/settings.local.json
+.claude/commands
+/.claude/skills/agent-browser/
+/.claude/skills/openspec-apply-change/
+/.claude/skills/openspec-archive-change/
+/.claude/skills/openspec-explore/
+/.claude/skills/openspec-propose/
