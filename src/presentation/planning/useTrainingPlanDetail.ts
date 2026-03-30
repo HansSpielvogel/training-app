@@ -4,6 +4,8 @@ import {
   addPlanSlot,
   removePlanSlot,
   movePlanSlot,
+  renameTrainingPlan,
+  deleteTrainingPlan,
 } from '@application/planning'
 import type { TrainingPlanDetail } from '@application/planning'
 import { DexieTrainingPlanRepository } from '@infrastructure/planning/DexieTrainingPlanRepository'
@@ -37,5 +39,14 @@ export function useTrainingPlanDetail(planId: string) {
     await refresh()
   }, [planId, refresh])
 
-  return { plan, addSlot, removeSlot, moveSlot }
+  const renamePlan = useCallback(async (newName: string) => {
+    await renameTrainingPlan(repo, planId, newName)
+    await refresh()
+  }, [planId, refresh])
+
+  const deletePlan = useCallback(async () => {
+    await deleteTrainingPlan(repo, planId)
+  }, [planId])
+
+  return { plan, addSlot, removeSlot, moveSlot, renamePlan, deletePlan }
 }

@@ -133,7 +133,7 @@ export function TrainingPlansScreen() {
         {plans.length === 0 && mode.type === 'list' ? (
           <div className="flex flex-col items-center justify-center h-48 text-gray-400">
             <p className="text-sm">No training plans yet.</p>
-            <p className="text-sm">Tap + to create the first one.</p>
+            <p className="text-sm">Tap "Add Training Plan" to get started.</p>
           </div>
         ) : (
           <div>

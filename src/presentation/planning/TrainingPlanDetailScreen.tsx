@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import type { PlanSlotDetail } from '@application/planning'
+import { DuplicatePlanNameError } from '@application/planning'
 import { useTrainingPlanDetail } from './useTrainingPlanDetail'
 import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscleGroupRepository'
 import type { MuscleGroup } from '@application/exercises'
 
 const muscleGroupRepo = new DexieMuscleGroupRepository()
 
-type SlotMode =
+type Mode =
   | { type: 'list' }
   | { type: 'adding' }
-  | { type: 'deleting'; slotId: string; name: string }
+  | { type: 'deletingSlot'; slotId: string; name: string }
+  | { type: 'renamingPlan'; currentName: string }
+  | { type: 'deletingPlan' }
 
 function SlotRow({
   slot,
@@ -30,33 +33,33 @@ function SlotRow({
   return (
     <div className="flex items-center px-4 py-3 border-b border-gray-100">
       <span className="flex-1 text-sm text-gray-800">{slot.muscleGroupName}</span>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-3">
         <button
           onClick={onMoveUp}
           disabled={isFirst}
-          className="p-1.5 text-gray-400 disabled:opacity-20 hover:text-blue-600"
+          className="p-2 text-gray-400 disabled:opacity-20 hover:text-blue-600"
           aria-label="Move up"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
           </svg>
         </button>
         <button
           onClick={onMoveDown}
           disabled={isLast}
-          className="p-1.5 text-gray-400 disabled:opacity-20 hover:text-blue-600"
+          className="p-2 text-gray-400 disabled:opacity-20 hover:text-blue-600"
           aria-label="Move down"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </button>
         <button
           onClick={onDelete}
-          className="p-1.5 text-gray-400 hover:text-red-600"
+          className="p-2 text-gray-400 hover:text-red-600"
           aria-label="Remove slot"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
@@ -69,9 +72,11 @@ function SlotRow({
 export function TrainingPlanDetailScreen() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const { plan, addSlot, removeSlot, moveSlot } = useTrainingPlanDetail(id!)
-  const [mode, setMode] = useState<SlotMode>({ type: 'list' })
+  const { plan, addSlot, removeSlot, moveSlot, renamePlan, deletePlan } = useTrainingPlanDetail(id!)
+  const [mode, setMode] = useState<Mode>({ type: 'list' })
   const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([])
+  const [renameError, setRenameError] = useState<string>()
+  const [renameValue, setRenameValue] = useState('')
 
   useEffect(() => {
     muscleGroupRepo.list().then(setMuscleGroups)
@@ -84,9 +89,31 @@ export function TrainingPlanDetailScreen() {
     setMode({ type: 'list' })
   }
 
-  async function handleDelete(slotId: string) {
+  async function handleDeleteSlot(slotId: string) {
     await removeSlot(slotId)
     setMode({ type: 'list' })
+  }
+
+  async function handleRename() {
+    setRenameError(undefined)
+    try {
+      await renamePlan(renameValue)
+      setMode({ type: 'list' })
+    } catch (err) {
+      if (err instanceof DuplicatePlanNameError) setRenameError('A plan with this name already exists')
+      else setRenameError('Name cannot be empty')
+    }
+  }
+
+  async function handleDeletePlan() {
+    await deletePlan()
+    navigate('/training-plans')
+  }
+
+  function startRename() {
+    setRenameValue(plan!.name)
+    setRenameError(undefined)
+    setMode({ type: 'renamingPlan', currentName: plan!.name })
   }
 
   return (
@@ -101,25 +128,65 @@ export function TrainingPlanDetailScreen() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="text-xl font-semibold text-gray-900">{plan.name}</h1>
+        <h1 className="flex-1 text-xl font-semibold text-gray-900">{plan.name}</h1>
+        <button onClick={startRename} className="p-2 text-gray-400 hover:text-blue-600" aria-label="Rename plan">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+        </button>
+        <button onClick={() => setMode({ type: 'deletingPlan' })} className="p-2 text-gray-400 hover:text-red-600" aria-label="Delete plan">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+        </button>
       </header>
+
+      {mode.type === 'renamingPlan' && (
+        <div className="p-3 bg-blue-50 border-b border-blue-200">
+          <input
+            autoFocus
+            type="text"
+            value={renameValue}
+            onChange={(e) => setRenameValue(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleRename()}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          {renameError && <p className="mt-1 text-xs text-red-600">{renameError}</p>}
+          <div className="mt-2 flex gap-2">
+            <button onClick={handleRename} className="flex-1 py-2 bg-blue-600 text-white text-sm rounded-md font-medium">Save</button>
+            <button onClick={() => setMode({ type: 'list' })} className="flex-1 py-2 bg-gray-100 text-gray-700 text-sm rounded-md font-medium">Cancel</button>
+          </div>
+        </div>
+      )}
+
+      {mode.type === 'deletingPlan' && (
+        <div className="px-4 py-3 bg-red-50 border-b border-red-200">
+          <p className="text-sm text-gray-700 mb-2">Delete <strong>{plan.name}</strong> and all its slots?</p>
+          <div className="flex gap-2">
+            <button onClick={handleDeletePlan} className="px-4 py-1.5 bg-red-600 text-white text-sm rounded-md">Delete</button>
+            <button onClick={() => setMode({ type: 'list' })} className="px-4 py-1.5 bg-gray-100 text-gray-700 text-sm rounded-md">Cancel</button>
+          </div>
+        </div>
+      )}
 
       <div className="flex-1 overflow-y-auto">
         {plan.slots.length === 0 && mode.type === 'list' ? (
           <div className="flex flex-col items-center justify-center h-48 text-gray-400">
             <p className="text-sm">No slots yet.</p>
-            <p className="text-sm">Tap + to add the first muscle group.</p>
+            <p className="text-sm">Tap "Add Muscle Group" to get started.</p>
           </div>
         ) : (
           <div>
             {plan.slots.map((slot, index) => (
               <div key={slot.id}>
-                {mode.type === 'deleting' && mode.slotId === slot.id ? (
+                {mode.type === 'deletingSlot' && mode.slotId === slot.id ? (
                   <div className="px-4 py-3 border-b border-gray-100 bg-red-50">
                     <p className="text-sm text-gray-700 mb-2">Remove <strong>{slot.muscleGroupName}</strong>?</p>
                     <div className="flex gap-2">
                       <button
-                        onClick={() => handleDelete(slot.id)}
+                        onClick={() => handleDeleteSlot(slot.id)}
                         className="px-4 py-1.5 bg-red-600 text-white text-sm rounded-md"
                       >
                         Remove
@@ -139,7 +206,7 @@ export function TrainingPlanDetailScreen() {
                     isLast={index === plan.slots.length - 1}
                     onMoveUp={() => moveSlot(slot.id, 'up')}
                     onMoveDown={() => moveSlot(slot.id, 'down')}
-                    onDelete={() => setMode({ type: 'deleting', slotId: slot.id, name: slot.muscleGroupName })}
+                    onDelete={() => setMode({ type: 'deletingSlot', slotId: slot.id, name: slot.muscleGroupName })}
                   />
                 )}
               </div>

@@ -5,12 +5,18 @@ import { ExerciseDefinitionsPage } from './presentation/exercises/ExerciseDefini
 import { TrainingPlansScreen } from './presentation/planning/TrainingPlansScreen'
 import { TrainingPlanDetailScreen } from './presentation/planning/TrainingPlanDetailScreen'
 import { seedTrainingPlans } from '@application/planning'
+import { seedExerciseLibrary } from '@application/exercises'
 import { DexieTrainingPlanRepository } from '@infrastructure/planning/DexieTrainingPlanRepository'
+import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscleGroupRepository'
+import { DexieExerciseDefinitionRepository } from '@infrastructure/exercises/DexieExerciseDefinitionRepository'
 
 const planRepo = new DexieTrainingPlanRepository()
+const muscleGroupRepo = new DexieMuscleGroupRepository()
+const exerciseRepo = new DexieExerciseDefinitionRepository()
 
 export default function App() {
   useEffect(() => {
+    seedExerciseLibrary(muscleGroupRepo, exerciseRepo)
     seedTrainingPlans(planRepo)
   }, [])
 

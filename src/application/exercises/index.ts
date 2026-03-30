@@ -10,6 +10,7 @@ export { deleteExerciseDefinition } from './deleteExerciseDefinition'
 
 export { exportExerciseLibrary } from './exportExerciseLibrary'
 export { importExerciseLibrary, InvalidImportError } from './importExerciseLibrary'
+export { seedExerciseLibrary } from './seedExerciseLibrary'
 
 // Re-export domain types so presentation doesn't import domain directly
 export type { MuscleGroup } from '@domain/exercises/MuscleGroup'

@@ -46,10 +46,7 @@ Versioned memory lives in `openspec/memory/`. Delete a file once its content is 
 - `openspec/memory/project_roadmap.md` — phase breakdown, seeding plan
 - `openspec/memory/project_sport-extensibility.md` — SessionSummary interface, no generic Exercise
 
-## After implementation Workflow
-* Always run all tests
-* Always verify in the UI
-* After significant UI changes, run `/ui-review` to capture iPhone screenshots and critique the design
-* Always update this claude.md file, also with new insights
-* Always commit and push
+## After Implementation Workflow
+
+Run `/after-impl` — the skill handles tests, UI verification, ui-review, CLAUDE.md update, commit and push.
 
