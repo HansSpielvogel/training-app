@@ -12,11 +12,25 @@ The system SHALL allow the user to start a new training session by selecting a t
 ---
 
 ### Requirement: Pick exercise variation per slot
-For each session entry (muscle group slot), the system SHALL display the last up to 4 distinct `ExerciseDefinition`s used for that muscle group across previous completed sessions (newest-first). The user SHALL be able to select one of these recent variations or choose any other `ExerciseDefinition` for the same muscle group from a full list. The chosen `ExerciseDefinition` SHALL be assigned to the entry.
+For each session entry (muscle group slot), the system SHALL display a smart rotation suggestion when one can be computed, followed by the last up to 4 distinct `ExerciseDefinition`s used for that muscle group across previous completed sessions (newest-first). The user SHALL be able to select the suggested variation, one of the recent variations, or any other `ExerciseDefinition` for the same muscle group from a full list. The chosen `ExerciseDefinition` SHALL be assigned to the entry.
+
+The rotation suggestion is derived from the last 5 completed sessions containing an entry for the slot's muscle group. The `ExerciseDefinition` used least frequently among those sessions is suggested, excluding the most recently used exercise. On a count tie, the one used longest ago is preferred. No suggestion is shown when fewer than 2 distinct exercises appear in those 5 sessions, or when all non-recent candidates share the same frequency.
 
 #### Scenario: Recent variations shown
 - **WHEN** user opens a slot to log sets
 - **THEN** up to 4 most recently used ExerciseDefinitions for that muscle group are displayed as quick-pick options
+
+#### Scenario: Rotation suggestion shown
+- **WHEN** user opens a slot and the rotation algorithm finds a least-used exercise that is not the most recently used among the last 5 sessions
+- **THEN** a suggestion chip is displayed above the recent-variations list identifying the recommended ExerciseDefinition
+
+#### Scenario: No rotation suggestion
+- **WHEN** user opens a slot and fewer than 2 distinct exercises appear in the last 5 sessions, or all non-recent candidates are equally frequently used
+- **THEN** no suggestion chip is shown and only the recent-variations list appears
+
+#### Scenario: Pick rotation suggestion
+- **WHEN** user taps the rotation suggestion chip
+- **THEN** that ExerciseDefinition is assigned to the entry
 
 #### Scenario: Pick recent variation
 - **WHEN** user taps a recent variation
@@ -33,15 +47,23 @@ For each session entry (muscle group slot), the system SHALL display the last up
 ---
 
 ### Requirement: Log sets
-Once an exercise variation is assigned to a session entry, the user SHALL be able to add sets. Each set SHALL record weight (a `Weight` value) and reps (positive integer). Sets SHALL be displayed in the order they were added. The user SHALL be able to remove the last added set.
+Once an exercise variation is assigned to a session entry, the user SHALL be able to log sets in one of two modes. The default mode is **quick mode**: the user enters weight and reps once and taps "Log N sets" to add N identical sets at once, where N is the `defaultSets` value of the assigned exercise (defaulting to 3 if not set). A toggle button SHALL allow switching to **individual mode**, where the user adds one set at a time. The mode toggle is available at any time and does not affect already-logged sets. Sets SHALL be displayed in the order they were added. The user SHALL be able to remove the last added set.
 
-#### Scenario: Add a set
-- **WHEN** user submits weight and reps for a set
-- **THEN** the set is appended to the entry's set list and the inputs reset for the next set
+#### Scenario: Add sets in quick mode (default)
+- **WHEN** user submits weight and reps in quick mode
+- **THEN** N identical sets are appended to the entry and inputs reset
+
+#### Scenario: Switch to individual mode
+- **WHEN** user taps the individual mode toggle
+- **THEN** the logger switches to individual mode: one set is added per submit
+
+#### Scenario: Switch back to quick mode
+- **WHEN** user taps the quick mode toggle while in individual mode
+- **THEN** the logger returns to quick mode
 
 #### Scenario: Remove last set
 - **WHEN** user taps remove on the last set
-- **THEN** that set is deleted from the entry
+- **THEN** that set is deleted from the entry regardless of current mode
 
 #### Scenario: Cannot add set without variation
 - **WHEN** no exercise variation is assigned to the entry
