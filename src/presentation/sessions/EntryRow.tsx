@@ -132,7 +132,7 @@ export function EntryRow({
           {setCount === 0 && onRemoveEntry && (
             <button
               onClick={onRemoveEntry}
-              className="w-full py-2 text-sm text-red-500 border border-red-200 rounded-md"
+              className="w-1/5 py-2 text-sm text-red-500 border border-red-200 rounded-md"
             >
               Remove slot
             </button>
