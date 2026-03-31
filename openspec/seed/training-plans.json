@@ -10,9 +10,10 @@
         { "id": "slot-oa-3", "muscleGroupId": "mg-schultern",   "order": 2 },
         { "id": "slot-oa-4", "muscleGroupId": "mg-schulterrot", "order": 3, "optional": true },
         { "id": "slot-oa-5", "muscleGroupId": "mg-bizeps",      "order": 4 },
-        { "id": "slot-oa-6", "muscleGroupId": "mg-trapez",      "order": 5, "optional": true },
+        { "id": "slot-oa-6", "muscleGroupId": "mg-schultern",   "order": 5 },
         { "id": "slot-oa-7", "muscleGroupId": "mg-trizeps",     "order": 6 },
-        { "id": "slot-oa-8", "muscleGroupId": "mg-ruecken-b",   "order": 7, "optional": true }
+        { "id": "slot-oa-8", "muscleGroupId": "mg-ruecken-b",   "order": 7, "optional": true },
+        { "id": "slot-oa-9", "muscleGroupId": "mg-trapez",      "order": 8, "optional": true }
       ]
     },
     {
@@ -34,13 +35,13 @@
       "slots": [
         { "id": "slot-co-1", "muscleGroupId": "mg-bauch",      "order": 0 },
         { "id": "slot-co-2", "muscleGroupId": "mg-gesaess",    "order": 1 },
-        { "id": "slot-co-3", "muscleGroupId": "mg-bauch",      "order": 2 },
+        { "id": "slot-co-3", "muscleGroupId": "mg-bauch-seite","order": 2 },
         { "id": "slot-co-4", "muscleGroupId": "mg-bauch",      "order": 3 },
         { "id": "slot-co-5", "muscleGroupId": "mg-unterer-r",  "order": 4 },
         { "id": "slot-co-6", "muscleGroupId": "mg-bauch",      "order": 5 },
         { "id": "slot-co-7", "muscleGroupId": "mg-unterer-r",  "order": 6 },
-        { "id": "slot-co-8", "muscleGroupId": "mg-or",         "order": 7, "optional": true },
-        { "id": "slot-co-9", "muscleGroupId": "mg-ov",         "order": 8, "optional": true }
+        { "id": "slot-co-8", "muscleGroupId": "mg-obers-hin", "order": 7, "optional": true },
+        { "id": "slot-co-9", "muscleGroupId": "mg-obers-vor", "order": 8, "optional": true }
       ]
     },
     {
@@ -48,13 +49,13 @@
       "name": "Beine & Po",
       "slots": [
         { "id": "slot-bp-1", "muscleGroupId": "mg-unterer-r",  "order": 0 },
-        { "id": "slot-bp-2", "muscleGroupId": "mg-ov",         "order": 1 },
+        { "id": "slot-bp-2", "muscleGroupId": "mg-obers-vor", "order": 1 },
         { "id": "slot-bp-3", "muscleGroupId": "mg-unterer-r",  "order": 2 },
         { "id": "slot-bp-4", "muscleGroupId": "mg-waden",      "order": 3 },
         { "id": "slot-bp-5", "muscleGroupId": "mg-gesaess",    "order": 4 },
         { "id": "slot-bp-6", "muscleGroupId": "mg-beine-a",    "order": 5 },
-        { "id": "slot-bp-7", "muscleGroupId": "mg-or",         "order": 6 },
-        { "id": "slot-bp-8", "muscleGroupId": "mg-ov",         "order": 7, "optional": true }
+        { "id": "slot-bp-7", "muscleGroupId": "mg-obers-hin", "order": 6 },
+        { "id": "slot-bp-8", "muscleGroupId": "mg-obers-vor", "order": 7, "optional": true }
       ]
     },
     {
@@ -62,11 +63,11 @@
       "name": "Core+Beine",
       "slots": [
         { "id": "slot-cb-1", "muscleGroupId": "mg-bauch",      "order": 0 },
-        { "id": "slot-cb-2", "muscleGroupId": "mg-ov",         "order": 1 },
-        { "id": "slot-cb-3", "muscleGroupId": "mg-bauch",      "order": 2 },
+        { "id": "slot-cb-2", "muscleGroupId": "mg-obers-vor", "order": 1 },
+        { "id": "slot-cb-3", "muscleGroupId": "mg-bauch-seite","order": 2 },
         { "id": "slot-cb-4", "muscleGroupId": "mg-gesaess",    "order": 3 },
         { "id": "slot-cb-5", "muscleGroupId": "mg-beine-a",    "order": 4 },
-        { "id": "slot-cb-6", "muscleGroupId": "mg-or",         "order": 5 },
+        { "id": "slot-cb-6", "muscleGroupId": "mg-obers-hin", "order": 5 },
         { "id": "slot-cb-7", "muscleGroupId": "mg-bauch",      "order": 6, "optional": true }
       ]
     }

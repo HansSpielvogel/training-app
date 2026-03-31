@@ -2,7 +2,7 @@
   "version": 1,
   "sessions": [
     {
-      "id": "seed-session-oberkoerper-a",
+      "id": "seed-session-oberkoerper",
       "planId": "plan-oberkoerper-a",
       "planName": "Oberkörper A",
       "status": "completed",
@@ -11,7 +11,7 @@
       "entries": [
         {
           "muscleGroupId": "mg-h-schulter",
-          "exerciseDefinitionId": "ex-rf-kh",
+          "exerciseDefinitionId": "ex-rf-maschine",
           "sets": [{ "weight": { "kind": "single", "value": 40 }, "reps": 10 }]
         },
         {
@@ -63,7 +63,7 @@
       "entries": [
         {
           "muscleGroupId": "mg-h-schulter",
-          "exerciseDefinitionId": "ex-rf-kabelzug",
+          "exerciseDefinitionId": "ex-rf-seilzug",
           "sets": [{ "weight": { "kind": "stacked", "base": 5, "added": 1.25 }, "reps": 10 }]
         },
         {
@@ -157,7 +157,7 @@
           "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 9 }, "reps": 11 }]
         },
         {
-          "muscleGroupId": "mg-ov",
+          "muscleGroupId": "mg-obers-vor",
           "exerciseDefinitionId": "ex-kniebeugen-lh",
           "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 47.5 }, "reps": 13 }]
         },
@@ -177,7 +177,7 @@
           "sets": [{ "weight": { "kind": "single", "value": 35 }, "reps": 14 }]
         },
         {
-          "muscleGroupId": "mg-ov",
+          "muscleGroupId": "mg-obers-vor",
           "exerciseDefinitionId": "ex-ausfallschritt",
           "optional": true,
           "sets": [{ "weight": { "kind": "single", "value": 12 }, "reps": 14 }]
@@ -188,7 +188,7 @@
           "sets": [{ "weight": { "kind": "stacked", "base": 31.5, "added": 6.8 }, "reps": 11 }]
         },
         {
-          "muscleGroupId": "mg-or",
+          "muscleGroupId": "mg-obers-hin",
           "exerciseDefinitionId": "ex-leg-curl-lieg",
           "sets": [{ "weight": { "kind": "stacked", "base": 32, "added": 2.5 }, "reps": 12 }]
         }
@@ -208,7 +208,7 @@
           "sets": [{ "weight": { "kind": "single", "value": 12.5 }, "reps": 11 }]
         },
         {
-          "muscleGroupId": "mg-ov",
+          "muscleGroupId": "mg-obers-vor",
           "exerciseDefinitionId": "ex-kniebeugen-lh",
           "sets": [{ "weight": { "kind": "stacked", "base": 0, "added": 47.5 }, "reps": 13 }]
         },
@@ -228,7 +228,7 @@
           "sets": [{ "weight": { "kind": "stacked", "base": 31.5, "added": 6.8 }, "reps": 11 }]
         },
         {
-          "muscleGroupId": "mg-or",
+          "muscleGroupId": "mg-obers-hin",
           "exerciseDefinitionId": "ex-leg-curl-lieg",
           "sets": [{ "weight": { "kind": "stacked", "base": 32, "added": 2.5 }, "reps": 12 }]
         }
