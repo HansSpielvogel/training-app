@@ -6,15 +6,16 @@ type: project
 
 ## Next Up
 
-**`session-enhancements`** (sessions/ bounded context — new session features)
-- p2: RPE tracking: 1–10 effort rating per session. Should be shown in the stats-Progression view
-- p2: Temp session modification: add/remove muscle groups during active session only (not saved to plan)
-- p3: Temp session modification: add a complete training plan to the active session on the fly (e.g. add "mini-core" to an active "Oberkörper" session)
-- p3: Display hints: alternating rest time (from exercise-variants, depends on that change)
+**`session-enhancements-2`** (sessions/ bounded context — new session features)
+- p3: RPE tracking:  instead or additionally of the (opt.) hint put a (1-10) hint, so i know what is the range (not self-explanatory)
+- p2: Temp session modification: remove muscle groups during active session only (not saved to plan) (i do not see a possibility at the moment)
+- p2: the extra "added" weight which can be stored in a session entry is not able to input in an active session. I cannot enter 12+2.5. at best keep the number input, so maybe a own field next to weight, optional to be filled out?
 
 **`exercise-variants`** (exercises/ bounded context)
 - p3: Asymmetric weight type (`{ kind: 'asymmetric'; left; right }`)
 - p3: Alternating exercise variant: flag + rest time override on ExerciseDefinition; shown as hint in active session (e.g. 4 sets alternating left/right, 36s rest)
+- p3: Display hints: alternating rest time
+- p3: if the last tracked sets of an exercise all have the same weight and Reps, show a consolidated view in the "Last:" info in active session, something like Last: 24x10 *3
 
 **`stats-enhancements`** (presentation/ — read-only views, no domain changes)
 - p3: In the Exercises view, show last used weight and reps for every exercise (if available)

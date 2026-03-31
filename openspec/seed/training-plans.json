@@ -70,6 +70,15 @@
         { "id": "slot-cb-6", "muscleGroupId": "mg-obers-hin", "order": 5 },
         { "id": "slot-cb-7", "muscleGroupId": "mg-bauch",      "order": 6, "optional": true }
       ]
+    },
+    {
+      "id": "plan-core-addon",
+      "name": "Core-Addon",
+      "slots": [
+        { "id": "slot-co-1", "muscleGroupId": "mg-bauch",      "order": 0 },
+        { "id": "slot-co-2", "muscleGroupId": "mg-gesaess",    "order": 1 },
+        { "id": "slot-co-3", "muscleGroupId": "mg-bauch-seite","order": 2, "optional": true }
+      ]
     }
   ]
 }
