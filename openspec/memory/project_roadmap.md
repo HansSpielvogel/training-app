@@ -25,6 +25,7 @@ type: project
 
 ## Future (not scheduled)
 
+- add a drag gesture for deleting the training plan slots in the active session, with a red trash indicator appearing while dragging as a feedback
 - AI suggestions based on history
 - Other sports (new bounded context, see extensibility rule in CLAUDE.md)
 

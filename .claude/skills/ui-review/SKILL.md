@@ -28,6 +28,9 @@ Target user: Hans, using the app one-handed at the gym on an iPhone 17.
 App URL: http://localhost:5173
 Recent changes: {{CONTEXT}}
 
+IMPORTANT — no heredoc syntax: Never use `<<'EOF'` or `<<EOF` in any bash command.
+For agent-browser eval with multi-line JS: minify to a single line and use `agent-browser eval 'JS_HERE'`, or use base64: `agent-browser eval -b "$(printf '%s' 'JS_HERE' | base64 -w0)"`.
+
 Steps:
 1. Run: agent-browser set device "iPhone 16 Pro"
    (closest emulation to iPhone 17 available in agent-browser)

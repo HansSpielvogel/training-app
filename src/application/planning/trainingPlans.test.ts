@@ -212,7 +212,7 @@ describe('updateSlotOptional', () => {
 describe('seedTrainingPlans', () => {
   it('seeds when no plans exist', async () => {
     await seedTrainingPlans(repo)
-    expect(await repo.countPlans()).toBe(5)
+    expect(await repo.countPlans()).toBe(6)
   })
 
   it('does not seed when plans already exist', async () => {
