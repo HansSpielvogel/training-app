@@ -6,11 +6,6 @@ type: project
 
 ## Next Up
 
-**`session-enhancements-2`** (sessions/ bounded context — new session features)
-- p3: RPE tracking:  instead or additionally of the (opt.) hint put a (1-10) hint, so i know what is the range (not self-explanatory)
-- p2: Temp session modification: remove muscle groups during active session only (not saved to plan) (i do not see a possibility at the moment)
-- p2: the extra "added" weight which can be stored in a session entry is not able to input in an active session. I cannot enter 12+2.5. at best keep the number input, so maybe a own field next to weight, optional to be filled out?
-
 **`exercise-variants`** (exercises/ bounded context)
 - p3: Asymmetric weight type (`{ kind: 'asymmetric'; left; right }`)
 - p3: Alternating exercise variant: flag + rest time override on ExerciseDefinition; shown as hint in active session (e.g. 4 sets alternating left/right, 36s rest)
