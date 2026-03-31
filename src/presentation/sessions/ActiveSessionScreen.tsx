@@ -61,6 +61,13 @@ export function ActiveSessionScreen() {
     }
   }
 
+  function expandAndPreload(nextIndex: number | null) {
+    setExpandedIndex(nextIndex)
+    if (nextIndex !== null && !exerciseDataMap[nextIndex] && session) {
+      loadExerciseData(nextIndex, session.entries[nextIndex].muscleGroupId)
+    }
+  }
+
   function handleToggle(i: number) {
     const isCurrentlyExpanded = expandedIndex === i
     if (isCurrentlyExpanded) {
@@ -69,7 +76,7 @@ export function ActiveSessionScreen() {
       if (hasSets) {
         const newDone = new Set(doneIndices).add(i)
         setDoneIndices(newDone)
-        setExpandedIndex(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
+        expandAndPreload(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
       } else {
         setExpandedIndex(null)
       }
@@ -81,7 +88,7 @@ export function ActiveSessionScreen() {
   function handleMarkDone(i: number) {
     const newDone = new Set(doneIndices).add(i)
     setDoneIndices(newDone)
-    setExpandedIndex(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
+    expandAndPreload(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
   }
 
   async function handleComplete() {
@@ -157,6 +164,7 @@ export function ActiveSessionScreen() {
             exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
             exerciseData={exerciseDataMap[i] ?? null}
             lastSets={lastSetsMap[i] ?? null}
+            done={doneIndices.has(i)}
             isExpanded={expandedIndex === i}
             onToggle={() => handleToggle(i)}
             onMarkDone={() => handleMarkDone(i)}

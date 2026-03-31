@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import type { ExerciseDefinition } from '@application/exercises'
 import type { SessionEntry, SessionSet, Weight } from '@application/sessions'
 import { VariationPicker } from './VariationPicker'
@@ -17,6 +16,7 @@ interface EntryRowProps {
   exerciseData: EntryExerciseData | null
   lastSets: SessionSet[] | null
   defaultSets?: number
+  done: boolean
   isExpanded: boolean
   onToggle: () => void
   onMarkDone: () => void
@@ -34,6 +34,7 @@ export function EntryRow({
   exerciseData,
   lastSets,
   defaultSets,
+  done,
   isExpanded,
   onToggle,
   onMarkDone,
@@ -43,17 +44,11 @@ export function EntryRow({
   onAddSet,
   onRemoveLast,
 }: EntryRowProps) {
-  const [done, setDone] = useState(false)
   const setCount = entry.sets.length
 
   function handleToggle() {
     if (!isExpanded && !exerciseData) onLoadExerciseData()
     onToggle()
-  }
-
-  function handleMarkDone() {
-    setDone(true)
-    onMarkDone()
   }
 
   return (
@@ -120,13 +115,15 @@ export function EntryRow({
               onRemoveLast={onRemoveLast}
             />
           )}
-          <button
-            onClick={handleMarkDone}
-            disabled={done}
-            className="w-full py-2 bg-green-600 text-white text-sm rounded-md font-medium disabled:opacity-40"
-          >
-            {done ? 'Done' : 'Done'}
-          </button>
+          {setCount > 0 && (
+            <button
+              onClick={onMarkDone}
+              disabled={done}
+              className="w-full py-2 bg-green-600 text-white text-sm rounded-md font-medium disabled:opacity-40"
+            >
+              Done
+            </button>
+          )}
         </div>
       )}
     </div>
