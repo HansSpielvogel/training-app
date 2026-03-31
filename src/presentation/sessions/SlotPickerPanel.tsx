@@ -86,7 +86,7 @@ export function SlotPickerPanel({
   }
 
   return (
-    <div className="px-4 py-2 flex gap-3 border-b border-gray-100">
+    <div className="px-4 py-2 flex gap-3 border-t border-gray-100">
       <button
         onClick={onOpenMuscleGroupPicker}
         className="py-1.5 px-3 text-sm text-blue-600 font-medium border border-blue-200 rounded-full"

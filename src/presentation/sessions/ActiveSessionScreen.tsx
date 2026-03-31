@@ -190,9 +190,6 @@ export function ActiveSessionScreen() {
             onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : undefined}
           />
         ))}
-      </div>
-
-      <div className="border-t border-gray-200 bg-white">
         <SlotPickerPanel
           showMuscleGroupPicker={showMuscleGroupPicker}
           showPlanPicker={showPlanPicker}
@@ -206,6 +203,9 @@ export function ActiveSessionScreen() {
           onCancelMuscleGroupPicker={() => setShowMuscleGroupPicker(false)}
           onCancelPlanPicker={() => setShowPlanPicker(false)}
         />
+      </div>
+
+      <div className="border-t border-gray-200 bg-white">
         <div className="px-4 py-2">
           {confirmFinish ? (
             <div className="flex gap-2">

@@ -155,10 +155,10 @@ export function TrainingPlanDetailScreen() {
       </div>
 
       {mode.type === 'list' && (
-        <div className="p-4 border-t border-gray-200 bg-white">
+        <div className="px-4 py-2 border-t border-gray-200 bg-white">
           <button
             onClick={() => setMode({ type: 'adding' })}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium text-sm"
+            className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium text-sm"
           >
             + Add Muscle Group
           </button>
