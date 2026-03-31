@@ -22,6 +22,7 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
   const n = defaultSets ?? DEFAULT_SET_COUNT
   const [mode, setMode] = useState<'quick' | 'individual'>('quick')
   const [weightInput, setWeightInput] = useState('')
+  const [addedWeightInput, setAddedWeightInput] = useState('')
   const [repsInput, setRepsInput] = useState('')
   const [rpeInput, setRpeInput] = useState('')
   const [weightError, setWeightError] = useState<string>()
@@ -40,8 +41,9 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
     setWeightError(undefined)
     setRpeError(undefined)
     let weight: Weight
+    const rawWeight = addedWeightInput.trim() !== '' ? `${weightInput}+${addedWeightInput}` : weightInput
     try {
-      weight = parseWeight(weightInput)
+      weight = parseWeight(rawWeight)
     } catch {
       setWeightError('Invalid weight (e.g. 22.5, 2x15, 31.5+2.3)')
       return null
@@ -65,6 +67,7 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
     if (!parsed) return
     onAdd(parsed.weight, parsed.reps, n, parsed.rpe)
     setWeightInput('')
+    setAddedWeightInput('')
     setRepsInput('')
     setRpeInput('')
   }
@@ -74,6 +77,7 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
     if (!parsed) return
     onAdd(parsed.weight, parsed.reps, 1, parsed.rpe)
     setWeightInput('')
+    setAddedWeightInput('')
     setRepsInput('')
     setRpeInput('')
   }
@@ -105,6 +109,16 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
             style={{ fontSize: '16px' }}
             className={`flex-1 px-3 py-2 border rounded-md ${weightError ? 'border-red-400' : 'border-gray-300'}`}
           />
+          <input
+            type="text"
+            inputMode="decimal"
+            placeholder="+add"
+            value={addedWeightInput}
+            onChange={(e) => { setAddedWeightInput(e.target.value); setWeightError(undefined) }}
+            onFocus={handleFocus}
+            style={{ fontSize: '16px' }}
+            className="w-16 px-2 py-2 border border-gray-300 rounded-md"
+          />
         </div>
         {weightError && <p className="mt-0.5 text-xs text-red-500">{weightError}</p>}
         <div className="flex gap-2">
@@ -119,10 +133,11 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
             className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
           />
           <div className="flex-1 flex flex-col">
+            <span className="text-xs text-gray-500 mb-0.5">RPE (1–10, opt.)</span>
             <input
               type="number"
               inputMode="numeric"
-              placeholder="RPE (opt.)"
+              placeholder="RPE"
               value={rpeInput}
               onChange={(e) => { setRpeInput(e.target.value); setRpeError(undefined) }}
               onFocus={handleFocus}

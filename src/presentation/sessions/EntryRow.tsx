@@ -75,7 +75,7 @@ export function EntryRow({
           )}
         </div>
         <div className="flex items-center gap-1 ml-2">
-          {entry.isTemp && setCount === 0 && onRemoveEntry && (
+          {setCount === 0 && onRemoveEntry && (
             <button
               onClick={(e) => { e.stopPropagation(); onRemoveEntry() }}
               className="min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-red-500"

@@ -27,6 +27,7 @@ export function useActiveSession() {
 
   const [session, setSession] = useState<TrainingSession | null>(null)
   const [loading, setLoading] = useState(true)
+  const [removedPlanSlotIndices, setRemovedPlanSlotIndices] = useState<Set<number>>(new Set())
 
   const refresh = useCallback(async () => {
     const active = await sessionRepo.getActiveSession()
@@ -102,11 +103,17 @@ export function useActiveSession() {
     [exerciseRepo]
   )
 
+  const removePlanSlot = useCallback((index: number) => {
+    setRemovedPlanSlotIndices((prev) => new Set([...prev, index]))
+  }, [])
+
   const slotActions = useSessionSlotActions(session, sessionRepo, planRepo, refresh)
 
   return {
     session,
     loading,
+    removedPlanSlotIndices,
+    removePlanSlot,
     start,
     assign,
     clearVariation: clearVariationFn,

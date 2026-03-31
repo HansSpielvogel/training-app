@@ -2,6 +2,7 @@ import '@testing-library/jest-dom'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { SetLogger } from './SetLogger'
+import type { Weight } from '@application/sessions'
 
 const noop = () => {}
 const defaultProps = {
@@ -33,6 +34,43 @@ describe('SetLogger', () => {
       fireEvent.change(input, { target: { value: '-22.5' } })
       fireEvent.click(screen.getByLabelText('Toggle negative'))
       expect(input).toHaveValue('22.5')
+    })
+  })
+
+  describe('addedWeightInput', () => {
+    it('creates stacked weight when added field has a value', () => {
+      const onAdd = vi.fn()
+      render(<SetLogger {...defaultProps} onAdd={onAdd} />)
+      fireEvent.change(screen.getByPlaceholderText('Weight'), { target: { value: '30' } })
+      fireEvent.change(screen.getByPlaceholderText('+add'), { target: { value: '2.5' } })
+      fireEvent.change(screen.getByPlaceholderText('Reps'), { target: { value: '10' } })
+      fireEvent.click(screen.getByText(/Log/))
+      expect(onAdd).toHaveBeenCalledWith<[Weight, number, number, undefined]>(
+        { kind: 'stacked', base: 30, added: 2.5 }, 10, expect.any(Number), undefined,
+      )
+    })
+
+    it('handles comma decimal in added field', () => {
+      const onAdd = vi.fn()
+      render(<SetLogger {...defaultProps} onAdd={onAdd} />)
+      fireEvent.change(screen.getByPlaceholderText('Weight'), { target: { value: '30' } })
+      fireEvent.change(screen.getByPlaceholderText('+add'), { target: { value: '2,5' } })
+      fireEvent.change(screen.getByPlaceholderText('Reps'), { target: { value: '10' } })
+      fireEvent.click(screen.getByText(/Log/))
+      expect(onAdd).toHaveBeenCalledWith<[Weight, number, number, undefined]>(
+        { kind: 'stacked', base: 30, added: 2.5 }, 10, expect.any(Number), undefined,
+      )
+    })
+
+    it('falls back to normal parse when added field is empty', () => {
+      const onAdd = vi.fn()
+      render(<SetLogger {...defaultProps} onAdd={onAdd} />)
+      fireEvent.change(screen.getByPlaceholderText('Weight'), { target: { value: '30' } })
+      fireEvent.change(screen.getByPlaceholderText('Reps'), { target: { value: '10' } })
+      fireEvent.click(screen.getByText(/Log/))
+      expect(onAdd).toHaveBeenCalledWith<[Weight, number, number, undefined]>(
+        { kind: 'single', value: 30 }, 10, expect.any(Number), undefined,
+      )
     })
   })
 

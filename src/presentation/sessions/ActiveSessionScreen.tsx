@@ -19,7 +19,7 @@ export function findNextIncomplete(current: number | null, doneIndices: Set<numb
 
 export function ActiveSessionScreen() {
   const navigate = useNavigate()
-  const { session, loading, assign, clearVariation, addSet, removeLastSet, complete, abandon, getRecentVariations, getRotationSuggestion, getLastSets, getExercisesForMuscleGroup, addTempSlot, removeTempSlot, addPlanSlots, listPlans } =
+  const { session, loading, assign, clearVariation, addSet, removeLastSet, complete, abandon, getRecentVariations, getRotationSuggestion, getLastSets, getExercisesForMuscleGroup, addTempSlot, removeTempSlot, addPlanSlots, listPlans, removedPlanSlotIndices, removePlanSlot } =
     useActiveSession()
   const { muscleGroups } = useMuscleGroups()
   const [exerciseDataMap, setExerciseDataMap] = useState<Record<number, EntryExerciseData>>({})
@@ -82,7 +82,7 @@ export function ActiveSessionScreen() {
       if (hasSets) {
         const newDone = new Set(doneIndices).add(i)
         setDoneIndices(newDone)
-        expandAndPreload(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
+        expandAndPreload(findNextIncomplete(i, new Set([...newDone, ...removedPlanSlotIndices]), session?.entries.length ?? 0))
       } else {
         setExpandedIndex(null)
       }
@@ -94,7 +94,7 @@ export function ActiveSessionScreen() {
   function handleMarkDone(i: number) {
     const newDone = new Set(doneIndices).add(i)
     setDoneIndices(newDone)
-    expandAndPreload(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
+    expandAndPreload(findNextIncomplete(i, new Set([...newDone, ...removedPlanSlotIndices]), session?.entries.length ?? 0))
   }
 
   async function handleComplete() {
@@ -169,27 +169,30 @@ export function ActiveSessionScreen() {
       )}
 
       <div className="flex-1 overflow-y-auto">
-        {session.entries.map((entry, i) => (
-          <EntryRow
-            key={i}
-            entry={entry}
-            muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
-            exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
-            exerciseData={exerciseDataMap[i] ?? null}
-            lastSets={lastSetsMap[i] ?? null}
-            done={doneIndices.has(i)}
-            isExpanded={expandedIndex === i}
-            onToggle={() => handleToggle(i)}
-            onMarkDone={() => handleMarkDone(i)}
-            onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
-            onAssign={(id) => handleAssign(i, id)}
-            onClearVariation={() => { clearVariation(i); setLastSetsMap((prev) => ({ ...prev, [i]: null })) }}
-            defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
-            onAddSet={(weight: Weight, reps: number, count: number, rpe?: number) => addSet(i, weight, reps, count, rpe)}
-            onRemoveLast={() => removeLastSet(i)}
-            onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : undefined}
-          />
-        ))}
+        {session.entries.map((entry, i) => {
+          if (removedPlanSlotIndices.has(i)) return null
+          return (
+            <EntryRow
+              key={i}
+              entry={entry}
+              muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
+              exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
+              exerciseData={exerciseDataMap[i] ?? null}
+              lastSets={lastSetsMap[i] ?? null}
+              done={doneIndices.has(i)}
+              isExpanded={expandedIndex === i}
+              onToggle={() => handleToggle(i)}
+              onMarkDone={() => handleMarkDone(i)}
+              onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
+              onAssign={(id) => handleAssign(i, id)}
+              onClearVariation={() => { clearVariation(i); setLastSetsMap((prev) => ({ ...prev, [i]: null })) }}
+              defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
+              onAddSet={(weight: Weight, reps: number, count: number, rpe?: number) => addSet(i, weight, reps, count, rpe)}
+              onRemoveLast={() => removeLastSet(i)}
+              onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : () => removePlanSlot(i)}
+            />
+          )
+        })}
         <SlotPickerPanel
           showMuscleGroupPicker={showMuscleGroupPicker}
           showPlanPicker={showPlanPicker}
