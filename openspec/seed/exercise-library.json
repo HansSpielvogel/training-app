@@ -26,7 +26,7 @@
     { "id": "ex-seitheben-maschine", "name": "Seitheben Maschine",              "muscleGroupIds": ["mg-schultern"], "notes": "Höhe 7" },
     { "id": "ex-sd-kh",              "name": "Schulterdrücken KH",              "muscleGroupIds": ["mg-schultern", "mg-trizeps"] },
     { "id": "ex-sd-lh",              "name": "Schulterdrücken LH",              "muscleGroupIds": ["mg-schultern", "mg-trizeps"] },
-    { "id": "ex-sd-maschine",        "name": "Schulterdrücken Maschine",        "muscleGroupIds": ["mg-schultern", "mg-trizeps"], "notes": "Höhe 5" },
+    { "id": "ex-sd-maschine",        "name": "Schulterdrücken Maschine",        "muscleGroupIds": ["mg-schultern", "mg-trizeps", "mg-brust"], "notes": "Höhe 5" },
 
     { "id": "ex-rf-maschine",        "name": "Reverse Flys Maschine",           "muscleGroupIds": ["mg-h-schulter"] },
     { "id": "ex-rf-kh-sb",           "name": "Reverse Flys KH Schrägbank",      "muscleGroupIds": ["mg-h-schulter"] },
