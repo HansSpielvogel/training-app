@@ -99,6 +99,33 @@ describe('addSet', () => {
     expect(loaded?.entries[0].sets[0]).toEqual({ weight: { kind: 'single', value: 80 }, reps: 10 })
     expect(loaded?.entries[0].sets[1]).toEqual({ weight: { kind: 'single', value: 85 }, reps: 8 })
   })
+
+  it('stores rpe when provided', async () => {
+    const plan = await seedPlanWithSlots()
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+
+    await addSet(sessionRepo, session.id, 0, { kind: 'single', value: 80 }, 10, 8)
+
+    const loaded = await sessionRepo.getById(session.id)
+    expect(loaded?.entries[0].sets[0].rpe).toBe(8)
+  })
+
+  it('stores no rpe when not provided', async () => {
+    const plan = await seedPlanWithSlots()
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+
+    await addSet(sessionRepo, session.id, 0, { kind: 'single', value: 80 }, 10)
+
+    const loaded = await sessionRepo.getById(session.id)
+    expect(loaded?.entries[0].sets[0].rpe).toBeUndefined()
+  })
+
+  it('rejects invalid rpe', async () => {
+    const plan = await seedPlanWithSlots()
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+
+    await expect(addSet(sessionRepo, session.id, 0, { kind: 'single', value: 80 }, 10, 11)).rejects.toThrow()
+  })
 })
 
 describe('removeLastSet', () => {
@@ -145,6 +172,26 @@ describe('completeSession', () => {
     const completed = await sessionRepo.listCompleted()
     expect(completed).toHaveLength(1)
     expect(completed[0].id).toBe(session.id)
+  })
+})
+
+describe('SessionEntry isTemp', () => {
+  it('plan slots have no isTemp flag', async () => {
+    const plan = await seedPlanWithSlots()
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+    expect(session.entries[0].isTemp).toBeFalsy()
+  })
+
+  it('session entry can have isTemp: true when saved directly', async () => {
+    const plan = await seedPlanWithSlots()
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+    const withTemp = {
+      ...session,
+      entries: [...session.entries, { muscleGroupId: 'mg-arms', sets: [], isTemp: true }],
+    }
+    await sessionRepo.save(withTemp)
+    const loaded = await sessionRepo.getById(session.id)
+    expect(loaded?.entries[2].isTemp).toBe(true)
   })
 })
 

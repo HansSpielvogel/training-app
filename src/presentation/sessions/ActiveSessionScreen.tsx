@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Weight, SessionSet } from '@application/sessions'
+import type { TrainingPlan } from '@application/planning'
 import { useActiveSession } from './useActiveSession'
 import { useMuscleGroups } from '../exercises/useMuscleGroups'
 import { EntryRow } from './EntryRow'
 import type { EntryExerciseData } from './EntryRow'
+import { ConfirmAbandonBanner } from './ConfirmAbandonBanner'
+import { SlotPickerPanel } from './SlotPickerPanel'
 
 export function findNextIncomplete(current: number | null, doneIndices: Set<number>, total: number): number | null {
   const start = current !== null ? current + 1 : 0
@@ -16,7 +19,7 @@ export function findNextIncomplete(current: number | null, doneIndices: Set<numb
 
 export function ActiveSessionScreen() {
   const navigate = useNavigate()
-  const { session, loading, assign, clearVariation, addSet, removeLastSet, complete, abandon, getRecentVariations, getRotationSuggestion, getLastSets, getExercisesForMuscleGroup } =
+  const { session, loading, assign, clearVariation, addSet, removeLastSet, complete, abandon, getRecentVariations, getRotationSuggestion, getLastSets, getExercisesForMuscleGroup, addTempSlot, removeTempSlot, addPlanSlots, listPlans } =
     useActiveSession()
   const { muscleGroups } = useMuscleGroups()
   const [exerciseDataMap, setExerciseDataMap] = useState<Record<number, EntryExerciseData>>({})
@@ -26,6 +29,10 @@ export function ActiveSessionScreen() {
   const [confirmAbandon, setConfirmAbandon] = useState(false)
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
   const [doneIndices, setDoneIndices] = useState<Set<number>>(new Set())
+  const [showMuscleGroupPicker, setShowMuscleGroupPicker] = useState(false)
+  const [showPlanPicker, setShowPlanPicker] = useState(false)
+  const [availablePlans, setAvailablePlans] = useState<TrainingPlan[]>([])
+  const [planPickerMessage, setPlanPickerMessage] = useState<string>()
 
   useEffect(() => {
     if (!loading && !session) navigate('/sessions', { replace: true })
@@ -41,7 +48,6 @@ export function ActiveSessionScreen() {
     ])
     setExerciseDataMap((prev) => ({ ...prev, [entryIndex]: { recent, all, suggestion } }))
     setLastSetsMap((prev) => ({ ...prev, [entryIndex]: lastSets }))
-
     const nameMap: Record<string, string> = {}
     for (const ex of [...recent, ...all]) nameMap[ex.id] = ex.name
     setExerciseNames((prev) => ({ ...prev, ...nameMap }))
@@ -101,6 +107,27 @@ export function ActiveSessionScreen() {
     navigate('/sessions', { replace: true })
   }
 
+  async function handleAddTempSlot(muscleGroupId: string) {
+    setShowMuscleGroupPicker(false)
+    await addTempSlot(muscleGroupId)
+  }
+
+  async function handleOpenPlanPicker() {
+    const plans = await listPlans()
+    setAvailablePlans(plans.filter(p => p.id !== session?.planId))
+    setShowPlanPicker(true)
+    setPlanPickerMessage(undefined)
+  }
+
+  async function handleAddPlanSlots(planId: string) {
+    const added = await addPlanSlots(planId)
+    if (added === 0) {
+      setPlanPickerMessage('All muscle groups from that plan are already in this session.')
+    } else {
+      setShowPlanPicker(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -135,30 +162,16 @@ export function ActiveSessionScreen() {
       </header>
 
       {confirmAbandon && (
-        <div className="px-4 py-3 bg-red-50 border-b border-red-200">
-          <p className="text-sm font-medium text-red-800 mb-0.5">Abandon this session?</p>
-          <p className="text-xs text-red-600 mb-3">All logged sets will be lost.</p>
-          <div className="flex gap-2">
-            <button
-              onClick={handleAbandon}
-              className="px-4 py-2 bg-red-600 text-white text-sm rounded-lg font-medium"
-            >
-              Abandon
-            </button>
-            <button
-              onClick={() => setConfirmAbandon(false)}
-              className="px-4 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg font-medium"
-            >
-              Keep Going
-            </button>
-          </div>
-        </div>
+        <ConfirmAbandonBanner
+          onAbandon={handleAbandon}
+          onCancel={() => setConfirmAbandon(false)}
+        />
       )}
 
       <div className="flex-1 overflow-y-auto">
         {session.entries.map((entry, i) => (
           <EntryRow
-            key={entry.muscleGroupId}
+            key={i}
             entry={entry}
             muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
             exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
@@ -172,36 +185,52 @@ export function ActiveSessionScreen() {
             onAssign={(id) => handleAssign(i, id)}
             onClearVariation={() => { clearVariation(i); setLastSetsMap((prev) => ({ ...prev, [i]: null })) }}
             defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
-            onAddSet={(weight: Weight, reps: number, count: number) => addSet(i, weight, reps, count)}
+            onAddSet={(weight: Weight, reps: number, count: number, rpe?: number) => addSet(i, weight, reps, count, rpe)}
             onRemoveLast={() => removeLastSet(i)}
+            onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : undefined}
           />
         ))}
       </div>
 
-      <div className="p-4 border-t border-gray-200 bg-white">
-        {confirmFinish ? (
-          <div className="flex gap-2">
+      <div className="border-t border-gray-200 bg-white">
+        <SlotPickerPanel
+          showMuscleGroupPicker={showMuscleGroupPicker}
+          showPlanPicker={showPlanPicker}
+          muscleGroups={muscleGroups}
+          availablePlans={availablePlans}
+          planPickerMessage={planPickerMessage}
+          onAddTempSlot={handleAddTempSlot}
+          onAddPlanSlots={handleAddPlanSlots}
+          onOpenMuscleGroupPicker={() => { setShowMuscleGroupPicker(true); setShowPlanPicker(false) }}
+          onOpenPlanPicker={() => { handleOpenPlanPicker(); setShowMuscleGroupPicker(false) }}
+          onCancelMuscleGroupPicker={() => setShowMuscleGroupPicker(false)}
+          onCancelPlanPicker={() => setShowPlanPicker(false)}
+        />
+        <div className="p-4">
+          {confirmFinish ? (
+            <div className="flex gap-2">
+              <button
+                onClick={() => setConfirmFinish(false)}
+                className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm"
+              >
+                Keep Going
+              </button>
+              <button
+                onClick={handleComplete}
+                className="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium text-sm"
+              >
+                Finish
+              </button>
+            </div>
+          ) : (
             <button
-              onClick={() => setConfirmFinish(false)}
-              className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm"
+              onClick={() => { setConfirmFinish(true); setConfirmAbandon(false) }}
+              className="w-full py-3 bg-green-600 text-white rounded-lg font-medium text-sm"
             >
-              Keep Going
+              Finish Workout
             </button>
-            <button
-              onClick={handleComplete}
-              className="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium text-sm"
-            >
-              Finish
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={() => { setConfirmFinish(true); setConfirmAbandon(false) }}
-            className="w-full py-3 bg-green-600 text-white rounded-lg font-medium text-sm"
-          >
-            Finish Workout
-          </button>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )

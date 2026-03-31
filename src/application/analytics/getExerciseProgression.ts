@@ -31,10 +31,16 @@ export async function getExerciseProgression(
       }
     }
 
+    const rpeSets = entry.sets.filter(s => s.rpe !== undefined)
+    const avgRpe = rpeSets.length > 0
+      ? Math.round(rpeSets.reduce((sum, s) => sum + s.rpe!, 0) / rpeSets.length)
+      : undefined
+
     points.push({
       date: new Date(session.completedAt ?? session.startedAt),
       weight: maxWeight,
       weightUnit,
+      ...(avgRpe !== undefined ? { avgRpe } : {}),
     })
   }
 

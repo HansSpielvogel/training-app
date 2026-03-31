@@ -4,6 +4,14 @@ const WIDTH = 300
 const HEIGHT = 160
 const PAD = { top: 10, right: 10, bottom: 30, left: 40 }
 
+function rpeColor(rpe: number): string {
+  // green (1) → yellow (5–6) → red (10)
+  const t = (rpe - 1) / 9
+  const r = Math.round(t * 220)
+  const g = Math.round((1 - t) * 180)
+  return `rgb(${r},${g},50)`
+}
+
 function formatDate(date: Date): string {
   return `${date.getMonth() + 1}/${date.getDate()}`
 }
@@ -69,6 +77,11 @@ export function ProgressionChart({ points }: Props) {
           <circle key={i} cx={toX(i)} cy={toY(p.weight)} r={3} fill="#2563eb" />
         ))}
 
+        {/* RPE indicator dots (below weight dot) */}
+        {points.map((p, i) => p.avgRpe !== undefined && (
+          <circle key={`rpe-${i}`} cx={toX(i)} cy={toY(p.weight) + 10} r={3} fill={rpeColor(p.avgRpe)} />
+        ))}
+
         {/* X-axis date labels */}
         {labelIndices.map(i => (
           <text
@@ -83,7 +96,12 @@ export function ProgressionChart({ points }: Props) {
           </text>
         ))}
       </svg>
-      <p className="text-xs text-gray-400 text-center mt-1">{weightUnit}</p>
+      <div className="flex items-center justify-center gap-3 mt-1">
+        <p className="text-xs text-gray-400">{weightUnit}</p>
+        {points.some(p => p.avgRpe !== undefined) && (
+          <p className="text-xs text-gray-400">● RPE</p>
+        )}
+      </div>
     </div>
   )
 }

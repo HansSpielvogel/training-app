@@ -14,7 +14,7 @@ interface Props {
   sets: readonly SessionSet[]
   lastSets: SessionSet[] | null
   defaultSets?: number
-  onAdd: (weight: Weight, reps: number, count: number) => void
+  onAdd: (weight: Weight, reps: number, count: number, rpe?: number) => void
   onRemoveLast: () => void
 }
 
@@ -23,7 +23,9 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
   const [mode, setMode] = useState<'quick' | 'individual'>('quick')
   const [weightInput, setWeightInput] = useState('')
   const [repsInput, setRepsInput] = useState('')
+  const [rpeInput, setRpeInput] = useState('')
   const [weightError, setWeightError] = useState<string>()
+  const [rpeError, setRpeError] = useState<string>()
 
   function handleFocus(e: React.FocusEvent<HTMLInputElement>) {
     const el = e.currentTarget
@@ -34,8 +36,9 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
     setWeightInput((prev) => prev.startsWith('-') ? prev.slice(1) : '-' + prev)
   }
 
-  function parseInputs(): { weight: Weight; reps: number } | null {
+  function parseInputs(): { weight: Weight; reps: number; rpe?: number } | null {
     setWeightError(undefined)
+    setRpeError(undefined)
     let weight: Weight
     try {
       weight = parseWeight(weightInput)
@@ -45,23 +48,34 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
     }
     const reps = parseInt(repsInput, 10)
     if (!reps || reps <= 0) return null
-    return { weight, reps }
+    let rpe: number | undefined
+    if (rpeInput !== '') {
+      const parsed = parseInt(rpeInput, 10)
+      if (!Number.isInteger(parsed) || parsed < 1 || parsed > 10 || String(parsed) !== rpeInput.trim()) {
+        setRpeError('1–10')
+        return null
+      }
+      rpe = parsed
+    }
+    return { weight, reps, rpe }
   }
 
   function handleQuickAdd() {
     const parsed = parseInputs()
     if (!parsed) return
-    onAdd(parsed.weight, parsed.reps, n)
+    onAdd(parsed.weight, parsed.reps, n, parsed.rpe)
     setWeightInput('')
     setRepsInput('')
+    setRpeInput('')
   }
 
   function handleIndividualAdd() {
     const parsed = parseInputs()
     if (!parsed) return
-    onAdd(parsed.weight, parsed.reps, 1)
+    onAdd(parsed.weight, parsed.reps, 1, parsed.rpe)
     setWeightInput('')
     setRepsInput('')
+    setRpeInput('')
   }
 
   return (
@@ -71,40 +85,53 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
           Last: {lastSets.map((s) => `${formatWeight(s.weight)}×${s.reps}`).join('  ')}
         </p>
       )}
-      <div className="flex gap-2 items-start">
-        <div className="flex-1">
-          <div className="flex gap-1">
-            <button
-              type="button"
-              onClick={toggleMinus}
-              className="px-2 py-2 text-sm border border-gray-300 rounded-md text-gray-600 select-none"
-              aria-label="Toggle negative"
-            >
-              -/+
-            </button>
+      <div className="space-y-2">
+        <div className="flex gap-1">
+          <button
+            type="button"
+            onClick={toggleMinus}
+            className="px-2 py-2 text-sm border border-gray-300 rounded-md text-gray-600 select-none"
+            aria-label="Toggle negative"
+          >
+            -/+
+          </button>
+          <input
+            type="text"
+            inputMode="decimal"
+            placeholder="Weight"
+            value={weightInput}
+            onChange={(e) => { setWeightInput(e.target.value); setWeightError(undefined) }}
+            onFocus={handleFocus}
+            style={{ fontSize: '16px' }}
+            className={`flex-1 px-3 py-2 border rounded-md ${weightError ? 'border-red-400' : 'border-gray-300'}`}
+          />
+        </div>
+        {weightError && <p className="mt-0.5 text-xs text-red-500">{weightError}</p>}
+        <div className="flex gap-2">
+          <input
+            type="number"
+            inputMode="numeric"
+            placeholder="Reps"
+            value={repsInput}
+            onChange={(e) => setRepsInput(e.target.value)}
+            onFocus={handleFocus}
+            style={{ fontSize: '16px' }}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+          />
+          <div className="flex-1 flex flex-col">
             <input
-              type="text"
-              inputMode="decimal"
-              placeholder="Weight"
-              value={weightInput}
-              onChange={(e) => { setWeightInput(e.target.value); setWeightError(undefined) }}
+              type="number"
+              inputMode="numeric"
+              placeholder="RPE (opt.)"
+              value={rpeInput}
+              onChange={(e) => { setRpeInput(e.target.value); setRpeError(undefined) }}
               onFocus={handleFocus}
               style={{ fontSize: '16px' }}
-              className={`flex-1 px-3 py-2 border rounded-md ${weightError ? 'border-red-400' : 'border-gray-300'}`}
+              className={`w-full px-3 py-2 border rounded-md ${rpeError ? 'border-red-400' : 'border-gray-300'}`}
             />
+            {rpeError && <p className="mt-0.5 text-xs text-red-500">{rpeError}</p>}
           </div>
-          {weightError && <p className="mt-0.5 text-xs text-red-500">{weightError}</p>}
         </div>
-        <input
-          type="number"
-          inputMode="numeric"
-          placeholder="Reps"
-          value={repsInput}
-          onChange={(e) => setRepsInput(e.target.value)}
-          onFocus={handleFocus}
-          style={{ fontSize: '16px' }}
-          className="w-20 px-3 py-2 border border-gray-300 rounded-md"
-        />
       </div>
 
       <div className="flex items-center gap-2">
@@ -112,7 +139,7 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
           <button
             onClick={handleQuickAdd}
             disabled={!weightInput || !repsInput}
-            className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:opacity-40 font-medium"
+            className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:bg-gray-200 disabled:text-gray-400 font-medium"
           >
             Log {n}×
           </button>
@@ -120,7 +147,7 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
           <button
             onClick={handleIndividualAdd}
             disabled={!weightInput || !repsInput}
-            className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:opacity-40 font-medium"
+            className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:bg-gray-200 disabled:text-gray-400 font-medium"
           >
             Add Set
           </button>
@@ -138,7 +165,7 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
           {sets.map((set, i) => (
             <div key={i} className="flex items-center justify-between px-3 py-1.5 bg-gray-50 rounded-md">
               <span className="text-sm text-gray-700">
-                {`Set ${i + 1}: ${formatWeight(set.weight)} × ${set.reps}`}
+                {`Set ${i + 1}: ${formatWeight(set.weight)} × ${set.reps}`}{set.rpe !== undefined && <span className="ml-1 text-xs text-gray-400">RPE {set.rpe}</span>}
               </span>
               {i === sets.length - 1 && (
                 <button

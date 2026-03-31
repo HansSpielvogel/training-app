@@ -127,6 +127,48 @@ describe('getExerciseProgression', () => {
     expect(result[0].weight).toBe(80)
     expect(result[1].weight).toBe(90)
   })
+
+  it('computes average RPE for a session with RPE sets', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
+        sets: [
+          { weight: { kind: 'single', value: 80 }, reps: 10, rpe: 7 },
+          { weight: { kind: 'single', value: 80 }, reps: 10, rpe: 9 },
+        ],
+      }],
+    }))
+
+    const result = await getExerciseProgression(sessionRepo, 'ex-bench')
+    expect(result[0].avgRpe).toBe(8)
+  })
+
+  it('omits avgRpe when no sets have RPE', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
+        sets: [{ weight: { kind: 'single', value: 80 }, reps: 10 }],
+      }],
+    }))
+
+    const result = await getExerciseProgression(sessionRepo, 'ex-bench')
+    expect(result[0].avgRpe).toBeUndefined()
+  })
+
+  it('ignores sets without RPE when computing average', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
+        sets: [
+          { weight: { kind: 'single', value: 80 }, reps: 10, rpe: 6 },
+          { weight: { kind: 'single', value: 80 }, reps: 10 },
+        ],
+      }],
+    }))
+
+    const result = await getExerciseProgression(sessionRepo, 'ex-bench')
+    expect(result[0].avgRpe).toBe(6)
+  })
 })
 
 describe('getMuscleGroupVolume', () => {

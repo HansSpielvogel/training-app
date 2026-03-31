@@ -23,8 +23,9 @@ interface EntryRowProps {
   onLoadExerciseData: () => void
   onAssign: (exerciseDefinitionId: string) => void
   onClearVariation: () => void
-  onAddSet: (weight: Weight, reps: number, count: number) => void
+  onAddSet: (weight: Weight, reps: number, count: number, rpe?: number) => void
   onRemoveLast: () => void
+  onRemoveEntry?: () => void
 }
 
 export function EntryRow({
@@ -43,6 +44,7 @@ export function EntryRow({
   onClearVariation,
   onAddSet,
   onRemoveLast,
+  onRemoveEntry,
 }: EntryRowProps) {
   const setCount = entry.sets.length
 
@@ -62,6 +64,9 @@ export function EntryRow({
           {entry.optional && (
             <span className="ml-2 px-1.5 py-0.5 text-xs font-medium text-amber-800 bg-amber-100 border border-amber-300 rounded">Evtl</span>
           )}
+          {entry.isTemp && (
+            <span className="ml-2 px-1.5 py-0.5 text-xs font-medium text-purple-700 bg-purple-100 border border-purple-300 rounded">Temp</span>
+          )}
           {exerciseName && (
             <span className="ml-2 text-xs text-gray-500">{exerciseName}</span>
           )}
@@ -70,6 +75,17 @@ export function EntryRow({
           )}
         </div>
         <div className="flex items-center gap-1 ml-2">
+          {entry.isTemp && setCount === 0 && onRemoveEntry && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onRemoveEntry() }}
+              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-red-500"
+              aria-label="Remove slot"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          )}
           {done && (
             <span className="w-5 h-5 flex items-center justify-center rounded-full bg-green-500 text-white text-xs">✓</span>
           )}
@@ -111,7 +127,7 @@ export function EntryRow({
               sets={entry.sets}
               lastSets={lastSets}
               defaultSets={defaultSets}
-              onAdd={onAddSet}
+              onAdd={(weight, reps, count, rpe) => onAddSet(weight, reps, count, rpe)}
               onRemoveLast={onRemoveLast}
             />
           )}

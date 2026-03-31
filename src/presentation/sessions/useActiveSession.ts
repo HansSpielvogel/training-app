@@ -17,6 +17,7 @@ import {
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
 import { DexieTrainingPlanRepository } from '@infrastructure/planning/DexieTrainingPlanRepository'
 import { DexieExerciseDefinitionRepository } from '@infrastructure/exercises/DexieExerciseDefinitionRepository'
+import { useSessionSlotActions } from './useSessionSlotActions'
 
 // Hooks are the composition root — they wire use cases to repositories
 export function useActiveSession() {
@@ -52,9 +53,9 @@ export function useActiveSession() {
     await refresh()
   }, [session, sessionRepo, refresh])
 
-  const addSetFn = useCallback(async (entryIndex: number, weight: Weight, reps: number, count: number = 1) => {
+  const addSetFn = useCallback(async (entryIndex: number, weight: Weight, reps: number, count: number = 1, rpe?: number) => {
     if (!session) return
-    for (let i = 0; i < count; i++) await addSet(sessionRepo, session.id, entryIndex, weight, reps)
+    for (let i = 0; i < count; i++) await addSet(sessionRepo, session.id, entryIndex, weight, reps, rpe)
     await refresh()
   }, [session, sessionRepo, refresh])
 
@@ -101,6 +102,8 @@ export function useActiveSession() {
     [exerciseRepo]
   )
 
+  const slotActions = useSessionSlotActions(session, sessionRepo, planRepo, refresh)
+
   return {
     session,
     loading,
@@ -115,5 +118,6 @@ export function useActiveSession() {
     getRotationSuggestion,
     getLastSets,
     getExercisesForMuscleGroup,
+    ...slotActions,
   }
 }
