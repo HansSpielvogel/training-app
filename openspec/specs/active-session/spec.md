@@ -22,7 +22,7 @@ The rotation suggestion is derived from the last 5 completed sessions containing
 
 #### Scenario: Rotation suggestion shown
 - **WHEN** user opens a slot and the rotation algorithm finds a least-used exercise that is not the most recently used among the last 5 sessions
-- **THEN** a suggestion chip is displayed above the recent-variations list identifying the recommended ExerciseDefinition
+- **THEN** a 💡 suggestion chip is displayed inline with the recent-variations list identifying the recommended ExerciseDefinition
 
 #### Scenario: No rotation suggestion
 - **WHEN** user opens a slot and fewer than 2 distinct exercises appear in the last 5 sessions, or all non-recent candidates are equally frequently used
