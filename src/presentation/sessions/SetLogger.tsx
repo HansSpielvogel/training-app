@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { SessionSet } from '@application/sessions'
 import type { Weight } from '@application/sessions'
 import { parseWeight } from '@application/sessions'
-import { DEFAULT_SET_COUNT } from '@domain/exercises/ExerciseDefinition'
+import { DEFAULT_SET_COUNT } from '@application/exercises'
 
 function formatWeight(w: Weight): string {
   if (w.kind === 'single') return String(w.value)
@@ -24,6 +24,15 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
   const [weightInput, setWeightInput] = useState('')
   const [repsInput, setRepsInput] = useState('')
   const [weightError, setWeightError] = useState<string>()
+
+  function handleFocus(e: React.FocusEvent<HTMLInputElement>) {
+    const el = e.currentTarget
+    setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)
+  }
+
+  function toggleMinus() {
+    setWeightInput((prev) => prev.startsWith('-') ? prev.slice(1) : '-' + prev)
+  }
 
   function parseInputs(): { weight: Weight; reps: number } | null {
     setWeightError(undefined)
@@ -64,14 +73,26 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
       )}
       <div className="flex gap-2 items-start">
         <div className="flex-1">
-          <input
-            type="text"
-            inputMode="decimal"
-            placeholder="Weight"
-            value={weightInput}
-            onChange={(e) => { setWeightInput(e.target.value); setWeightError(undefined) }}
-            className={`w-full px-3 py-2 text-sm border rounded-md ${weightError ? 'border-red-400' : 'border-gray-300'}`}
-          />
+          <div className="flex gap-1">
+            <button
+              type="button"
+              onClick={toggleMinus}
+              className="px-2 py-2 text-sm border border-gray-300 rounded-md text-gray-600 select-none"
+              aria-label="Toggle negative"
+            >
+              -/+
+            </button>
+            <input
+              type="text"
+              inputMode="decimal"
+              placeholder="Weight"
+              value={weightInput}
+              onChange={(e) => { setWeightInput(e.target.value); setWeightError(undefined) }}
+              onFocus={handleFocus}
+              style={{ fontSize: '16px' }}
+              className={`flex-1 px-3 py-2 border rounded-md ${weightError ? 'border-red-400' : 'border-gray-300'}`}
+            />
+          </div>
           {weightError && <p className="mt-0.5 text-xs text-red-500">{weightError}</p>}
         </div>
         <input
@@ -80,13 +101,18 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
           placeholder="Reps"
           value={repsInput}
           onChange={(e) => setRepsInput(e.target.value)}
-          className="w-20 px-3 py-2 text-sm border border-gray-300 rounded-md"
+          onFocus={handleFocus}
+          style={{ fontSize: '16px' }}
+          className="w-20 px-3 py-2 border border-gray-300 rounded-md"
         />
+      </div>
+
+      <div className="flex items-center gap-2">
         {mode === 'quick' ? (
           <button
             onClick={handleQuickAdd}
             disabled={!weightInput || !repsInput}
-            className="px-3 py-2 text-sm bg-blue-600 text-white rounded-md disabled:opacity-40 whitespace-nowrap"
+            className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:opacity-40 font-medium"
           >
             Log {n}×
           </button>
@@ -94,19 +120,18 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
           <button
             onClick={handleIndividualAdd}
             disabled={!weightInput || !repsInput}
-            className="px-4 py-2 text-sm bg-blue-600 text-white rounded-md disabled:opacity-40"
+            className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:opacity-40 font-medium"
           >
-            Add
+            Add Set
           </button>
         )}
+        <button
+          onClick={() => setMode(mode === 'quick' ? 'individual' : 'quick')}
+          className="px-3 py-2.5 text-sm text-gray-600 border border-gray-300 rounded-md"
+        >
+          {mode === 'quick' ? 'Individual' : 'Quick sets'}
+        </button>
       </div>
-
-      <button
-        onClick={() => setMode(mode === 'quick' ? 'individual' : 'quick')}
-        className="text-xs text-gray-400 underline"
-      >
-        {mode === 'quick' ? 'Individual sets' : 'Quick sets'}
-      </button>
 
       {sets.length > 0 && (
         <div className="space-y-1">

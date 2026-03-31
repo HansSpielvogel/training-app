@@ -17,6 +17,9 @@ interface EntryRowProps {
   exerciseData: EntryExerciseData | null
   lastSets: SessionSet[] | null
   defaultSets?: number
+  isExpanded: boolean
+  onToggle: () => void
+  onMarkDone: () => void
   onLoadExerciseData: () => void
   onAssign: (exerciseDefinitionId: string) => void
   onClearVariation: () => void
@@ -31,25 +34,33 @@ export function EntryRow({
   exerciseData,
   lastSets,
   defaultSets,
+  isExpanded,
+  onToggle,
+  onMarkDone,
   onLoadExerciseData,
   onAssign,
   onClearVariation,
   onAddSet,
   onRemoveLast,
 }: EntryRowProps) {
-  const [expanded, setExpanded] = useState(false)
+  const [done, setDone] = useState(false)
   const setCount = entry.sets.length
 
-  function handleExpand() {
-    if (!expanded && !exerciseData) onLoadExerciseData()
-    setExpanded(!expanded)
+  function handleToggle() {
+    if (!isExpanded && !exerciseData) onLoadExerciseData()
+    onToggle()
+  }
+
+  function handleMarkDone() {
+    setDone(true)
+    onMarkDone()
   }
 
   return (
     <div className={`border-b border-gray-100 ${setCount > 0 ? 'border-l-2 border-l-blue-400' : ''}`}>
       <div
         className="flex items-center justify-between px-4 py-3 cursor-pointer active:bg-gray-50"
-        onClick={handleExpand}
+        onClick={handleToggle}
       >
         <div className="flex-1 min-w-0">
           <span className="text-sm font-medium text-gray-800">{muscleGroupName}</span>
@@ -64,7 +75,10 @@ export function EntryRow({
           )}
         </div>
         <div className="flex items-center gap-1 ml-2">
-          {entry.exerciseDefinitionId && (
+          {done && (
+            <span className="w-5 h-5 flex items-center justify-center rounded-full bg-green-500 text-white text-xs">✓</span>
+          )}
+          {entry.exerciseDefinitionId && !done && (
             <button
               onClick={(e) => { e.stopPropagation(); onClearVariation() }}
               className="p-3 text-gray-400 hover:text-red-500"
@@ -76,7 +90,7 @@ export function EntryRow({
             </button>
           )}
           <svg
-            className={`w-4 h-4 text-gray-400 transition-transform ${expanded ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
             fill="none" stroke="currentColor" viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -84,7 +98,7 @@ export function EntryRow({
         </div>
       </div>
 
-      {expanded && (
+      {isExpanded && (
         <div className="px-4 pb-4 space-y-3">
           {!entry.exerciseDefinitionId ? (
             exerciseData ? (
@@ -106,6 +120,13 @@ export function EntryRow({
               onRemoveLast={onRemoveLast}
             />
           )}
+          <button
+            onClick={handleMarkDone}
+            disabled={done}
+            className="w-full py-2 bg-green-600 text-white text-sm rounded-md font-medium disabled:opacity-40"
+          >
+            {done ? 'Done' : 'Done'}
+          </button>
         </div>
       )}
     </div>

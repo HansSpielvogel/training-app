@@ -49,4 +49,16 @@ describe('parseWeight', () => {
   it('throws on empty string', () => {
     expect(() => parseWeight('')).toThrow()
   })
+
+  it('parses single weight with comma decimal', () => {
+    expect(parseWeight('22,5')).toEqual({ kind: 'single', value: 22.5 })
+  })
+
+  it('parses stacked weight with comma decimals', () => {
+    expect(parseWeight('31,5+2,3')).toEqual({ kind: 'stacked', base: 31.5, added: 2.3 })
+  })
+
+  it('parses bilateral with comma decimal', () => {
+    expect(parseWeight('2x22,5')).toEqual({ kind: 'bilateral', perSide: 22.5 })
+  })
 })

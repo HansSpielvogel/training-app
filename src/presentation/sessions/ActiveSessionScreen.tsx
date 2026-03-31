@@ -6,6 +6,14 @@ import { useMuscleGroups } from '../exercises/useMuscleGroups'
 import { EntryRow } from './EntryRow'
 import type { EntryExerciseData } from './EntryRow'
 
+export function findNextIncomplete(current: number | null, doneIndices: Set<number>, total: number): number | null {
+  const start = current !== null ? current + 1 : 0
+  for (let i = start; i < total; i++) {
+    if (!doneIndices.has(i)) return i
+  }
+  return null
+}
+
 export function ActiveSessionScreen() {
   const navigate = useNavigate()
   const { session, loading, assign, clearVariation, addSet, removeLastSet, complete, abandon, getRecentVariations, getRotationSuggestion, getLastSets, getExercisesForMuscleGroup } =
@@ -16,6 +24,8 @@ export function ActiveSessionScreen() {
   const [lastSetsMap, setLastSetsMap] = useState<Record<number, SessionSet[] | null>>({})
   const [confirmFinish, setConfirmFinish] = useState(false)
   const [confirmAbandon, setConfirmAbandon] = useState(false)
+  const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
+  const [doneIndices, setDoneIndices] = useState<Set<number>>(new Set())
 
   useEffect(() => {
     if (!loading && !session) navigate('/sessions', { replace: true })
@@ -51,6 +61,29 @@ export function ActiveSessionScreen() {
     }
   }
 
+  function handleToggle(i: number) {
+    const isCurrentlyExpanded = expandedIndex === i
+    if (isCurrentlyExpanded) {
+      const entry = session?.entries[i]
+      const hasSets = (entry?.sets.length ?? 0) > 0
+      if (hasSets) {
+        const newDone = new Set(doneIndices).add(i)
+        setDoneIndices(newDone)
+        setExpandedIndex(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
+      } else {
+        setExpandedIndex(null)
+      }
+    } else {
+      setExpandedIndex(i)
+    }
+  }
+
+  function handleMarkDone(i: number) {
+    const newDone = new Set(doneIndices).add(i)
+    setDoneIndices(newDone)
+    setExpandedIndex(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
+  }
+
   async function handleComplete() {
     await complete()
     navigate('/sessions', { replace: true })
@@ -84,7 +117,7 @@ export function ActiveSessionScreen() {
           <h1 className="flex-1 min-w-0 truncate text-xl font-semibold text-gray-900">{session.planName}</h1>
           <button
             onClick={() => { setConfirmAbandon(true); setConfirmFinish(false) }}
-            className="ml-3 p-2 text-sm text-gray-400 hover:text-red-500 min-h-[44px] flex items-center"
+            className="ml-3 p-2 text-sm text-red-500 min-h-[44px] flex items-center"
           >
             Abandon
           </button>
@@ -124,6 +157,9 @@ export function ActiveSessionScreen() {
             exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
             exerciseData={exerciseDataMap[i] ?? null}
             lastSets={lastSetsMap[i] ?? null}
+            isExpanded={expandedIndex === i}
+            onToggle={() => handleToggle(i)}
+            onMarkDone={() => handleMarkDone(i)}
             onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
             onAssign={(id) => handleAssign(i, id)}
             onClearVariation={() => { clearVariation(i); setLastSetsMap((prev) => ({ ...prev, [i]: null })) }}

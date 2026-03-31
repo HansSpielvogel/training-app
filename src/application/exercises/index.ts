@@ -13,6 +13,7 @@ export { importExerciseLibrary, InvalidImportError } from './importExerciseLibra
 export { seedExerciseLibrary } from './seedExerciseLibrary'
 
 // Re-export domain types so presentation doesn't import domain directly
+export { DEFAULT_SET_COUNT } from '@domain/exercises/ExerciseDefinition'
 export type { MuscleGroup } from '@domain/exercises/MuscleGroup'
 export { DuplicateNameError, MuscleGroupInUseError } from '@domain/exercises/MuscleGroup'
 export type { ExerciseDefinition } from '@domain/exercises/ExerciseDefinition'

@@ -1,14 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   getTrainingPlan,
-  addPlanSlot,
-  removePlanSlot,
-  movePlanSlot,
-  updateSlotOptional,
-  renameTrainingPlan,
   deleteTrainingPlan,
 } from '@application/planning'
-import type { TrainingPlanDetail } from '@application/planning'
+import type { TrainingPlanDetail, PlanSlotDetail } from '@application/planning'
 import { DexieTrainingPlanRepository } from '@infrastructure/planning/DexieTrainingPlanRepository'
 import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscleGroupRepository'
 
@@ -16,42 +12,80 @@ import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscl
 export function useTrainingPlanDetail(planId: string) {
   const repo = useRef(new DexieTrainingPlanRepository()).current
   const muscleGroupRepo = useRef(new DexieMuscleGroupRepository()).current
+  const navigate = useNavigate()
   const [plan, setPlan] = useState<TrainingPlanDetail | undefined>()
 
-  const refresh = useCallback(async () => {
-    setPlan(await getTrainingPlan(repo, muscleGroupRepo, planId))
+  useEffect(() => {
+    getTrainingPlan(repo, muscleGroupRepo, planId).then(setPlan)
   }, [repo, muscleGroupRepo, planId])
 
-  useEffect(() => { refresh() }, [refresh])
+  const addSlot = useCallback((muscleGroupId: string) => {
+    if (!plan) return
+    const maxOrder = plan.slots.reduce((max, s) => Math.max(max, s.order), 0)
+    const newSlot: PlanSlotDetail = {
+      id: crypto.randomUUID(),
+      muscleGroupId,
+      muscleGroupName: muscleGroupId,
+      order: maxOrder + 1,
+      optional: false,
+    }
+    setPlan((prev) => prev ? { ...prev, slots: [...prev.slots, newSlot] } : prev)
+  }, [plan])
 
-  const addSlot = useCallback(async (muscleGroupId: string) => {
-    await addPlanSlot(repo, planId, muscleGroupId)
-    await refresh()
-  }, [repo, planId, refresh])
+  const removeSlot = useCallback((slotId: string) => {
+    setPlan((prev) => prev ? { ...prev, slots: prev.slots.filter((s) => s.id !== slotId) } : prev)
+  }, [])
 
-  const removeSlot = useCallback(async (slotId: string) => {
-    await removePlanSlot(repo, slotId)
-    await refresh()
-  }, [repo, refresh])
+  const moveSlot = useCallback((slotId: string, direction: 'up' | 'down') => {
+    setPlan((prev) => {
+      if (!prev) return prev
+      const slots = [...prev.slots]
+      const index = slots.findIndex((s) => s.id === slotId)
+      if (index === -1) return prev
+      const swapIndex = direction === 'up' ? index - 1 : index + 1
+      if (swapIndex < 0 || swapIndex >= slots.length) return prev
+      const a = slots[index]
+      const b = slots[swapIndex]
+      slots[index] = { ...a, order: b.order }
+      slots[swapIndex] = { ...b, order: a.order }
+      return { ...prev, slots }
+    })
+  }, [])
 
-  const moveSlot = useCallback(async (slotId: string, direction: 'up' | 'down') => {
-    await movePlanSlot(repo, planId, slotId, direction)
-    await refresh()
-  }, [repo, planId, refresh])
+  const renamePlan = useCallback((newName: string) => {
+    const trimmed = newName.trim()
+    if (!trimmed) throw new Error('Name cannot be empty')
+    setPlan((prev) => prev ? { ...prev, name: trimmed } : prev)
+  }, [])
 
-  const renamePlan = useCallback(async (newName: string) => {
-    await renameTrainingPlan(repo, planId, newName)
-    await refresh()
-  }, [repo, planId, refresh])
+  const toggleSlotOptional = useCallback((slotId: string, optional: boolean) => {
+    setPlan((prev) => prev
+      ? { ...prev, slots: prev.slots.map((s) => s.id === slotId ? { ...s, optional } : s) }
+      : prev
+    )
+  }, [])
 
-  const toggleSlotOptional = useCallback(async (slotId: string, optional: boolean) => {
-    await updateSlotOptional(repo, slotId, optional)
-    await refresh()
-  }, [repo, refresh])
+  const save = useCallback(async () => {
+    if (!plan) return
+    await repo.savePlan({ id: plan.id, name: plan.name, createdAt: plan.createdAt })
+    await repo.deleteSlotsByPlan(plan.id)
+    await repo.saveSlots(plan.slots.map((s) => ({
+      id: s.id,
+      planId: plan.id,
+      muscleGroupId: s.muscleGroupId,
+      order: s.order,
+      optional: s.optional || undefined,
+    })))
+    navigate('/training-plans')
+  }, [plan, repo, navigate])
+
+  const discard = useCallback(() => {
+    navigate('/training-plans')
+  }, [navigate])
 
   const deletePlan = useCallback(async () => {
     await deleteTrainingPlan(repo, planId)
   }, [repo, planId])
 
-  return { plan, addSlot, removeSlot, moveSlot, toggleSlotOptional, renamePlan, deletePlan }
+  return { plan, addSlot, removeSlot, moveSlot, toggleSlotOptional, renamePlan, save, discard, deletePlan }
 }

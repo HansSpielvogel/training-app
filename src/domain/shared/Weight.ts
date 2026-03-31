@@ -4,7 +4,7 @@ export type Weight =
   | { kind: 'stacked'; base: number; added: number }
 
 export function parseWeight(input: string): Weight {
-  const s = input.trim()
+  const s = input.trim().replace(/,/g, '.')
 
   const bilateral = s.match(/^2[x×](\d+(?:\.\d+)?)$/i)
   if (bilateral) return { kind: 'bilateral', perSide: parseFloat(bilateral[1]) }
