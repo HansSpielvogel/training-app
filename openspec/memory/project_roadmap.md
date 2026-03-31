@@ -20,6 +20,7 @@ type: project
 - p3: In the Exercises view, show last used weight and reps for every exercise (if available)
 - p3: In stats/Progression: add a list view showing all logged weight, reps, and date
 - p3: In stats/Progression: incorporate reps into the graph — reps increase before weight increases, then reset; both dimensions should be visible
+- p3: In stats/calendar: Add a click on the past session to expand a list of exercises done 
 
 ## Future (not scheduled)
 
