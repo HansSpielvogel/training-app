@@ -133,11 +133,10 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
             className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
           />
           <div className="flex-1 flex flex-col">
-            <span className="text-xs text-gray-500 mb-0.5">RPE (1–10, opt.)</span>
             <input
               type="number"
               inputMode="numeric"
-              placeholder="RPE"
+              placeholder="RPE (1-10)"
               value={rpeInput}
               onChange={(e) => { setRpeInput(e.target.value); setRpeError(undefined) }}
               onFocus={handleFocus}
