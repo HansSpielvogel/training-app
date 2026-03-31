@@ -1,9 +1,19 @@
 ### Requirement: Mark slot as done
-The user SHALL be able to mark a session entry slot as done via a dedicated button. The done state is UI-only and ephemeral — it does not affect the persisted session data. Sets logged to the slot remain visible and editable after the slot is marked done. When a slot is marked done, the clear-exercise button for that slot SHALL be hidden.
+The user SHALL be able to mark a session entry slot as done via a dedicated button. The Done button SHALL only be visible when at least one set has been logged for that slot. The done state is UI-only and ephemeral — it does not affect the persisted session data. Sets logged to the slot remain visible and editable after the slot is marked done. When a slot is marked done, the clear-exercise button for that slot SHALL be hidden.
+
+Collapsing an expanded slot that has at least one logged set also marks it as done (same visual and behavioural result as pressing the Done button).
 
 #### Scenario: Mark slot done via button
-- **WHEN** the user taps the "Done" button on an expanded slot
+- **WHEN** the user taps the "Done" button on an expanded slot (requires at least one set logged)
 - **THEN** the slot shows a green done indicator, the clear-exercise button is hidden, and the done callback fires
+
+#### Scenario: Done button hidden until sets are logged
+- **WHEN** a slot is expanded but no sets have been logged yet
+- **THEN** the Done button is not shown
+
+#### Scenario: Mark slot done via collapse
+- **WHEN** the user collapses a slot that has at least one logged set
+- **THEN** the slot shows a green done indicator and the clear-exercise button is hidden
 
 #### Scenario: Sets remain editable after done
 - **WHEN** a slot is marked done
