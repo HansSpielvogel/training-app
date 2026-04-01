@@ -20,7 +20,9 @@ type: project
 
 ## Future (not scheduled)
 
+- add a possibility to change the RPE on a logged set (I reflect after doing the set: "that was tough i should mark the RPE as high")
 - add a drag gesture for deleting the training plan slots in the active session, with a red trash indicator appearing while dragging as a feedback
+- add a way to be able to change training entries order (reordering) in an active session, maybe a drag and drop gesture?
 - AI suggestions based on history
 - Other sports (new bounded context, see extensibility rule in CLAUDE.md)
 

@@ -81,7 +81,7 @@ export function EntryRow({
           {entry.exerciseDefinitionId && !done && (
             <button
               onClick={(e) => { e.stopPropagation(); onClearVariation() }}
-              className="p-3 text-gray-400 hover:text-red-500"
+              className="px-3 self-stretch flex items-center text-gray-400 hover:text-red-500"
               aria-label="Deselect exercise"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -99,7 +99,10 @@ export function EntryRow({
       </div>
 
       {isExpanded && (
-        <div className="px-4 pb-4 space-y-3">
+        <div
+          className="px-4 pb-4 space-y-3 transition-[min-height] duration-200 ease-out"
+          style={{ minHeight: entry.exerciseDefinitionId ? '200px' : '0' }}
+        >
           {!entry.exerciseDefinitionId ? (
             exerciseData ? (
               <VariationPicker
@@ -112,13 +115,15 @@ export function EntryRow({
               <p className="text-sm text-gray-400">Loading exercises…</p>
             )
           ) : (
-            <SetLogger
-              sets={entry.sets}
-              lastSets={lastSets}
-              defaultSets={defaultSets}
-              onAdd={(weight, reps, count, rpe) => onAddSet(weight, reps, count, rpe)}
-              onRemoveLast={onRemoveLast}
-            />
+            <div style={{ animation: 'fadeIn 150ms ease-out' }}>
+              <SetLogger
+                sets={entry.sets}
+                lastSets={lastSets}
+                defaultSets={defaultSets}
+                onAdd={(weight, reps, count, rpe) => onAddSet(weight, reps, count, rpe)}
+                onRemoveLast={onRemoveLast}
+              />
+            </div>
           )}
           {setCount > 0 && (
             <button
