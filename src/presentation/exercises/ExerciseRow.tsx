@@ -1,5 +1,6 @@
 import type { ExerciseDefinition } from '@application/exercises'
 import type { LastUsedEntry } from '@application/analytics'
+import { formatSets } from '../shared/formatSets'
 
 interface ExerciseRowProps {
   ed: ExerciseDefinition
@@ -16,7 +17,7 @@ export function ExerciseRow({ ed, muscleGroupNames, lastUsed, onEdit, onDelete }
         <p className="text-sm text-gray-800">{ed.name}</p>
         <p className="text-xs text-gray-400 truncate">{muscleGroupNames}</p>
         {lastUsed && (
-          <p className="text-xs text-gray-500 mt-0.5">{lastUsed.weight} {lastUsed.weightUnit} · {lastUsed.reps} reps</p>
+          <p className="text-xs text-gray-500 mt-0.5">{formatSets(lastUsed.sets)}</p>
         )}
       </div>
       <button onClick={onEdit} className="p-2 text-gray-400 hover:text-blue-600" aria-label="Edit">

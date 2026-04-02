@@ -44,6 +44,7 @@ export async function getExerciseProgression(
       weight: maxWeight,
       weightUnit,
       avgReps,
+      sets: entry.sets,
       ...(avgRpe !== undefined ? { avgRpe } : {}),
     })
   }

@@ -3,12 +3,7 @@ import type { SessionSet } from '@application/sessions'
 import type { Weight } from '@application/sessions'
 import { parseWeight } from '@application/sessions'
 import { DEFAULT_SET_COUNT } from '@application/exercises'
-
-function formatWeight(w: Weight): string {
-  if (w.kind === 'single') return String(w.value)
-  if (w.kind === 'bilateral') return `2×${w.perSide}`
-  return `${w.base}+${w.added}`
-}
+import { formatSets } from '../shared/formatSets'
 
 interface Props {
   sets: readonly SessionSet[]
@@ -85,9 +80,7 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
   return (
     <div className="space-y-2">
       {lastSets && lastSets.length > 0 && (
-        <p className="text-sm text-gray-500">
-          Last: {lastSets.map((s) => `${formatWeight(s.weight)}×${s.reps}`).join('  ')}
-        </p>
+        <p className="text-sm text-gray-500">Last: {formatSets(lastSets)}</p>
       )}
       <div className="space-y-2">
         <div className="flex gap-1">
@@ -179,7 +172,7 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
           {sets.map((set, i) => (
             <div key={i} className="flex items-center justify-between px-3 py-1.5 bg-gray-50 rounded-md">
               <span className="text-sm text-gray-700">
-                {`Set ${i + 1}: ${formatWeight(set.weight)} × ${set.reps}`}{set.rpe !== undefined && <span className="ml-1 text-xs text-gray-400">RPE {set.rpe}</span>}
+                {`Set ${i + 1}: `}{formatSets([set])}
               </span>
               {i === sets.length - 1 && (
                 <button

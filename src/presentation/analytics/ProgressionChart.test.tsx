@@ -10,6 +10,7 @@ function makePoint(overrides: Partial<ExerciseProgressionPoint> = {}): ExerciseP
     weight: 80,
     weightUnit: 'kg',
     avgReps: 10,
+    sets: [{ weight: { kind: 'single', value: 80 }, reps: 10 }],
     ...overrides,
   }
 }

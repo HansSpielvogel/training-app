@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import type { ExerciseDefinition } from '@application/exercises'
 import type { ExerciseProgressionPoint } from '@application/analytics'
 import { ProgressionChart } from './ProgressionChart'
+import { formatSets } from '../shared/formatSets'
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString()
@@ -61,18 +62,10 @@ export function ExerciseProgressionView({ exercises, getProgression, getFullProg
             <ProgressionChart points={chartPoints} />
           ) : (
             <div>
-              <div className="flex items-center px-4 py-2 bg-gray-50 border-b border-gray-200">
-                <span className="flex-1 text-xs text-gray-400">Date</span>
-                <span className="text-xs text-gray-400 mr-3">Best set</span>
-                <span className="text-xs text-gray-400 w-14 text-right">Avg reps</span>
-              </div>
               {listPoints.map((p, i) => (
                 <div key={i} className="flex items-center px-4 py-3 border-b border-gray-100">
-                  <span className="flex-1 text-xs text-gray-500">{formatDate(p.date)}</span>
-                  <span className="text-sm text-blue-600 font-medium mr-3">{p.weight} {p.weightUnit}</span>
-                  {p.avgReps !== undefined && (
-                    <span className="text-xs text-orange-500 w-14 text-right">{p.avgReps} reps</span>
-                  )}
+                  <span className="w-20 text-xs text-gray-400 shrink-0">{formatDate(p.date)}</span>
+                  <span className="text-sm text-gray-700">{formatSets(p.sets)}</span>
                 </div>
               ))}
             </div>

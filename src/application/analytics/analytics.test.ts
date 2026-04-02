@@ -66,7 +66,9 @@ describe('getExerciseProgression', () => {
     expect(result).toHaveLength(2)
     expect(result[0].weight).toBe(85)
     expect(result[0].weightUnit).toBe('kg')
+    expect(result[0].sets).toHaveLength(2)
     expect(result[1].weight).toBe(90)
+    expect(result[1].sets).toHaveLength(1)
   })
 
   it('normalizes bilateral weight to perSide with kg/side unit', async () => {
@@ -309,18 +311,19 @@ describe('getLastUsedByExercise', () => {
     expect(result).toEqual({})
   })
 
-  it('returns last-used weight and reps per exercise', async () => {
+  it('returns last-used weight, reps, and sets per exercise', async () => {
+    const sets = [{ weight: { kind: 'single' as const, value: 80 }, reps: 10 }]
     await sessionRepo.save(makeSession({
       id: 's1',
       completedAt: new Date('2024-01-01'),
-      entries: [{
-        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
-        sets: [{ weight: { kind: 'single', value: 80 }, reps: 10 }],
-      }],
+      entries: [{ muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench', sets }],
     }))
 
     const result = await getLastUsedByExercise(sessionRepo)
-    expect(result['ex-bench']).toEqual({ weight: 80, weightUnit: 'kg', reps: 10 })
+    expect(result['ex-bench'].weight).toBe(80)
+    expect(result['ex-bench'].reps).toBe(10)
+    expect(result['ex-bench'].sets).toHaveLength(1)
+    expect(result['ex-bench'].sets[0].reps).toBe(10)
   })
 
   it('picks the most recent session for each exercise', async () => {
@@ -369,8 +372,12 @@ describe('getLastUsedByExercise', () => {
     }))
 
     const result = await getLastUsedByExercise(sessionRepo)
-    expect(result['ex-curl']).toEqual({ weight: 15, weightUnit: 'kg/side', reps: 12 })
-    expect(result['ex-cable']).toEqual({ weight: 60, weightUnit: 'kg', reps: 15 })
+    expect(result['ex-curl'].weight).toBe(15)
+    expect(result['ex-curl'].weightUnit).toBe('kg/side')
+    expect(result['ex-curl'].reps).toBe(12)
+    expect(result['ex-cable'].weight).toBe(60)
+    expect(result['ex-cable'].weightUnit).toBe('kg')
+    expect(result['ex-cable'].reps).toBe(15)
   })
 
   it('omits exercises with no sets', async () => {

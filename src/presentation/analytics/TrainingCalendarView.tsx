@@ -1,28 +1,8 @@
 import { useState } from 'react'
 import type { SessionSummaryItem } from '@application/analytics'
-import type { TrainingSession, SessionSet, Weight } from '@application/sessions'
+import type { TrainingSession } from '@application/sessions'
 import type { ExerciseDefinition } from '@application/exercises'
-
-function formatWeight(w: Weight): string {
-  switch (w.kind) {
-    case 'single': return `${w.value} kg`
-    case 'bilateral': return `${w.perSide} kg/side`
-    case 'stacked': return `${w.base + w.added} kg`
-  }
-}
-
-function formatSets(sets: readonly SessionSet[]): string {
-  if (sets.length === 0) return ''
-  const weights = sets.map(s => formatWeight(s.weight))
-  const allSameWeight = weights.every(w => w === weights[0])
-  if (allSameWeight && sets.length > 1) {
-    const allSameReps = sets.every(s => s.reps === sets[0].reps)
-    return allSameReps
-      ? `${weights[0]} × ${sets[0].reps} (${sets.length} sets)`
-      : `${weights[0]} × ${sets.length} sets`
-  }
-  return sets.map((s, i) => `${weights[i]} × ${s.reps}`).join(' · ')
-}
+import { formatSets } from '../shared/formatSets'
 
 interface Props {
   sessions: SessionSummaryItem[]

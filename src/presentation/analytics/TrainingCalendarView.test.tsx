@@ -56,7 +56,7 @@ describe('TrainingCalendarView', () => {
     setup()
     fireEvent.click(screen.getByText('Push'))
     await waitFor(() => expect(screen.getByText('Bench Press')).toBeInTheDocument())
-    expect(screen.getByText('80 kg × 10 · 85 kg × 8')).toBeInTheDocument()
+    expect(screen.getByText('80 kg × 10, 85 kg × 8')).toBeInTheDocument()
   })
 
   it('collapses the card on second tap', async () => {

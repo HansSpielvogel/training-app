@@ -33,7 +33,7 @@ export async function getLastUsedByExercise(
         }
       }
 
-      result[id] = { weight: maxWeight, weightUnit, reps: repsAtMax }
+      result[id] = { weight: maxWeight, weightUnit, reps: repsAtMax, sets: entry.sets }
     }
   }
 
