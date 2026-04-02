@@ -12,6 +12,8 @@ export default defineConfig({
       strategies: 'generateSW',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
+        navigateFallback: '/training-app/index.html',
+        navigateFallbackAllowlist: [/^\/training-app/],
       },
       manifest: {
         name: 'Training App',
@@ -21,8 +23,8 @@ export default defineConfig({
         background_color: '#ffffff',
         display: 'standalone',
         orientation: 'portrait',
-        scope: '/',
-        start_url: '/',
+        scope: '/training-app/',
+        start_url: '/training-app/',
         icons: [
           {
             src: 'pwa-192x192.png',
