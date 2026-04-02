@@ -31,27 +31,26 @@ describe('ExerciseProgressionView', () => {
     expect(screen.getByText('Bench Press')).toBeInTheDocument()
   })
 
-  it('shows chart view after selecting an exercise', async () => {
+  it('shows list view by default after selecting an exercise', async () => {
     setup()
     fireEvent.click(screen.getByText('Bench Press'))
-    await waitFor(() => expect(screen.getByText('Chart')).toBeInTheDocument())
+    await waitFor(() => expect(screen.getByText('85 kg')).toBeInTheDocument())
+    expect(screen.getByText('8 reps')).toBeInTheDocument()
+    expect(screen.getByText('Chart')).toBeInTheDocument()
     expect(screen.getByText('List')).toBeInTheDocument()
   })
 
-  it('switches to list view when List is clicked', async () => {
-    setup()
+  it('shows list with a single session recorded', async () => {
+    const singlePoint = [points[0]]
+    setup({ getProgression: vi.fn().mockResolvedValue(singlePoint), getFullProgression: vi.fn().mockResolvedValue(singlePoint) })
     fireEvent.click(screen.getByText('Bench Press'))
-    await waitFor(() => expect(screen.getByText('List')).toBeInTheDocument())
-    fireEvent.click(screen.getByText('List'))
-    await waitFor(() => expect(screen.getByText('85 kg')).toBeInTheDocument())
-    expect(screen.getByText('8 reps')).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByText('80 kg')).toBeInTheDocument())
+    expect(screen.getByText('Chart')).toBeInTheDocument()
   })
 
   it('shows list in most-recent-first order', async () => {
     setup()
     fireEvent.click(screen.getByText('Bench Press'))
-    await waitFor(() => screen.getByText('List'))
-    fireEvent.click(screen.getByText('List'))
     await waitFor(() => {
       const weights = screen.getAllByText(/\d+ kg$/)
       expect(weights[0].textContent).toBe('85 kg')
@@ -59,14 +58,22 @@ describe('ExerciseProgressionView', () => {
     })
   })
 
-  it('switches back to chart view when Chart is clicked', async () => {
+  it('switches to chart view when Chart is clicked', async () => {
     setup()
     fireEvent.click(screen.getByText('Bench Press'))
-    await waitFor(() => screen.getByText('List'))
-    fireEvent.click(screen.getByText('List'))
     await waitFor(() => screen.getByText('85 kg'))
     fireEvent.click(screen.getByText('Chart'))
-    expect(screen.queryByText('85 kg')).not.toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByText('85 kg')).not.toBeInTheDocument())
+  })
+
+  it('switches back to list view when List is clicked', async () => {
+    setup()
+    fireEvent.click(screen.getByText('Bench Press'))
+    await waitFor(() => screen.getByText('85 kg'))
+    fireEvent.click(screen.getByText('Chart'))
+    await waitFor(() => expect(screen.queryByText('85 kg')).not.toBeInTheDocument())
+    fireEvent.click(screen.getByText('List'))
+    await waitFor(() => expect(screen.getByText('85 kg')).toBeInTheDocument())
   })
 
   it('shows no-data message when exercise has no progression', async () => {

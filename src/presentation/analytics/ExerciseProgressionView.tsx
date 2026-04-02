@@ -15,7 +15,7 @@ interface Props {
 
 export function ExerciseProgressionView({ exercises, getProgression, getFullProgression }: Props) {
   const [selected, setSelected] = useState<ExerciseDefinition | null>(null)
-  const [view, setView] = useState<'chart' | 'list'>('chart')
+  const [view, setView] = useState<'chart' | 'list'>('list')
   const [chartPoints, setChartPoints] = useState<ExerciseProgressionPoint[]>([])
   const [listPoints, setListPoints] = useState<ExerciseProgressionPoint[]>([])
 
@@ -31,13 +31,13 @@ export function ExerciseProgressionView({ exercises, getProgression, getFullProg
       <div>
         <div className="flex items-center px-4 py-3 border-b border-gray-200">
           <button
-            onClick={() => { setSelected(null); setView('chart') }}
+            onClick={() => { setSelected(null); setView('list') }}
             className="text-gray-500 text-sm mr-3"
           >
             ← Back
           </button>
           <span className="flex-1 text-sm font-semibold text-gray-800">{selected.name}</span>
-          {chartPoints.length > 1 && (
+          {chartPoints.length >= 1 && (
             <div className="flex rounded-md overflow-hidden border border-gray-200">
               <button
                 onClick={() => setView('chart')}
@@ -57,8 +57,6 @@ export function ExerciseProgressionView({ exercises, getProgression, getFullProg
         <div className={view === 'chart' ? 'px-4 py-4' : ''}>
           {noData ? (
             <p className="text-sm text-gray-400 text-center mt-8 px-4">No data for this exercise yet.</p>
-          ) : chartPoints.length === 1 ? (
-            <p className="text-sm text-gray-400 text-center mt-8 px-4">Only 1 session recorded — keep training to see your trend.</p>
           ) : view === 'chart' ? (
             <ProgressionChart points={chartPoints} />
           ) : (
@@ -71,7 +69,7 @@ export function ExerciseProgressionView({ exercises, getProgression, getFullProg
               {listPoints.map((p, i) => (
                 <div key={i} className="flex items-center px-4 py-3 border-b border-gray-100">
                   <span className="flex-1 text-xs text-gray-500">{formatDate(p.date)}</span>
-                  <span className="text-sm text-gray-800 font-medium mr-3">{p.weight} {p.weightUnit}</span>
+                  <span className="text-sm text-blue-600 font-medium mr-3">{p.weight} {p.weightUnit}</span>
                   {p.avgReps !== undefined && (
                     <span className="text-xs text-orange-500 w-14 text-right">{p.avgReps} reps</span>
                   )}
