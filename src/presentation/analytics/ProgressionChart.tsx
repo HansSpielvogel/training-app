@@ -2,7 +2,7 @@ import type { ExerciseProgressionPoint } from '@application/analytics'
 
 const WIDTH = 300
 const HEIGHT = 160
-const PAD = { top: 10, right: 10, bottom: 30, left: 40 }
+const PAD = { top: 10, right: 35, bottom: 30, left: 40 }
 
 function rpeColor(rpe: number): string {
   // green (1) → yellow (5–6) → red (10)
@@ -28,6 +28,12 @@ export function ProgressionChart({ points }: Props) {
   const maxW = Math.max(...weights)
   const weightRange = maxW - minW || 1
 
+  const repsValues = points.map(p => p.avgReps ?? 0).filter(r => r > 0)
+  const hasReps = repsValues.length > 0
+  const minR = hasReps ? Math.min(...repsValues) : 0
+  const maxR = hasReps ? Math.max(...repsValues) : 1
+  const repsRange = maxR - minR || 1
+
   const innerW = WIDTH - PAD.left - PAD.right
   const innerH = HEIGHT - PAD.top - PAD.bottom
 
@@ -37,8 +43,15 @@ export function ProgressionChart({ points }: Props) {
   function toY(w: number) {
     return PAD.top + innerH - ((w - minW) / weightRange) * innerH
   }
+  function toYReps(r: number) {
+    return PAD.top + innerH - ((r - minR) / repsRange) * innerH
+  }
 
-  const polyline = points.map((p, i) => `${toX(i)},${toY(p.weight)}`).join(' ')
+  const weightPolyline = points.map((p, i) => `${toX(i)},${toY(p.weight)}`).join(' ')
+  const repsPolyline = hasReps
+    ? points.map((p, i) => p.avgReps !== undefined ? `${toX(i)},${toYReps(p.avgReps)}` : null)
+      .filter(Boolean).join(' ')
+    : ''
 
   const labelIndices =
     points.length <= 5
@@ -54,7 +67,7 @@ export function ProgressionChart({ points }: Props) {
         className="w-full"
         style={{ maxHeight: 180 }}
       >
-        {/* Y-axis labels */}
+        {/* Left Y-axis labels (weight) */}
         <text x={PAD.left - 4} y={PAD.top + 4} textAnchor="end" fontSize={10} fill="#9ca3af">
           {maxW}
         </text>
@@ -62,9 +75,21 @@ export function ProgressionChart({ points }: Props) {
           {minW}
         </text>
 
-        {/* Polyline */}
+        {/* Right Y-axis labels (reps) */}
+        {hasReps && (
+          <>
+            <text x={WIDTH - PAD.right + 4} y={PAD.top + 4} textAnchor="start" fontSize={10} fill="#f97316">
+              {maxR}
+            </text>
+            <text x={WIDTH - PAD.right + 4} y={PAD.top + innerH + 4} textAnchor="start" fontSize={10} fill="#f97316">
+              {minR}
+            </text>
+          </>
+        )}
+
+        {/* Weight polyline */}
         <polyline
-          points={polyline}
+          points={weightPolyline}
           fill="none"
           stroke="#2563eb"
           strokeWidth={2}
@@ -72,9 +97,26 @@ export function ProgressionChart({ points }: Props) {
           strokeLinecap="round"
         />
 
-        {/* Data point dots */}
+        {/* Weight data point dots */}
         {points.map((p, i) => (
           <circle key={i} cx={toX(i)} cy={toY(p.weight)} r={3} fill="#2563eb" />
+        ))}
+
+        {/* Reps polyline */}
+        {hasReps && repsPolyline && (
+          <polyline
+            points={repsPolyline}
+            fill="none"
+            stroke="#f97316"
+            strokeWidth={1.5}
+            strokeLinejoin="round"
+            strokeLinecap="round"
+          />
+        )}
+
+        {/* Reps data point dots */}
+        {hasReps && points.map((p, i) => p.avgReps !== undefined && (
+          <circle key={`reps-${i}`} cx={toX(i)} cy={toYReps(p.avgReps)} r={2.5} fill="#f97316" />
         ))}
 
         {/* RPE indicator dots (below weight dot) */}
@@ -97,7 +139,8 @@ export function ProgressionChart({ points }: Props) {
         ))}
       </svg>
       <div className="flex items-center justify-center gap-3 mt-1">
-        <p className="text-xs text-gray-400">{weightUnit}</p>
+        <p className="text-xs text-gray-400">— {weightUnit}</p>
+        {hasReps && <p className="text-xs text-orange-400">— reps</p>}
         {points.some(p => p.avgRpe !== undefined) && (
           <p className="text-xs text-gray-400">● RPE</p>
         )}

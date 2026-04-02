@@ -14,7 +14,7 @@ const TABS: { id: Tab; label: string }[] = [
 
 export function AnalyticsScreen() {
   const [activeTab, setActiveTab] = useState<Tab>('calendar')
-  const { sessionSummaries, muscleGroupVolumes, exercises, loading, getProgression } = useAnalytics()
+  const { sessionSummaries, muscleGroupVolumes, exercises, exerciseIdsWithHistory, loading, getProgression, getFullProgression, getSessionDetail } = useAnalytics()
 
   return (
     <div className="flex flex-col h-full">
@@ -43,10 +43,10 @@ export function AnalyticsScreen() {
       <div className="flex-1 overflow-y-auto">
         {loading ? null : (
           <>
-            {activeTab === 'calendar' && <TrainingCalendarView sessions={sessionSummaries} />}
+            {activeTab === 'calendar' && <TrainingCalendarView sessions={sessionSummaries} exercises={exercises} getSessionDetail={getSessionDetail} />}
             {activeTab === 'volume' && <MuscleGroupVolumeView volumes={muscleGroupVolumes} />}
             {activeTab === 'progression' && (
-              <ExerciseProgressionView exercises={exercises} getProgression={getProgression} />
+              <ExerciseProgressionView exercises={exercises.filter(e => exerciseIdsWithHistory.has(e.id))} getProgression={getProgression} getFullProgression={getFullProgression} />
             )}
           </>
         )}

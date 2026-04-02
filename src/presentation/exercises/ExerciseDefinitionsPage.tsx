@@ -16,7 +16,7 @@ type Mode =
 export function ExerciseDefinitionsPage() {
   const { muscleGroups } = useMuscleGroups()
   const [filterMuscleGroupId, setFilterMuscleGroupId] = useState<string | undefined>()
-  const { exerciseDefinitions, create, update, remove, exportLibrary, importLibrary } =
+  const { exerciseDefinitions, lastUsedByExercise, create, update, remove, exportLibrary, importLibrary } =
     useExerciseDefinitions(filterMuscleGroupId)
   const [mode, setMode] = useState<Mode>({ type: 'list' })
   const [formError, setFormError] = useState<string>()
@@ -164,6 +164,7 @@ export function ExerciseDefinitionsPage() {
                   <ExerciseRow
                     ed={ed}
                     muscleGroupNames={ed.muscleGroupIds.map(muscleGroupName).join(', ')}
+                    lastUsed={lastUsedByExercise[ed.id]}
                     onEdit={() => { setFormError(undefined); setMode({ type: 'editing', exercise: ed }) }}
                     onDelete={() => setMode({ type: 'deleting', id: ed.id, name: ed.name })}
                   />

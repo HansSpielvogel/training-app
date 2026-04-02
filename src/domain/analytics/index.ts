@@ -2,7 +2,14 @@ export interface ExerciseProgressionPoint {
   date: Date
   weight: number
   weightUnit: string
+  avgReps?: number
   avgRpe?: number
+}
+
+export interface LastUsedEntry {
+  weight: number
+  weightUnit: string
+  reps: number
 }
 
 export interface MuscleGroupVolume {

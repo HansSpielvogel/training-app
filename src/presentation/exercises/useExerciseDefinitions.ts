@@ -8,18 +8,28 @@ import {
   exportExerciseLibrary,
   importExerciseLibrary,
 } from '@application/exercises'
+import type { LastUsedEntry } from '@application/analytics'
+import { getLastUsedByExercise } from '@application/analytics'
 import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscleGroupRepository'
 import { DexieExerciseDefinitionRepository } from '@infrastructure/exercises/DexieExerciseDefinitionRepository'
+import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
 
 // Hooks are the composition root — they wire use cases to repositories
 export function useExerciseDefinitions(filterMuscleGroupId?: string) {
   const muscleGroupRepo = useRef(new DexieMuscleGroupRepository()).current
   const exerciseRepo = useRef(new DexieExerciseDefinitionRepository()).current
+  const sessionRepo = useRef(new DexieTrainingSessionRepository()).current
   const [exerciseDefinitions, setExerciseDefinitions] = useState<ExerciseDefinition[]>([])
+  const [lastUsedByExercise, setLastUsedByExercise] = useState<Record<string, LastUsedEntry>>({})
 
   const refresh = useCallback(async () => {
-    setExerciseDefinitions(await listExerciseDefinitions(exerciseRepo, filterMuscleGroupId))
-  }, [exerciseRepo, filterMuscleGroupId])
+    const [defs, lastUsed] = await Promise.all([
+      listExerciseDefinitions(exerciseRepo, filterMuscleGroupId),
+      getLastUsedByExercise(sessionRepo),
+    ])
+    setExerciseDefinitions(defs)
+    setLastUsedByExercise(lastUsed)
+  }, [exerciseRepo, sessionRepo, filterMuscleGroupId])
 
   useEffect(() => { refresh() }, [refresh])
 
@@ -48,5 +58,5 @@ export function useExerciseDefinitions(filterMuscleGroupId?: string) {
     await refresh()
   }, [muscleGroupRepo, exerciseRepo, refresh])
 
-  return { exerciseDefinitions, create, update, remove, exportLibrary, importLibrary }
+  return { exerciseDefinitions, lastUsedByExercise, create, update, remove, exportLibrary, importLibrary }
 }

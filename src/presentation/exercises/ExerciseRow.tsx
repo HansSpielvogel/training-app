@@ -1,18 +1,23 @@
 import type { ExerciseDefinition } from '@application/exercises'
+import type { LastUsedEntry } from '@application/analytics'
 
 interface ExerciseRowProps {
   ed: ExerciseDefinition
   muscleGroupNames: string
+  lastUsed?: LastUsedEntry
   onEdit: () => void
   onDelete: () => void
 }
 
-export function ExerciseRow({ ed, muscleGroupNames, onEdit, onDelete }: ExerciseRowProps) {
+export function ExerciseRow({ ed, muscleGroupNames, lastUsed, onEdit, onDelete }: ExerciseRowProps) {
   return (
     <div className="flex items-center px-4 py-3 border-b border-gray-100">
       <div className="flex-1 min-w-0">
         <p className="text-sm text-gray-800">{ed.name}</p>
         <p className="text-xs text-gray-400 truncate">{muscleGroupNames}</p>
+        {lastUsed && (
+          <p className="text-xs text-gray-500 mt-0.5">{lastUsed.weight} {lastUsed.weightUnit} · {lastUsed.reps} reps</p>
+        )}
       </div>
       <button onClick={onEdit} className="p-2 text-gray-400 hover:text-blue-600" aria-label="Edit">
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

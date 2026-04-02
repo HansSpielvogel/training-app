@@ -3,6 +3,7 @@ import {
   getExerciseProgression,
   getMuscleGroupVolume,
   getSessionSummaries,
+  getLastUsedByExercise,
 } from '@application/analytics'
 import type { ExerciseProgressionPoint, MuscleGroupVolume, SessionSummaryItem } from '@application/analytics'
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
@@ -19,6 +20,7 @@ export function useAnalytics() {
   const [sessionSummaries, setSessionSummaries] = useState<SessionSummaryItem[]>([])
   const [muscleGroupVolumes, setMuscleGroupVolumes] = useState<MuscleGroupVolume[]>([])
   const [exercises, setExercises] = useState<ExerciseDefinition[]>([])
+  const [exerciseIdsWithHistory, setExerciseIdsWithHistory] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -26,10 +28,12 @@ export function useAnalytics() {
       getSessionSummaries(sessionRepo),
       getMuscleGroupVolume(sessionRepo, muscleGroupRepo),
       exerciseRepo.list(),
-    ]).then(([summaries, volumes, exList]) => {
+      getLastUsedByExercise(sessionRepo),
+    ]).then(([summaries, volumes, exList, lastUsed]) => {
       setSessionSummaries(summaries)
       setMuscleGroupVolumes(volumes)
       setExercises(exList)
+      setExerciseIdsWithHistory(new Set(Object.keys(lastUsed)))
     }).finally(() => {
       setLoading(false)
     })
@@ -41,5 +45,16 @@ export function useAnalytics() {
     [sessionRepo],
   )
 
-  return { sessionSummaries, muscleGroupVolumes, exercises, loading, getProgression }
+  const getFullProgression = useCallback(
+    (exerciseDefinitionId: string): Promise<ExerciseProgressionPoint[]> =>
+      getExerciseProgression(sessionRepo, exerciseDefinitionId, Infinity),
+    [sessionRepo],
+  )
+
+  const getSessionDetail = useCallback(
+    (id: string) => sessionRepo.getById(id),
+    [sessionRepo],
+  )
+
+  return { sessionSummaries, muscleGroupVolumes, exercises, exerciseIdsWithHistory, loading, getProgression, getFullProgression, getSessionDetail }
 }

@@ -7,6 +7,7 @@ import type { TrainingSession } from '@domain/sessions/TrainingSession'
 import { getExerciseProgression } from './getExerciseProgression'
 import { getMuscleGroupVolume } from './getMuscleGroupVolume'
 import { getSessionSummaries } from './getSessionSummaries'
+import { getLastUsedByExercise } from './getLastUsedByExercise'
 
 let sessionRepo: DexieTrainingSessionRepository
 let muscleGroupRepo: DexieMuscleGroupRepository
@@ -169,6 +170,38 @@ describe('getExerciseProgression', () => {
     const result = await getExerciseProgression(sessionRepo, 'ex-bench')
     expect(result[0].avgRpe).toBe(6)
   })
+
+  it('computes average reps across all sets in a session', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
+        sets: [
+          { weight: { kind: 'single', value: 80 }, reps: 10 },
+          { weight: { kind: 'single', value: 85 }, reps: 8 },
+          { weight: { kind: 'single', value: 80 }, reps: 9 },
+        ],
+      }],
+    }))
+
+    const result = await getExerciseProgression(sessionRepo, 'ex-bench')
+    expect(result[0].avgReps).toBe(9) // round((10+8+9)/3)
+  })
+
+  it('returns all sessions when limit is Infinity', async () => {
+    for (let i = 0; i < 25; i++) {
+      await sessionRepo.save(makeSession({
+        id: `s-${i}`,
+        completedAt: new Date(`2024-01-${String(i + 1).padStart(2, '0')}`),
+        entries: [{
+          muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
+          sets: [{ weight: { kind: 'single', value: 80 + i }, reps: 8 }],
+        }],
+      }))
+    }
+
+    const result = await getExerciseProgression(sessionRepo, 'ex-bench', Infinity)
+    expect(result).toHaveLength(25)
+  })
 })
 
 describe('getMuscleGroupVolume', () => {
@@ -267,5 +300,85 @@ describe('getSessionSummaries', () => {
     expect(result[0].id).toBe('s2')
     expect(result[1].id).toBe('s3')
     expect(result[2].id).toBe('s1')
+  })
+})
+
+describe('getLastUsedByExercise', () => {
+  it('returns empty object when no sessions', async () => {
+    const result = await getLastUsedByExercise(sessionRepo)
+    expect(result).toEqual({})
+  })
+
+  it('returns last-used weight and reps per exercise', async () => {
+    await sessionRepo.save(makeSession({
+      id: 's1',
+      completedAt: new Date('2024-01-01'),
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
+        sets: [{ weight: { kind: 'single', value: 80 }, reps: 10 }],
+      }],
+    }))
+
+    const result = await getLastUsedByExercise(sessionRepo)
+    expect(result['ex-bench']).toEqual({ weight: 80, weightUnit: 'kg', reps: 10 })
+  })
+
+  it('picks the most recent session for each exercise', async () => {
+    await sessionRepo.save(makeSession({
+      id: 's1',
+      startedAt: new Date('2024-01-01'),
+      completedAt: new Date('2024-01-01'),
+      entries: [{ muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench', sets: [{ weight: { kind: 'single', value: 80 }, reps: 10 }] }],
+    }))
+    await sessionRepo.save(makeSession({
+      id: 's2',
+      startedAt: new Date('2024-02-01'),
+      completedAt: new Date('2024-02-01'),
+      entries: [{ muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench', sets: [{ weight: { kind: 'single', value: 90 }, reps: 8 }] }],
+    }))
+
+    const result = await getLastUsedByExercise(sessionRepo)
+    expect(result['ex-bench'].weight).toBe(90)
+    expect(result['ex-bench'].reps).toBe(8)
+  })
+
+  it('picks the max-weight set within the most recent session', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
+        sets: [
+          { weight: { kind: 'single', value: 80 }, reps: 10 },
+          { weight: { kind: 'single', value: 90 }, reps: 6 },
+          { weight: { kind: 'single', value: 85 }, reps: 8 },
+        ],
+      }],
+    }))
+
+    const result = await getLastUsedByExercise(sessionRepo)
+    expect(result['ex-bench'].weight).toBe(90)
+    expect(result['ex-bench'].reps).toBe(6)
+  })
+
+  it('handles bilateral and stacked weight normalization', async () => {
+    await sessionRepo.save(makeSession({
+      id: 's1',
+      entries: [
+        { muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-curl', sets: [{ weight: { kind: 'bilateral', perSide: 15 }, reps: 12 }] },
+        { muscleGroupId: 'mg-2', exerciseDefinitionId: 'ex-cable', sets: [{ weight: { kind: 'stacked', base: 50, added: 10 }, reps: 15 }] },
+      ],
+    }))
+
+    const result = await getLastUsedByExercise(sessionRepo)
+    expect(result['ex-curl']).toEqual({ weight: 15, weightUnit: 'kg/side', reps: 12 })
+    expect(result['ex-cable']).toEqual({ weight: 60, weightUnit: 'kg', reps: 15 })
+  })
+
+  it('omits exercises with no sets', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{ muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench', sets: [] }],
+    }))
+
+    const result = await getLastUsedByExercise(sessionRepo)
+    expect(result['ex-bench']).toBeUndefined()
   })
 })

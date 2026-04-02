@@ -3,37 +3,81 @@ import type { ExerciseDefinition } from '@application/exercises'
 import type { ExerciseProgressionPoint } from '@application/analytics'
 import { ProgressionChart } from './ProgressionChart'
 
+function formatDate(date: Date): string {
+  return date.toLocaleDateString()
+}
+
 interface Props {
   exercises: ExerciseDefinition[]
   getProgression: (exerciseDefinitionId: string) => Promise<ExerciseProgressionPoint[]>
+  getFullProgression: (exerciseDefinitionId: string) => Promise<ExerciseProgressionPoint[]>
 }
 
-export function ExerciseProgressionView({ exercises, getProgression }: Props) {
+export function ExerciseProgressionView({ exercises, getProgression, getFullProgression }: Props) {
   const [selected, setSelected] = useState<ExerciseDefinition | null>(null)
-  const [points, setPoints] = useState<ExerciseProgressionPoint[]>([])
+  const [view, setView] = useState<'chart' | 'list'>('chart')
+  const [chartPoints, setChartPoints] = useState<ExerciseProgressionPoint[]>([])
+  const [listPoints, setListPoints] = useState<ExerciseProgressionPoint[]>([])
 
   useEffect(() => {
     if (!selected) return
-    getProgression(selected.id).then(setPoints)
-  }, [selected, getProgression])
+    getProgression(selected.id).then(setChartPoints)
+    getFullProgression(selected.id).then(pts => setListPoints([...pts].reverse()))
+  }, [selected, getProgression, getFullProgression])
 
   if (selected) {
+    const noData = chartPoints.length === 0
     return (
       <div>
         <div className="flex items-center px-4 py-3 border-b border-gray-200">
           <button
-            onClick={() => setSelected(null)}
-            className="text-blue-600 text-sm font-medium mr-3"
+            onClick={() => { setSelected(null); setView('chart') }}
+            className="text-gray-500 text-sm mr-3"
           >
             ← Back
           </button>
-          <span className="text-sm font-semibold text-gray-800">{selected.name}</span>
+          <span className="flex-1 text-sm font-semibold text-gray-800">{selected.name}</span>
+          {chartPoints.length > 1 && (
+            <div className="flex rounded-md overflow-hidden border border-gray-200">
+              <button
+                onClick={() => setView('chart')}
+                className={`px-3 py-1 text-xs font-medium ${view === 'chart' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+              >
+                Chart
+              </button>
+              <button
+                onClick={() => setView('list')}
+                className={`px-3 py-1 text-xs font-medium ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+              >
+                List
+              </button>
+            </div>
+          )}
         </div>
-        <div className="px-4 py-4">
-          {points.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center mt-8">No data for this exercise yet.</p>
+        <div className={view === 'chart' ? 'px-4 py-4' : ''}>
+          {noData ? (
+            <p className="text-sm text-gray-400 text-center mt-8 px-4">No data for this exercise yet.</p>
+          ) : chartPoints.length === 1 ? (
+            <p className="text-sm text-gray-400 text-center mt-8 px-4">Only 1 session recorded — keep training to see your trend.</p>
+          ) : view === 'chart' ? (
+            <ProgressionChart points={chartPoints} />
           ) : (
-            <ProgressionChart points={points} />
+            <div>
+              <div className="flex items-center px-4 py-2 bg-gray-50 border-b border-gray-200">
+                <span className="flex-1 text-xs text-gray-400">Date</span>
+                <span className="text-xs text-gray-400 mr-3">Best set</span>
+                <span className="text-xs text-gray-400 w-14 text-right">Avg reps</span>
+              </div>
+              {listPoints.map((p, i) => (
+                <div key={i} className="flex items-center px-4 py-3 border-b border-gray-100">
+                  <span className="flex-1 text-xs text-gray-500">{formatDate(p.date)}</span>
+                  <span className="text-sm text-gray-800 font-medium mr-3">{p.weight} {p.weightUnit}</span>
+                  {p.avgReps !== undefined && (
+                    <span className="text-xs text-orange-500 w-14 text-right">{p.avgReps} reps</span>
+                  )}
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </div>

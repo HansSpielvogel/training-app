@@ -13,6 +13,7 @@ function normalizeWeight(weight: Weight): { value: number; unit: string } {
 export async function getExerciseProgression(
   sessionRepo: ITrainingSessionRepository,
   exerciseDefinitionId: string,
+  limit = 20,
 ): Promise<ExerciseProgressionPoint[]> {
   const sessions = await sessionRepo.listCompleted()
   const points: ExerciseProgressionPoint[] = []
@@ -31,6 +32,8 @@ export async function getExerciseProgression(
       }
     }
 
+    const avgReps = Math.round(entry.sets.reduce((sum, s) => sum + s.reps, 0) / entry.sets.length)
+
     const rpeSets = entry.sets.filter(s => s.rpe !== undefined)
     const avgRpe = rpeSets.length > 0
       ? Math.round(rpeSets.reduce((sum, s) => sum + s.rpe!, 0) / rpeSets.length)
@@ -40,10 +43,11 @@ export async function getExerciseProgression(
       date: new Date(session.completedAt ?? session.startedAt),
       weight: maxWeight,
       weightUnit,
+      avgReps,
       ...(avgRpe !== undefined ? { avgRpe } : {}),
     })
   }
 
   points.sort((a, b) => a.date.getTime() - b.date.getTime())
-  return points.slice(-20)
+  return points.slice(-limit)
 }
