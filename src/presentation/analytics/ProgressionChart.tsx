@@ -68,10 +68,10 @@ export function ProgressionChart({ points }: Props) {
         style={{ maxHeight: 180 }}
       >
         {/* Left Y-axis labels (weight) */}
-        <text x={PAD.left - 4} y={PAD.top + 4} textAnchor="end" fontSize={10} fill="#9ca3af">
+        <text x={PAD.left - 4} y={PAD.top + 4} textAnchor="end" fontSize={10} fill="#2563eb">
           {maxW}
         </text>
-        <text x={PAD.left - 4} y={PAD.top + innerH + 4} textAnchor="end" fontSize={10} fill="#9ca3af">
+        <text x={PAD.left - 4} y={PAD.top + innerH + 4} textAnchor="end" fontSize={10} fill="#2563eb">
           {minW}
         </text>
 
@@ -139,7 +139,7 @@ export function ProgressionChart({ points }: Props) {
         ))}
       </svg>
       <div className="flex items-center justify-center gap-3 mt-1">
-        <p className="text-xs text-gray-400">— {weightUnit}</p>
+        <p className="text-xs text-blue-600">— {weightUnit}</p>
         {hasReps && <p className="text-xs text-orange-400">— reps</p>}
         {points.some(p => p.avgRpe !== undefined) && (
           <p className="text-xs text-gray-400">● RPE</p>
