@@ -38,9 +38,13 @@ Ask yourself: Did this change affect the UI significantly?
 - Yes → invoke the `ui-review` skill
 - No → skip
 
+Resolve "Blockers" findings from the review directly and ask the user about other findings
+
 ### 3. Architecture review
 
 Invoke the `arch-review` skill.
+
+Resolve "Critical" findings from the review directly and ask the user about other findings
 
 ### 4. Update CLAUDE.md
 

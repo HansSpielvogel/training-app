@@ -56,7 +56,7 @@ When building session-tracking or analytics, define `SessionSummary` as a shared
 
 ## Project Context (Memory)
 
-- `openspec/memory/project_roadmap.md` — phase breakdown, future improvements, seeding plan
+- `openspec/memory/project_roadmap.md` — future improvements
 - `openspec/memory/project_training-flow.md` — session UX flow, variation picking, set logging
 
 ## Implementation Workflow
