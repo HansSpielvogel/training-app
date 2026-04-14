@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { Weight, SessionSet } from '@application/sessions'
+import type { Weight } from '@application/sessions'
 import type { TrainingPlan } from '@application/planning'
 import { useActiveSession } from './useActiveSession'
+import { useSessionConfirm } from './useSessionConfirm'
 import { useMuscleGroups } from '../exercises/useMuscleGroups'
 import { EntryRow } from './EntryRow'
-import type { EntryExerciseData } from './EntryRow'
 import { ConfirmAbandonBanner } from './ConfirmAbandonBanner'
 import { SlotPickerPanel } from './SlotPickerPanel'
 
@@ -19,14 +19,12 @@ export function findNextIncomplete(current: number | null, doneIndices: Set<numb
 
 export function ActiveSessionScreen() {
   const navigate = useNavigate()
-  const { session, loading, assign, clearVariation, addSet, removeLastSet, complete, abandon, getRecentVariations, getRotationSuggestion, getLastSets, getExercisesForMuscleGroup, addTempSlot, removeTempSlot, addPlanSlots, listPlans, removedPlanSlotIndices, removePlanSlot } =
-    useActiveSession()
+  const {
+    session, loading, clearVariation, addSet, removeLastSet, complete, abandon,
+    addTempSlot, removeTempSlot, addPlanSlots, listPlans, removePlanSlot,
+    exerciseDataMap, exerciseNames, lastSetsMap, loadExerciseData, handleAssign, clearLastSets,
+  } = useActiveSession()
   const { muscleGroups } = useMuscleGroups()
-  const [exerciseDataMap, setExerciseDataMap] = useState<Record<number, EntryExerciseData>>({})
-  const [exerciseNames, setExerciseNames] = useState<Record<string, string>>({})
-  const [lastSetsMap, setLastSetsMap] = useState<Record<number, SessionSet[] | null>>({})
-  const [confirmFinish, setConfirmFinish] = useState(false)
-  const [confirmAbandon, setConfirmAbandon] = useState(false)
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
   const [doneIndices, setDoneIndices] = useState<Set<number>>(new Set())
   const [showMuscleGroupPicker, setShowMuscleGroupPicker] = useState(false)
@@ -34,38 +32,12 @@ export function ActiveSessionScreen() {
   const [availablePlans, setAvailablePlans] = useState<TrainingPlan[]>([])
   const [planPickerMessage, setPlanPickerMessage] = useState<string>()
 
+  const { confirmFinish, setConfirmFinish, confirmAbandon, setConfirmAbandon, handleComplete, handleAbandon } =
+    useSessionConfirm(complete, abandon, () => navigate('/sessions', { replace: true }))
+
   useEffect(() => {
     if (!loading && !session) navigate('/sessions', { replace: true })
   }, [session, loading, navigate])
-
-  async function loadExerciseData(entryIndex: number, muscleGroupId: string) {
-    const exerciseDefinitionId = session?.entries[entryIndex]?.exerciseDefinitionId
-    const [recent, all, suggestion, lastSets] = await Promise.all([
-      getRecentVariations(muscleGroupId),
-      getExercisesForMuscleGroup(muscleGroupId),
-      getRotationSuggestion(muscleGroupId),
-      exerciseDefinitionId ? getLastSets(exerciseDefinitionId) : Promise.resolve(null),
-    ])
-    setExerciseDataMap((prev) => ({ ...prev, [entryIndex]: { recent, all, suggestion } }))
-    setLastSetsMap((prev) => ({ ...prev, [entryIndex]: lastSets }))
-    const nameMap: Record<string, string> = {}
-    for (const ex of [...recent, ...all]) nameMap[ex.id] = ex.name
-    setExerciseNames((prev) => ({ ...prev, ...nameMap }))
-  }
-
-  async function handleAssign(entryIndex: number, exerciseDefinitionId: string) {
-    await assign(entryIndex, exerciseDefinitionId)
-    const entry = session?.entries[entryIndex]
-    if (entry) {
-      const [allExercises, lastSets] = await Promise.all([
-        getExercisesForMuscleGroup(entry.muscleGroupId),
-        getLastSets(exerciseDefinitionId),
-      ])
-      const ex = allExercises.find((e) => e.id === exerciseDefinitionId)
-      if (ex) setExerciseNames((prev) => ({ ...prev, [ex.id]: ex.name }))
-      setLastSetsMap((prev) => ({ ...prev, [entryIndex]: lastSets }))
-    }
-  }
 
   function expandAndPreload(nextIndex: number | null) {
     setExpandedIndex(nextIndex)
@@ -82,7 +54,7 @@ export function ActiveSessionScreen() {
       if (hasSets) {
         const newDone = new Set(doneIndices).add(i)
         setDoneIndices(newDone)
-        expandAndPreload(findNextIncomplete(i, new Set([...newDone, ...removedPlanSlotIndices]), session?.entries.length ?? 0))
+        expandAndPreload(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
       } else {
         setExpandedIndex(null)
       }
@@ -94,17 +66,7 @@ export function ActiveSessionScreen() {
   function handleMarkDone(i: number) {
     const newDone = new Set(doneIndices).add(i)
     setDoneIndices(newDone)
-    expandAndPreload(findNextIncomplete(i, new Set([...newDone, ...removedPlanSlotIndices]), session?.entries.length ?? 0))
-  }
-
-  async function handleComplete() {
-    await complete()
-    navigate('/sessions', { replace: true })
-  }
-
-  async function handleAbandon() {
-    await abandon()
-    navigate('/sessions', { replace: true })
+    expandAndPreload(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
   }
 
   async function handleAddTempSlot(muscleGroupId: string) {
@@ -169,30 +131,27 @@ export function ActiveSessionScreen() {
       )}
 
       <div className="flex-1 overflow-y-auto">
-        {session.entries.map((entry, i) => {
-          if (removedPlanSlotIndices.has(i)) return null
-          return (
-            <EntryRow
-              key={i}
-              entry={entry}
-              muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
-              exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
-              exerciseData={exerciseDataMap[i] ?? null}
-              lastSets={lastSetsMap[i] ?? null}
-              done={doneIndices.has(i)}
-              isExpanded={expandedIndex === i}
-              onToggle={() => handleToggle(i)}
-              onMarkDone={() => handleMarkDone(i)}
-              onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
-              onAssign={(id) => handleAssign(i, id)}
-              onClearVariation={() => { clearVariation(i); setLastSetsMap((prev) => ({ ...prev, [i]: null })) }}
-              defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
-              onAddSet={(weight: Weight, reps: number, count: number, rpe?: number) => addSet(i, weight, reps, count, rpe)}
-              onRemoveLast={() => removeLastSet(i)}
-              onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : () => removePlanSlot(i)}
-            />
-          )
-        })}
+        {session.entries.map((entry, i) => (
+          <EntryRow
+            key={i}
+            entry={entry}
+            muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
+            exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
+            exerciseData={exerciseDataMap[i] ?? null}
+            lastSets={lastSetsMap[i] ?? null}
+            done={doneIndices.has(i)}
+            isExpanded={expandedIndex === i}
+            onToggle={() => handleToggle(i)}
+            onMarkDone={() => handleMarkDone(i)}
+            onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
+            onAssign={(id) => handleAssign(i, id)}
+            onClearVariation={() => { clearVariation(i); clearLastSets(i) }}
+            defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
+            onAddSet={(weight: Weight, reps: number, count: number, rpe?: number) => addSet(i, weight, reps, count, rpe)}
+            onRemoveLast={() => removeLastSet(i)}
+            onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : () => removePlanSlot(i)}
+          />
+        ))}
         <SlotPickerPanel
           showMuscleGroupPicker={showMuscleGroupPicker}
           showPlanPicker={showPlanPicker}
@@ -214,13 +173,13 @@ export function ActiveSessionScreen() {
             <div className="flex gap-2">
               <button
                 onClick={() => setConfirmFinish(false)}
-                className="flex-1 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm"
+                className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm"
               >
                 Keep Going
               </button>
               <button
                 onClick={handleComplete}
-                className="flex-1 py-2 bg-green-600 text-white rounded-lg font-medium text-sm"
+                className="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium text-sm"
               >
                 Finish
               </button>
@@ -228,7 +187,7 @@ export function ActiveSessionScreen() {
           ) : (
             <button
               onClick={() => { setConfirmFinish(true); setConfirmAbandon(false) }}
-              className="w-full py-2 bg-green-600 text-white rounded-lg font-medium text-sm"
+              className="w-full py-3 bg-green-600 text-white rounded-lg font-medium text-sm"
             >
               Finish Workout
             </button>

@@ -99,7 +99,6 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
             value={weightInput}
             onChange={(e) => { setWeightInput(e.target.value); setWeightError(undefined) }}
             onFocus={handleFocus}
-            style={{ fontSize: '16px' }}
             className={`flex-1 px-3 py-2 border rounded-md ${weightError ? 'border-red-400' : 'border-gray-300'}`}
           />
           <input
@@ -109,7 +108,6 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
             value={addedWeightInput}
             onChange={(e) => { setAddedWeightInput(e.target.value); setWeightError(undefined) }}
             onFocus={handleFocus}
-            style={{ fontSize: '16px' }}
             className="w-16 px-2 py-2 border border-gray-300 rounded-md"
           />
         </div>
@@ -122,7 +120,6 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
             value={repsInput}
             onChange={(e) => setRepsInput(e.target.value)}
             onFocus={handleFocus}
-            style={{ fontSize: '16px' }}
             className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
           />
           <div className="flex-1 flex flex-col">
@@ -133,7 +130,6 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
               value={rpeInput}
               onChange={(e) => { setRpeInput(e.target.value); setRpeError(undefined) }}
               onFocus={handleFocus}
-              style={{ fontSize: '16px' }}
               className={`w-full px-3 py-2 border rounded-md ${rpeError ? 'border-red-400' : 'border-gray-300'}`}
             />
             {rpeError && <p className="mt-0.5 text-xs text-red-500">{rpeError}</p>}

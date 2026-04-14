@@ -17,7 +17,7 @@ export function SlotRow({ slot, isFirst, isLast, onToggleOptional, onMoveUp, onM
       <div className="flex items-center gap-3">
         <button
           onClick={onToggleOptional}
-          className={`flex items-center gap-1 px-2 py-1 text-xs rounded border min-h-[36px] ${
+          className={`flex items-center gap-1 px-2 py-1 text-xs rounded border min-h-[44px] ${
             slot.optional
               ? 'text-amber-800 border-amber-300 bg-amber-100 font-medium'
               : 'text-gray-400 border-gray-200 bg-gray-50'
@@ -38,7 +38,7 @@ export function SlotRow({ slot, isFirst, isLast, onToggleOptional, onMoveUp, onM
         <button
           onClick={onMoveUp}
           disabled={isFirst}
-          className="p-2 text-gray-400 disabled:opacity-20 hover:text-blue-600"
+          className="p-3 text-gray-400 disabled:opacity-20 hover:text-blue-600"
           aria-label="Move up"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -48,7 +48,7 @@ export function SlotRow({ slot, isFirst, isLast, onToggleOptional, onMoveUp, onM
         <button
           onClick={onMoveDown}
           disabled={isLast}
-          className="p-2 text-gray-400 disabled:opacity-20 hover:text-blue-600"
+          className="p-3 text-gray-400 disabled:opacity-20 hover:text-blue-600"
           aria-label="Move down"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +57,7 @@ export function SlotRow({ slot, isFirst, isLast, onToggleOptional, onMoveUp, onM
         </button>
         <button
           onClick={onDelete}
-          className="p-2 text-gray-400 hover:text-red-600"
+          className="p-3 text-gray-400 hover:text-red-600"
           aria-label="Remove slot"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -28,9 +28,10 @@ export function SessionStartScreen() {
         <h1 className="text-xl font-semibold text-gray-900">Start Workout</h1>
       </header>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto flex flex-col">
+        <div className="flex-1 flex flex-col justify-center">
         {plans.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 text-gray-400">
+          <div className="flex flex-col items-center py-12 text-gray-400">
             <p className="text-sm">No training plans found.</p>
             <p className="text-sm">Create a plan first in the Plans tab.</p>
           </div>
@@ -53,6 +54,7 @@ export function SessionStartScreen() {
             ))}
           </div>
         )}
+        </div>
       </div>
     </div>
   )

@@ -1,14 +1,6 @@
 import type { ITrainingSessionRepository } from '@domain/sessions/ITrainingSessionRepository'
-import type { LastUsedEntry } from '@domain/analytics'
-import type { Weight } from '@domain/shared/Weight'
-
-function normalizeWeight(weight: Weight): { value: number; unit: string } {
-  switch (weight.kind) {
-    case 'single': return { value: weight.value, unit: 'kg' }
-    case 'bilateral': return { value: weight.perSide, unit: 'kg/side' }
-    case 'stacked': return { value: weight.base + weight.added, unit: 'kg' }
-  }
-}
+import type { LastUsedEntry, SetSnapshot } from '@domain/analytics'
+import { normalizeWeight } from './normalizeWeight'
 
 export async function getLastUsedByExercise(
   sessionRepo: ITrainingSessionRepository,
@@ -33,7 +25,8 @@ export async function getLastUsedByExercise(
         }
       }
 
-      result[id] = { weight: maxWeight, weightUnit, reps: repsAtMax, sets: entry.sets }
+      const sets: SetSnapshot[] = entry.sets.map(s => ({ weight: s.weight, reps: s.reps, ...(s.rpe !== undefined ? { rpe: s.rpe } : {}) }))
+      result[id] = { weight: maxWeight, weightUnit, reps: repsAtMax, sets }
     }
   }
 

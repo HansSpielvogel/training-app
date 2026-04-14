@@ -28,10 +28,10 @@ export function AnalyticsScreen() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+              className={`flex-1 py-2 text-sm border-b-2 -mb-px transition-colors ${
                 activeTab === tab.id
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500'
+                  ? 'border-blue-600 text-blue-600 font-semibold'
+                  : 'border-transparent text-gray-500 font-medium'
               }`}
             >
               {tab.label}

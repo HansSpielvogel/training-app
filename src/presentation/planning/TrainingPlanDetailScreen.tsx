@@ -68,10 +68,10 @@ export function TrainingPlanDetailScreen() {
           </button>
         </div>
         <div className="flex gap-2">
-          <button onClick={discard} className="flex-1 py-2 text-sm text-gray-600 border border-gray-300 rounded-md" aria-label="Discard">
+          <button onClick={discard} className="flex-1 py-3 text-sm text-gray-600 border border-gray-300 rounded-md" aria-label="Discard">
             Discard
           </button>
-          <button onClick={save} className="flex-1 py-2 text-sm bg-blue-600 text-white rounded-md font-medium" aria-label="Save">
+          <button onClick={save} className="flex-1 py-3 text-sm bg-blue-600 text-white rounded-md font-medium" aria-label="Save">
             Save
           </button>
         </div>
@@ -155,10 +155,10 @@ export function TrainingPlanDetailScreen() {
       </div>
 
       {mode.type === 'list' && (
-        <div className="px-4 py-2 border-t border-gray-200 bg-white">
+        <div className="p-4 border-t border-gray-200 bg-white">
           <button
             onClick={() => setMode({ type: 'adding' })}
-            className="w-full py-2 bg-blue-600 text-white rounded-lg font-medium text-sm"
+            className="w-full py-3 bg-blue-600 text-white rounded-lg font-medium text-sm"
           >
             + Add Muscle Group
           </button>

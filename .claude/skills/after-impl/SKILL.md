@@ -31,20 +31,24 @@ Also run E2E if changes touch flows covered by Playwright:
 npm run test:e2e
 ```
 
-### 23. UI review (if applicable)
+### 2. UI review (if applicable)
 
 Ask yourself: Did this change affect the UI significantly?
 
 - Yes → invoke the `ui-review` skill
 - No → skip
 
-Resolve "Blockers" findings from the review directly and ask the user about other findings
+After the review returns:
+1. Fix all **Blockers** directly without asking.
+2. Enumerate **Improvements** and **Polish** findings to the user in a table, then ask: *"Which of these do you want to fix now?"* Wait for their answer before doing anything.
 
 ### 3. Architecture review
 
 Invoke the `arch-review` skill.
 
-Resolve "Critical" findings from the review directly and ask the user about other findings
+After the review returns:
+1. Fix all **Critical** findings directly without asking.
+2. Enumerate **Warnings** and **Style** findings to the user in a table, then ask: *"Fix any of these now, or continue to CLAUDE.md update?"* Wait for their answer before doing anything.
 
 ### 4. Update CLAUDE.md
 

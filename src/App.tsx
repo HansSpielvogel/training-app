@@ -30,7 +30,7 @@ export default function App() {
 
   return (
     <BrowserRouter basename="/training-app">
-      <div id="app-root" className="flex flex-col h-screen bg-gray-50">
+      <div id="app-root" className="flex flex-col h-[100dvh] bg-gray-50">
         <div className="flex-1 overflow-hidden">
           <ErrorBoundary>
             <Routes>
@@ -46,7 +46,7 @@ export default function App() {
           </ErrorBoundary>
         </div>
         <nav
-          className="flex border-t border-gray-200 bg-white"
+          className="flex border-t border-gray-300 bg-gray-50"
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         >
           <NavLink

@@ -1,4 +1,5 @@
-import type { SessionSet, Weight } from '@application/sessions'
+import type { SetSnapshot } from '@application/analytics'
+import type { Weight } from '@application/sessions'
 
 function formatWeight(w: Weight): string {
   switch (w.kind) {
@@ -8,7 +9,7 @@ function formatWeight(w: Weight): string {
   }
 }
 
-export function formatSets(sets: readonly SessionSet[]): string {
+export function formatSets(sets: readonly SetSnapshot[]): string {
   if (sets.length === 0) return ''
 
   const weightStrs = sets.map(s => formatWeight(s.weight))

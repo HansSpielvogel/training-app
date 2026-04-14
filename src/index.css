@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+html, body {
+  overflow: hidden;
+}
+
+input, textarea, select {
+  font-size: max(16px, 1em);
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }

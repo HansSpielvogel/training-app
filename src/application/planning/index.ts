@@ -14,3 +14,4 @@ export { seedTrainingPlans } from './seedTrainingPlans'
 // Re-export domain types so presentation doesn't import domain directly
 export type { TrainingPlan } from '@domain/planning/TrainingPlan'
 export { DuplicatePlanNameError } from '@domain/planning/TrainingPlan'
+export type { ITrainingPlanRepository } from '@domain/planning/ITrainingPlanRepository'

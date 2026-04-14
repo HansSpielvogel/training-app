@@ -1,4 +1,10 @@
-import type { SessionSet } from '@domain/sessions/TrainingSession'
+import type { Weight } from '@domain/shared/Weight'
+
+export interface SetSnapshot {
+  readonly weight: Weight
+  readonly reps: number
+  readonly rpe?: number
+}
 
 export interface ExerciseProgressionPoint {
   date: Date
@@ -6,14 +12,14 @@ export interface ExerciseProgressionPoint {
   weightUnit: string
   avgReps?: number
   avgRpe?: number
-  sets: readonly SessionSet[]
+  sets: readonly SetSnapshot[]
 }
 
 export interface LastUsedEntry {
   weight: number
   weightUnit: string
   reps: number
-  sets: readonly SessionSet[]
+  sets: readonly SetSnapshot[]
 }
 
 export interface MuscleGroupVolume {

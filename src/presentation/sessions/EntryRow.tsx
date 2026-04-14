@@ -81,7 +81,7 @@ export function EntryRow({
           {entry.exerciseDefinitionId && !done && (
             <button
               onClick={(e) => { e.stopPropagation(); onClearVariation() }}
-              className="px-3 self-stretch flex items-center text-gray-400 hover:text-red-500"
+              className="px-3 min-w-[44px] self-stretch flex items-center justify-center text-gray-400 hover:text-red-500"
               aria-label="Deselect exercise"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,7 +137,7 @@ export function EntryRow({
           {setCount === 0 && onRemoveEntry && (
             <button
               onClick={onRemoveEntry}
-              className="w-full py-0.5 text-sm text-red-500 border border-red-200 rounded-md"
+              className="w-full py-2.5 text-sm text-red-500 border border-red-200 rounded-md"
             >
               Remove slot
             </button>

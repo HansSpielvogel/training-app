@@ -2,8 +2,8 @@ import { useCallback } from 'react'
 import type { TrainingSession } from '@application/sessions'
 import { addTempSlot, removeTempSlot, addPlanSlotsToSession } from '@application/sessions'
 import type { TrainingPlan } from '@application/planning'
-import type { ITrainingSessionRepository } from '@domain/sessions/ITrainingSessionRepository'
-import type { ITrainingPlanRepository } from '@domain/planning/ITrainingPlanRepository'
+import type { ITrainingSessionRepository } from '@application/sessions'
+import type { ITrainingPlanRepository } from '@application/planning'
 
 export function useSessionSlotActions(
   session: TrainingSession | null,
