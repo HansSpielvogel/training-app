@@ -15,6 +15,32 @@ while IFS= read -r file; do
   fi
 done < <(find src/presentation -name "*.ts" -o -name "*.tsx" | sort)
 
+# ── Application use-case file sizes ──────────────────────────────────────────
+while IFS= read -r file; do
+  lines=$(wc -l < "$file")
+  if [ "$lines" -gt 40 ]; then
+    echo "[WARN] $file: $lines lines (use-case limit: 40)" >> "$OUT"
+  fi
+done < <(find src/application -name "*.ts" ! -name "*.test.ts" ! -name "index.ts" | sort)
+
+# ── Infrastructure repository file sizes ─────────────────────────────────────
+while IFS= read -r file; do
+  lines=$(wc -l < "$file")
+  if [ "$lines" -gt 80 ]; then
+    echo "[WARN] $file: $lines lines (repository limit: 80)" >> "$OUT"
+  fi
+done < <(find src/infrastructure -name "*.ts" ! -name "*.test.ts" ! -name "index.ts" | sort)
+
+# ── Missing barrel files ──────────────────────────────────────────────────────
+for ctx in sessions exercises planning analytics; do
+  for layer in domain application; do
+    dir="src/$layer/$ctx"
+    if [ -d "$dir" ] && [ ! -f "$dir/index.ts" ]; then
+      echo "[WARN] $dir — missing index.ts barrel" >> "$OUT"
+    fi
+  done
+done
+
 # ── DDD import boundary violations ───────────────────────────────────────────
 
 # presentation → domain (hooks are allowed as composition root)
@@ -32,13 +58,25 @@ grep -rn "from '@" src/domain/ --include="*.ts" \
   | grep -v "from '@domain/" \
   | sed "s|^|[CRITICAL] |; s|:| line |1; s|$| — domain imports outside layer|" >> "$OUT"
 
-# cross-bounded-context at application layer
-grep -rn "from '@application/exercises/" src/application/planning/ --include="*.ts" 2>/dev/null \
-  | grep -v "\.test\.ts:" \
-  | sed "s|^|[WARN] |; s|:| line |1; s|$| — cross-context import (planning→exercises)|" >> "$OUT"
-grep -rn "from '@application/planning/" src/application/exercises/ --include="*.ts" 2>/dev/null \
-  | grep -v "\.test\.ts:" \
-  | sed "s|^|[WARN] |; s|:| line |1; s|$| — cross-context import (exercises→planning)|" >> "$OUT"
+# cross-bounded-context at domain level (only ID-type references allowed)
+for src_ctx in sessions planning analytics; do
+  for tgt_ctx in sessions exercises planning analytics; do
+    [ "$src_ctx" = "$tgt_ctx" ] && continue
+    grep -rn "from '@domain/$tgt_ctx/" "src/domain/$src_ctx/" --include="*.ts" 2>/dev/null \
+      | grep -v "Id['\"]" \
+      | sed "s|^|[CRITICAL] |; s|:| line |1; s|$| — $src_ctx domain imports full type from $tgt_ctx (use ID only)|" >> "$OUT"
+  done
+done
+
+# cross-bounded-context at application layer (all pairs)
+for src_ctx in sessions exercises planning analytics; do
+  for tgt_ctx in sessions exercises planning analytics; do
+    [ "$src_ctx" = "$tgt_ctx" ] && continue
+    grep -rn "from '@application/$tgt_ctx/" "src/application/$src_ctx/" --include="*.ts" 2>/dev/null \
+      | grep -v "\.test\.ts:" \
+      | sed "s|^|[WARN] |; s|:| line |1; s|$| — cross-context application import ($src_ctx→$tgt_ctx)|" >> "$OUT"
+  done
+done
 
 # ── TypeScript conventions ────────────────────────────────────────────────────
 

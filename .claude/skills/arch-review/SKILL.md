@@ -26,7 +26,18 @@ Steps:
       - Test conventions: test names describe behaviour, no shared mutable state, no mocking domain/app code
       - Naming: consistent with existing codebase (PascalCase components, camelCase hooks/use-cases, verb-first use-case filenames)
       - Code clarity: unnecessary complexity, dead code, logic that belongs in a different layer
-5. Report all findings — from both the script and the manual review — using the output format below.
+5. DDD correctness and bigger-picture review (read src/domain/ and src/application/ for the bounded contexts touched by the changed files):
+   a. **Ubiquitous language**: are domain terms (TrainingSession, SessionEntry, SessionSet, PlanSlot, MuscleGroup, ExerciseDefinition, Weight types) used consistently across all layers? Flag rename drift — e.g. UI says "workout" but domain says "session".
+   b. **Aggregate integrity**: are sub-entities (SessionEntry, SessionSet, PlanSlot) only accessible through their aggregate root? Flag any repository method that returns or queries sub-entities directly (e.g. getSetById).
+   c. **Domain logic placement**: is business logic (volume, set completion, variation rotation) in domain entities/value objects, not in use cases or hooks? Use cases orchestrate; they do not compute.
+   d. **Value object correctness**: do value objects enforce their own invariants (non-negative weight, valid RPE range)? Are they treated as immutable?
+   e. **Cross-context coupling**: at the domain level, sessions/ may only reference ExerciseDefinitionId — never a full ExerciseDefinition. planning/ may only reference MuscleGroupId. Flag full-object cross-context references.
+   f. **Anemic domain model**: flag entity files that are pure data bags with zero methods — ask where the missing behavior has leaked to (use case? hook?).
+   g. **Repository contracts**: repository interfaces in domain/ must expose only aggregate-root operations. No sub-entity queries.
+   h. **Use case SRP**: each use case file does exactly one thing. Flag files that contain two distinct operations.
+   i. **Bigger picture**: flag growing coupling that will become a structural problem — hooks doing too much orchestration, use cases growing beyond their scope, bounded contexts bleeding into each other, presentation importing domain objects as props.
+6. For large structural problems that would take significant effort (e.g. introducing domain events, reshaping a bounded context boundary, extracting a sub-domain): append a bullet to the `## Future` section of `openspec/memory/project_roadmap.md` and include it in the ### New Features output section.
+7. Report all findings — from the script and all manual review steps — using the output format below.
 
 Output format — return ONLY this, no preamble:
 
@@ -34,10 +45,13 @@ Output format — return ONLY this, no preamble:
 - `src/path/file.tsx:N` — issue. **Fix:** concrete suggestion.
 
 ### Warnings
-- `src/path/file.tsx` — issue. **Fix:** concrete suggestion.
+- `src/path/file.tsx:N` — issue. **Fix:** concrete suggestion.
 
 ### Style
 - `src/path/file.tsx:N` — issue. **Fix:** concrete suggestion.
+
+### New Features
+- Express the new idea of the feature and why it is neccessary.
 
 Omit any category with no findings. If there are no findings at all, return "No issues found."
 ```

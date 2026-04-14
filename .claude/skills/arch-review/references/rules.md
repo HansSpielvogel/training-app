@@ -45,6 +45,38 @@ One export per file. Inline sub-components count toward the parent's line total.
 - Mock only at the infrastructure boundary (never mock domain or application code).
 - Test names describe behavior: `it('disables submit while saving')` not `it('calls save()')`.
 
+## DDD Domain Model Rules
+
+**Aggregate roots**: `TrainingSession`, `ExerciseDefinition`, `TrainingPlan` are aggregate roots.
+Sub-entities (`SessionEntry`, `SessionSet`, `PlanSlot`) must only be accessed through their root — never queried or stored independently. No `getSetById`, no `findEntriesByExercise` returning raw sub-entities.
+
+**Domain logic placement**: business logic (volume calculation, set completion, variation rotation) belongs in domain entities or value objects, not in use cases or hooks. Use cases orchestrate; domain computes.
+
+**Value objects are immutable and self-validating**: `Weight`, `RPE`, and similar objects must enforce their own invariants (e.g. non-negative weight, valid RPE range). Never mutate — return new instances.
+
+**Cross-context coupling at domain level**: bounded contexts may only reference each other by ID type.
+- `sessions/` may import `ExerciseDefinitionId` from `exercises/` but never a full `ExerciseDefinition`
+- `planning/` may import `MuscleGroupId` from `exercises/` but never a full `MuscleGroup`
+- `sessions/` must not import from `planning/` at all
+
+**Repository interfaces in `domain/`**: expose only aggregate-root operations. Methods accept/return aggregate roots or IDs — never sub-entities directly.
+
+**Ubiquitous language**: use the exact domain terms from CLAUDE.md across all layers. The UI says "session" not "workout", "entry" not "exercise-item", "set" not "log-item". Drift is a smell.
+
+**Anemic domain model**: entity files with zero methods (pure data bags) are a design smell. Business rules that operate on entity state belong on the entity, not leaked into use cases.
+
+## Bigger-Picture Architecture
+
+**Use case naming**: verb-first, imperative, `camelCase`. Examples: `logSet`, `startSession`, `pickExercise`. Never noun-first (`sessionLogger`, `setManager`).
+
+**Barrel discipline**: every bounded-context folder in every layer must have an `index.ts` that exports only its public API. Other layers import via the barrel, never via deep paths like `@application/sessions/logSet`.
+
+**Composition root**: only hooks may instantiate infrastructure classes (repositories). Use cases accept repository interfaces via constructor injection. A use case must never `new` a repository.
+
+**Commands vs queries**: distinguish mutating use cases (commands) from read use cases (queries). Commands should not return domain objects beyond IDs; queries should not cause side effects.
+
+**Presentation stays thin**: hooks own composition and state. Components render and emit events only — no business logic in JSX. Domain objects must not be passed directly as props; transform to view models at the hook boundary.
+
 ## PWA / iPhone Requirements
 
 - `viewport-fit=cover` in the `<meta name="viewport">` tag.
