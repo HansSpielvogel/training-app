@@ -6,13 +6,6 @@ type: project
 
 ## Next Up
 
-### Group B — Weight Display & Set Entry (p2)
-
-- p1: Fix Bug: Input fields for text should not have Zoom when entering them. Apply no-zoom behavior consistently across the full app.
-- p2: In the active session "Last:" section, show `Weight` and `+add` as separate values (not summed), but ONLY there. For Langhantel (LH) exercises, display as `LH +10 kg` — the user enters only the added weight; the 20 kg bar is implicit to the exercise.
-- p2: When entering sets individually (non-quick mode), prefill each new set's fields with the values of the previous set.
-- p2: "Bauch" muscle group shows "Bauch Seite" exercises in suggestions. "Bauch Seite" is its own muscle group; its exercises must not appear under "Bauch". Root cause is likely in the seed data exercise assignments.
-
 ### Group C — exercise-variants
 - p3: Asymmetric weight type (`{ kind: 'asymmetric'; left; right }`)
 - p3: Alternating exercise variant: flag + rest time override on ExerciseDefinition; shown as hint in active session (e.g. 4 sets alternating left/right, 36s rest)
