@@ -1,11 +1,12 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import type { ExerciseDefinition } from '@application/exercises'
-import { DuplicateExerciseNameError, NoMuscleGroupError, InvalidImportError } from '@application/exercises'
+import { DuplicateExerciseNameError, NoMuscleGroupError } from '@application/exercises'
 import { useMuscleGroups } from './useMuscleGroups'
 import { useExerciseDefinitions } from './useExerciseDefinitions'
 import { ExerciseForm } from './ExerciseForm'
 import { ExerciseRow } from './ExerciseRow'
 import { ConfirmDeleteDialog } from '../shared/ConfirmDeleteDialog'
+import { ExerciseImportExport } from './ExerciseImportExport'
 
 type Mode =
   | { type: 'list' }
@@ -20,8 +21,6 @@ export function ExerciseDefinitionsPage() {
     useExerciseDefinitions(filterMuscleGroupId)
   const [mode, setMode] = useState<Mode>({ type: 'list' })
   const [formError, setFormError] = useState<string>()
-  const [importError, setImportError] = useState<string>()
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   function muscleGroupName(id: string) {
     return muscleGroups.find((mg) => mg.id === id)?.name ?? id
@@ -56,40 +55,6 @@ export function ExerciseDefinitionsPage() {
     setMode({ type: 'list' })
   }
 
-  async function handleExport() {
-    const json = await exportLibrary()
-    const blob = new Blob([json], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'exercise-library.json'
-    a.click()
-    URL.revokeObjectURL(url)
-  }
-
-  function handleImportClick() {
-    setImportError(undefined)
-    fileInputRef.current?.click()
-  }
-
-  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    e.target.value = ''
-    try {
-      const text = await file.text()
-      const data = JSON.parse(text)
-      const proceed = window.confirm(
-        'This will replace all muscle groups and exercises. Continue?',
-      )
-      if (!proceed) return
-      await importLibrary(data)
-    } catch (err) {
-      if (err instanceof InvalidImportError) setImportError(err.message)
-      else setImportError('Failed to read file. Make sure it is a valid export.')
-    }
-  }
-
   function reset() {
     setMode({ type: 'list' })
     setFormError(undefined)
@@ -100,25 +65,8 @@ export function ExerciseDefinitionsPage() {
       <header className="px-4 py-4 border-b border-gray-200 bg-white">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-semibold text-gray-900">Exercises</h1>
-          <div className="flex gap-2">
-            <button
-              onClick={handleExport}
-              className="px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-md font-medium"
-              title="Export library"
-            >
-              Export
-            </button>
-            <button
-              onClick={handleImportClick}
-              className="px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-md font-medium"
-              title="Import library"
-            >
-              Import
-            </button>
-            <input ref={fileInputRef} type="file" accept=".json" className="hidden" onChange={handleFileChange} />
-          </div>
+          <ExerciseImportExport onExport={exportLibrary} onImport={importLibrary} />
         </div>
-        {importError && <p className="mt-1 text-xs text-red-600">{importError}</p>}
       </header>
 
       <div className="px-4 py-2 bg-white border-b border-gray-100">

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { computeRotationSuggestion } from './computeRotationSuggestion'
-import type { TrainingSession } from '@domain/sessions/TrainingSession'
+import type { TrainingSession } from '@domain/sessions'
 
 function makeSession(exerciseIds: (string | undefined)[], muscleGroupId = 'mg-1'): TrainingSession {
   return {

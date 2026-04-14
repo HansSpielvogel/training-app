@@ -6,10 +6,11 @@ import {
   getLastUsedByExercise,
 } from '@application/analytics'
 import type { ExerciseProgressionPoint, MuscleGroupVolume, SessionSummaryItem } from '@application/analytics'
+import { listExerciseDefinitions } from '@application/exercises'
+import type { ExerciseDefinition } from '@application/exercises'
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
 import { DexieExerciseDefinitionRepository } from '@infrastructure/exercises/DexieExerciseDefinitionRepository'
 import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscleGroupRepository'
-import type { ExerciseDefinition } from '@application/exercises'
 
 // Hooks are the composition root — they wire use cases to repositories
 export function useAnalytics() {
@@ -27,7 +28,7 @@ export function useAnalytics() {
     Promise.all([
       getSessionSummaries(sessionRepo),
       getMuscleGroupVolume(sessionRepo, muscleGroupRepo),
-      exerciseRepo.list(),
+      listExerciseDefinitions(exerciseRepo),
       getLastUsedByExercise(sessionRepo),
     ]).then(([summaries, volumes, exList, lastUsed]) => {
       setSessionSummaries(summaries)

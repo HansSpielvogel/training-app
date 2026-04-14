@@ -74,6 +74,21 @@ describe('SetLogger', () => {
     })
   })
 
+  describe('individual mode prefill', () => {
+    it('retains weight and reps after first set is logged in individual mode', () => {
+      const onAdd = vi.fn()
+      render(<SetLogger {...defaultProps} onAdd={onAdd} />)
+
+      fireEvent.click(screen.getByText('Individual'))
+      fireEvent.change(screen.getByPlaceholderText('Weight'), { target: { value: '80' } })
+      fireEvent.change(screen.getByPlaceholderText('Reps'), { target: { value: '10' } })
+      fireEvent.click(screen.getByText('Add Set'))
+
+      expect(screen.getByPlaceholderText('Weight')).toHaveValue('80')
+      expect(screen.getByPlaceholderText('Reps')).toHaveValue(10)
+    })
+  })
+
   describe('scroll on focus', () => {
     beforeEach(() => {
       Element.prototype.scrollIntoView = vi.fn()

@@ -38,7 +38,7 @@ vi.mock('@infrastructure/exercises/DexieExerciseDefinitionRepository', () => ({
 import { useActiveSession } from './useActiveSession'
 
 describe('removePlanSlot', () => {
-  it('calls sessionRepo.save with the entry removed', async () => {
+  it('removes the specified entry from the session', async () => {
     mockGetActiveSession.mockResolvedValue({ ...mockSession, entries: [...mockSession.entries] })
     mockGetById.mockResolvedValue({ ...mockSession, entries: [...mockSession.entries] })
 

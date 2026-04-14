@@ -3,17 +3,18 @@ import type { SessionSet } from '@application/sessions'
 import type { Weight } from '@application/sessions'
 import { parseWeight } from '@application/sessions'
 import { DEFAULT_SET_COUNT } from '@application/exercises'
-import { formatSets } from '../shared/formatSets'
+import { formatSets, formatLastSets } from '../shared/formatSets'
 
 interface Props {
   sets: readonly SessionSet[]
   lastSets: SessionSet[] | null
   defaultSets?: number
+  exerciseName?: string
   onAdd: (weight: Weight, reps: number, count: number, rpe?: number) => void
   onRemoveLast: () => void
 }
 
-export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: Props) {
+export function SetLogger({ sets, lastSets, defaultSets, exerciseName, onAdd, onRemoveLast }: Props) {
   const n = defaultSets ?? DEFAULT_SET_COUNT
   const [mode, setMode] = useState<'quick' | 'individual'>('quick')
   const [weightInput, setWeightInput] = useState('')
@@ -71,16 +72,14 @@ export function SetLogger({ sets, lastSets, defaultSets, onAdd, onRemoveLast }: 
     const parsed = parseInputs()
     if (!parsed) return
     onAdd(parsed.weight, parsed.reps, 1, parsed.rpe)
-    setWeightInput('')
-    setAddedWeightInput('')
-    setRepsInput('')
+    // Retain weight and reps as prefill for the next set in individual mode
     setRpeInput('')
   }
 
   return (
     <div className="space-y-2">
       {lastSets && lastSets.length > 0 && (
-        <p className="text-sm text-gray-500">Last: {formatSets(lastSets)}</p>
+        <p className="text-sm text-gray-500">Last: {formatLastSets(lastSets, exerciseName)}</p>
       )}
       <div className="space-y-2">
         <div className="flex gap-1">

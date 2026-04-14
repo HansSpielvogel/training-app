@@ -1,6 +1,6 @@
 import type { ITrainingSessionRepository } from '@domain/sessions/ITrainingSessionRepository'
-import type { Weight } from '@domain/shared/Weight'
-import { createSessionSet } from '@domain/sessions/TrainingSession'
+import type { Weight } from '@domain/shared'
+import { createSessionSet } from '@domain/sessions'
 
 export async function addSet(
   repo: ITrainingSessionRepository,

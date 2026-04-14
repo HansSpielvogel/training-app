@@ -1,4 +1,4 @@
-import type { Weight } from '@domain/shared/Weight'
+import type { Weight } from '@domain/shared'
 
 export function normalizeWeight(weight: Weight): { value: number; unit: string } {
   switch (weight.kind) {

@@ -65,7 +65,7 @@
     { "id": "ex-ausrollen",          "name": "Ausrollen",                       "muscleGroupIds": ["mg-bauch"] },
     { "id": "ex-bauch-bank",         "name": "Bauch Bank schwebend",            "muscleGroupIds": ["mg-bauch"] },
     { "id": "ex-bauch-boden",        "name": "Bauch Boden halten",              "muscleGroupIds": ["mg-bauch"] },
-    { "id": "ex-oblique-crunch",     "name": "Oblique Crunch",                  "muscleGroupIds": ["mg-bauch", "mg-bauch-seite"] },
+    { "id": "ex-oblique-crunch",     "name": "Oblique Crunch",                  "muscleGroupIds": ["mg-bauch-seite"] },
 
     { "id": "ex-torso-rotation",     "name": "Torso Rotation",                  "muscleGroupIds": ["mg-bauch-seite"] },
     { "id": "ex-bauch-seite-kh",     "name": "Bauch Seite Bank",                "muscleGroupIds": ["mg-bauch-seite"] },

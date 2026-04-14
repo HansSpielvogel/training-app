@@ -276,7 +276,7 @@
       "completedAt": "2026-03-05T10:00:00.000Z",
       "entries": [
         {
-          "muscleGroupId": "mg-bauch",
+          "muscleGroupId": "mg-bauch-seite",
           "exerciseDefinitionId": "ex-oblique-crunch",
           "sets": [
             { "weight": { "kind": "single", "value": 12.5 }, "reps": 11 },
@@ -294,7 +294,7 @@
           ]
         },
         {
-          "muscleGroupId": "mg-bauch",
+          "muscleGroupId": "mg-bauch-seite",
           "exerciseDefinitionId": "ex-bauch-seite-kh",
           "sets": [
             { "weight": { "kind": "stacked", "base": 0, "added": 8 }, "reps": 10 },
@@ -321,7 +321,7 @@
           ]
         },
         {
-          "muscleGroupId": "mg-bauch",
+          "muscleGroupId": "mg-bauch-seite",
           "exerciseDefinitionId": "ex-torso-rotation",
           "sets": [
             { "weight": { "kind": "stacked", "base": 31.5, "added": 2.3 }, "reps": 11 },

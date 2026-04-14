@@ -1,5 +1,5 @@
 import type { ITrainingSessionRepository } from '@domain/sessions/ITrainingSessionRepository'
-import type { TrainingSession } from '@domain/sessions/TrainingSession'
+import type { TrainingSession } from '@domain/sessions'
 import type { ITrainingPlanRepository } from '@domain/planning/ITrainingPlanRepository'
 
 export async function startSession(

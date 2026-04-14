@@ -120,6 +120,7 @@ export function EntryRow({
                 sets={entry.sets}
                 lastSets={lastSets}
                 defaultSets={defaultSets}
+                exerciseName={exerciseName}
                 onAdd={(weight, reps, count, rpe) => onAddSet(weight, reps, count, rpe)}
                 onRemoveLast={onRemoveLast}
               />

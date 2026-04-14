@@ -1,5 +1,5 @@
 import type { ITrainingSessionRepository } from '@domain/sessions/ITrainingSessionRepository'
-import type { TrainingSession } from '@domain/sessions/TrainingSession'
+import type { TrainingSession } from '@domain/sessions'
 import seedData from '../../../openspec/seed/sessions-seed.json'
 
 export async function seedSessions(repo: ITrainingSessionRepository): Promise<void> {

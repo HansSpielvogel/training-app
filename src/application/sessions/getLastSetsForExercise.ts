@@ -1,5 +1,5 @@
 import type { ITrainingSessionRepository } from '@domain/sessions/ITrainingSessionRepository'
-import type { SessionSet } from '@domain/sessions/TrainingSession'
+import type { SessionSet } from '@domain/sessions'
 
 export async function getLastSetsForExercise(
   repo: ITrainingSessionRepository,
