@@ -16,11 +16,15 @@ During an active session, the user SHALL be able to add a new muscle group slot 
 ---
 
 ### Requirement: Remove temp slot
-The user SHALL be able to remove a temp slot from the active session, but only when no sets have been logged to it. Removing a temp slot with logged sets SHALL be blocked to prevent accidental data loss.
+The user SHALL be able to remove a temp slot from the active session, but only when no sets have been logged to it. Removing a temp slot with logged sets SHALL be blocked to prevent accidental data loss. Removal SHALL be persisted immediately to IndexedDB so the slot remains gone if the user navigates away and returns.
 
 #### Scenario: Remove empty temp slot
 - **WHEN** user taps the remove button on a temp slot that has no sets logged
-- **THEN** the temp slot is removed from the active session
+- **THEN** the temp slot is removed from the active session and the removal persists through navigation
+
+#### Scenario: Removed slot stays gone after navigation
+- **WHEN** user removes a temp slot and then navigates to another screen and back
+- **THEN** the removed slot does not reappear
 
 #### Scenario: Cannot remove temp slot with sets
 - **WHEN** a temp slot has at least one set logged
@@ -46,3 +50,12 @@ During an active session, the user SHALL be able to select a training plan and a
 #### Scenario: Slots added as temp
 - **WHEN** slots are added from another training plan
 - **THEN** they are marked isTemp: true and the original training plans remain unchanged
+
+---
+
+### Requirement: Plan slot removal persists through navigation
+When the user removes a plan slot during an active session, the removal SHALL be persisted to IndexedDB immediately. If the user navigates away and returns to the active session, the removed slot SHALL remain absent.
+
+#### Scenario: Removed plan slot stays gone after navigation
+- **WHEN** user removes a plan slot and then navigates to another screen (e.g. Stats) and returns
+- **THEN** the removed slot does not reappear in the active session
