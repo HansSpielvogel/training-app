@@ -42,6 +42,7 @@ presentation/   ← React components and hooks
 - **`sessions/`** — Core domain. `TrainingSession`, `SessionEntry`, `SessionSet`. This is the heart of the app: what was done, with what weight, how many reps.
 - **`exercises/`** — Supporting. `ExerciseDefinition`, `MuscleGroup`. The catalogue of exercises; exists to serve session logging and plan building.
 - **`planning/`** — Supporting. `TrainingPlan`, `PlanSlot`. Defines the template for a session; references MuscleGroups, not specific exercises (variation is chosen at training time).
+- **`analytics/`** — Read-only. Aggregates completed session data for display. Defines its own `SetSnapshot` type (`weight`, `reps`, `rpe?`) — never imports `SessionSet` from the sessions context. Application use cases map `SessionSet → SetSnapshot` at the boundary.
 
 **Key domain rules:**
 - `PlanSlot` references a `MuscleGroup`, never an `ExerciseDefinition` — the exercise is picked per session

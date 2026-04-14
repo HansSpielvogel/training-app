@@ -6,12 +6,6 @@ type: project
 
 ## Next Up
 
-### Group A — PWA / UI Polish (p1)
-
-- p1: In home screen PWA mode, the bottom bar is partially cut off and a spurious scrollbar appears. Fix bar visibility and remove the scrollbar.
-- p1: Input fields in the active session correctly suppress zoom, but other areas (e.g. exercise name editing) still zoom. Apply no-zoom behavior consistently across the full app.
-- p1: In active session, deleted muscle group entries reappear after navigating away and back (e.g. to Stats). Deleted entries should remain gone on return, consistent with temp-added groups.
-
 ### Group B — Weight Display & Set Entry (p2)
 
 - p2: In the active session "Last:" section, show `Weight` and `+add` as separate values (not summed). For Langhantel (LH) exercises, display as `LH +10 kg` — the user enters only the added weight; the 20 kg bar is implicit to the exercise.
