@@ -69,7 +69,7 @@ Sub-entities (`SessionEntry`, `SessionSet`, `PlanSlot`) must only be accessed th
 
 **Use case naming**: verb-first, imperative, `camelCase`. Examples: `logSet`, `startSession`, `pickExercise`. Never noun-first (`sessionLogger`, `setManager`).
 
-**Barrel discipline**: every bounded-context folder in every layer must have an `index.ts` that exports only its public API. Other layers import via the barrel, never via deep paths like `@application/sessions/logSet`.
+**Barrel discipline**: every bounded-context folder in every layer must have an `index.ts` that exports only its public API. Other layers import via the barrel, never via deep paths like `@application/sessions/logSet`. Domain barrels in use: `@domain/sessions`, `@domain/exercises`, `@domain/planning`, `@domain/analytics`, `@domain/shared`. Deep paths like `@domain/sessions/TrainingSession` or `@domain/shared/Weight` are violations.
 
 **Composition root**: only hooks may instantiate infrastructure classes (repositories). Use cases accept repository interfaces via constructor injection. A use case must never `new` a repository.
 

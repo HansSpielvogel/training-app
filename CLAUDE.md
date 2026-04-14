@@ -55,6 +55,10 @@ presentation/   ← React components and hooks
 Do NOT make the Exercise model generic. Extensibility comes from bounded context architecture.
 When building session-tracking or analytics, define `SessionSummary` as a shared interface. Strength training entities implement it. Do not add `sportType` enums or generic fields to `ExerciseDefinition`. Adding a new sport = new bounded context, no rewrite of the strength domain.
 
+## Seed Data Consistency
+
+`openspec/seed/exercise-library.json` and `openspec/seed/sessions-seed.json` must stay in sync. When changing `muscleGroupIds` on an exercise, also audit `sessions-seed.json` for entries referencing that exercise — their `muscleGroupId` must still be one of the exercise's groups.
+
 ## Project Context (Memory)
 
 - `openspec/memory/project_roadmap.md` — future improvements
