@@ -9,15 +9,7 @@ Run these steps in order after finishing any implementation task.
 
 ## Steps
 
-### 1. Run tests and build
-
-```bash
-npm test
-```
-
-If tests fail: stop, report the failures, fix them before continuing.
-
-Also run the production build to catch TypeScript errors that `vitest` skips:
+### 1. Build & e2e tests
 
 ```bash
 npm run build
