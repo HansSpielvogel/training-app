@@ -33,28 +33,42 @@ function touch(x: number, y = 200) {
 }
 
 describe('EntryRow swipe-to-delete', () => {
-  it('calls onRemoveEntry when swipe exceeds 60px threshold', () => {
+  it('does not call onRemoveEntry on swipe — deletion requires tapping the trash button', () => {
     const onRemoveEntry = vi.fn()
     render(<EntryRow {...defaultProps} onRemoveEntry={onRemoveEntry} />)
     const row = screen.getByText('Chest').closest('.relative') as Element
 
     fireEvent.touchStart(row, touch(200))
-    fireEvent.touchMove(row, touch(130))  // dx=70 > 60
-    fireEvent.touchEnd(row)
-
-    expect(onRemoveEntry).toHaveBeenCalled()
-  })
-
-  it('does not call onRemoveEntry when swipe is below 60px threshold (snap back)', () => {
-    const onRemoveEntry = vi.fn()
-    render(<EntryRow {...defaultProps} onRemoveEntry={onRemoveEntry} />)
-    const row = screen.getByText('Chest').closest('.relative') as Element
-
-    fireEvent.touchStart(row, touch(200))
-    fireEvent.touchMove(row, touch(160))  // dx=40 < 60
+    fireEvent.touchMove(row, touch(130))  // dx=70 > 40 threshold
     fireEvent.touchEnd(row)
 
     expect(onRemoveEntry).not.toHaveBeenCalled()
+  })
+
+  it('snaps open when swipe exceeds 40px threshold', () => {
+    const onRemoveEntry = vi.fn()
+    const { container } = render(<EntryRow {...defaultProps} onRemoveEntry={onRemoveEntry} />)
+    const row = screen.getByText('Chest').closest('.relative') as Element
+
+    fireEvent.touchStart(row, touch(200))
+    fireEvent.touchMove(row, touch(155))  // dx=45 > 40
+    fireEvent.touchEnd(row)
+
+    const inner = container.querySelector('[style*="translateX"]') as HTMLElement
+    expect(inner.style.transform).toBe('translateX(-80px)')
+  })
+
+  it('snaps closed when swipe is below 40px threshold', () => {
+    const onRemoveEntry = vi.fn()
+    const { container } = render(<EntryRow {...defaultProps} onRemoveEntry={onRemoveEntry} />)
+    const row = screen.getByText('Chest').closest('.relative') as Element
+
+    fireEvent.touchStart(row, touch(200))
+    fireEvent.touchMove(row, touch(170))  // dx=30 < 40
+    fireEvent.touchEnd(row)
+
+    const inner = container.querySelector('[style*="translateX"]') as HTMLElement
+    expect(inner.style.transform).toBe('translateX(-0px)')
   })
 
   it('does not swipe when entry has logged sets', () => {
@@ -67,7 +81,7 @@ describe('EntryRow swipe-to-delete', () => {
     const row = screen.getByText('Chest').closest('.relative') as Element
 
     fireEvent.touchStart(row, touch(200))
-    fireEvent.touchMove(row, touch(130))  // dx=70 > 60
+    fireEvent.touchMove(row, touch(130))
     fireEvent.touchEnd(row)
 
     expect(onRemoveEntry).not.toHaveBeenCalled()

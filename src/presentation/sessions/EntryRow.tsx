@@ -45,7 +45,7 @@ export const EntryRow = forwardRef<HTMLDivElement, EntryRowProps>(function Entry
   const canSwipe = setCount === 0 && !!onRemoveEntry
 
   const { swipeX, swiping, swipeBlocked, handleTouchStart, handleTouchMove, handleTouchEnd } =
-    useSwipeToDelete({ canSwipe, setCount, onRemoveEntry })
+    useSwipeToDelete({ canSwipe, setCount })
 
   function handleToggle() {
     if (!isExpanded && !exerciseData) onLoadExerciseData()
@@ -66,11 +66,15 @@ export const EntryRow = forwardRef<HTMLDivElement, EntryRowProps>(function Entry
         </div>
       )}
       {canSwipe && (
-        <div className="absolute inset-y-0 right-0 w-20 bg-red-500 flex items-center justify-center">
+        <button
+          className="absolute inset-y-0 right-0 w-20 bg-red-500 flex items-center justify-center"
+          onTouchEnd={(e) => { e.stopPropagation(); onRemoveEntry?.() }}
+          onClick={onRemoveEntry}
+        >
           <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
           </svg>
-        </div>
+        </button>
       )}
       <div
         className={`border-b border-gray-100 bg-white ${setCount > 0 ? 'border-l-2 border-l-blue-400' : ''}`}

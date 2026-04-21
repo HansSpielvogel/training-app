@@ -3,19 +3,23 @@
 ### Requirement: Remove plan slot from active session
 The user SHALL be able to remove any slot from the active session, including plan-defined slots (not only temp slots). Removing a plan slot SHALL dismiss it from the current session view only; the underlying training plan SHALL NOT be modified. The removal is ephemeral and is not persisted beyond the current session.
 
-Removal is triggered by a swipe-left gesture on the entry row. Swiping left SHALL reveal a red trash action behind the row. When the swipe passes a threshold (≥60px), releasing commits the removal. Slots that have at least one set logged SHALL NOT be removable via swipe; the gesture is disabled on those rows.
+Removal is triggered by a two-step gesture: swipe-left to reveal the trash button, then tap the button to confirm removal. Swiping left SHALL reveal a red trash button behind the row. When the swipe passes the snap threshold (≥40px), releasing snaps the row open and keeps the trash button visible. Tapping the trash button commits the removal. Slots that have at least one set logged SHALL NOT be removable; the gesture is disabled on those rows.
 
-#### Scenario: Swipe-left reveals trash action
-- **WHEN** user begins swiping left on a session entry row that has no sets logged
-- **THEN** a red trash indicator is revealed behind the row as the row translates left
+#### Scenario: Swipe-left reveals trash button
+- **WHEN** user swipes left past the snap threshold (≥40px) on an entry with no sets logged and releases
+- **THEN** the row snaps fully open (80px) and the red trash button remains visible
 
-#### Scenario: Release past threshold removes slot
-- **WHEN** user swipes left past the threshold and releases
+#### Scenario: Tap trash button removes slot
+- **WHEN** the trash button is visible and the user taps it
 - **THEN** the entry is removed from the active session view for the remainder of the session
 
 #### Scenario: Release before threshold snaps back
-- **WHEN** user swipes left but releases before the threshold
+- **WHEN** user swipes left but releases before the snap threshold (<40px)
 - **THEN** the row snaps back to its original position and the slot remains in the session
+
+#### Scenario: Swipe-right closes revealed trash button
+- **WHEN** the row is in the open (trash visible) state and user swipes right
+- **THEN** the row snaps back to its original position, hiding the trash button
 
 #### Scenario: Swipe disabled on rows with logged sets
 - **WHEN** user attempts to swipe left on an entry that has at least one set logged

@@ -4,7 +4,6 @@ import type React from 'react'
 interface UseSwipeToDeleteOptions {
   canSwipe: boolean
   setCount: number
-  onRemoveEntry?: () => void
 }
 
 interface UseSwipeToDeleteResult {
@@ -16,22 +15,22 @@ interface UseSwipeToDeleteResult {
   handleTouchEnd: () => void
 }
 
-export function useSwipeToDelete({ canSwipe, setCount, onRemoveEntry }: UseSwipeToDeleteOptions): UseSwipeToDeleteResult {
+export function useSwipeToDelete({ canSwipe, setCount }: UseSwipeToDeleteOptions): UseSwipeToDeleteResult {
   const [swipeX, setSwipeX] = useState(0)
   const [swiping, setSwiping] = useState(false)
   const [swipeBlocked, setSwipeBlocked] = useState(false)
-  const swipeTouchRef = useRef({ startX: 0, startY: 0, activated: false })
+  const touchRef = useRef({ startX: 0, startY: 0, startSwipeX: 0, activated: false })
   const blockAttempted = useRef(false)
   const blockTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   function handleTouchStart(e: React.TouchEvent) {
     blockAttempted.current = false
-    swipeTouchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY, activated: false }
+    touchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY, startSwipeX: swipeX, activated: false }
     if (canSwipe) setSwiping(true)
   }
 
   function handleTouchMove(e: React.TouchEvent) {
-    const { startX, startY } = swipeTouchRef.current
+    const { startX, startY, startSwipeX } = touchRef.current
     const dx = startX - e.touches[0].clientX
     const dy = Math.abs(e.touches[0].clientY - startY)
 
@@ -45,26 +44,24 @@ export function useSwipeToDelete({ canSwipe, setCount, onRemoveEntry }: UseSwipe
       return
     }
 
-    if (!swipeTouchRef.current.activated) {
-      if (dx > 5 && dx > dy) {
-        swipeTouchRef.current.activated = true
+    if (!touchRef.current.activated) {
+      const isLeftSwipe = dx > 5 && dx > dy
+      const isRightSwipe = -dx > 5 && -dx > dy && startSwipeX > 0
+      if (isLeftSwipe || isRightSwipe) {
+        touchRef.current.activated = true
       } else {
         return
       }
     }
-    setSwipeX(Math.min(Math.max(dx, 0), 80))
+    setSwipeX(Math.min(Math.max(startSwipeX + dx, 0), 80))
   }
 
   function handleTouchEnd() {
     setSwiping(false)
     blockAttempted.current = false
-    if (!swipeTouchRef.current.activated) return
-    swipeTouchRef.current.activated = false
-    if (swipeX >= 60) {
-      onRemoveEntry?.()
-    } else {
-      setSwipeX(0)
-    }
+    if (!touchRef.current.activated) return
+    touchRef.current.activated = false
+    setSwipeX(swipeX >= 40 ? 80 : 0)
   }
 
   return { swipeX, swiping, swipeBlocked, handleTouchStart, handleTouchMove, handleTouchEnd }

@@ -177,7 +177,7 @@ export function ActiveSessionScreen() {
       <div className="flex-1 overflow-y-auto">
         {session.entries.map((entry, i) => (
           <ActiveSessionEntryItem
-            key={i}
+            key={`${entry.muscleGroupId}-${entry.exerciseDefinitionId ?? 'none'}`}
             entry={entry}
             index={i}
             muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
