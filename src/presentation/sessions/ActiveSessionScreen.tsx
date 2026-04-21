@@ -7,44 +7,12 @@ import { useSessionConfirm } from './useSessionConfirm'
 import { useMuscleGroups } from '../exercises/useMuscleGroups'
 import { useEntryDoneState } from './useEntryDoneState'
 import { useDragReorder } from './useDragReorder'
-import { EntryRow } from './EntryRow'
 import { ConfirmAbandonBanner } from './ConfirmAbandonBanner'
 import { SlotPickerPanel } from './SlotPickerPanel'
 import { SessionFooter } from './SessionFooter'
-
-export function findNextIncomplete(current: number | null, doneIndices: Set<number>, total: number): number | null {
-  const start = current !== null ? current + 1 : 0
-  for (let i = start; i < total; i++) {
-    if (!doneIndices.has(i)) return i
-  }
-  return null
-}
-
-export function findActiveEntry(entries: readonly { sets: readonly unknown[]; exerciseDefinitionId?: string }[], doneIndices: Set<number>): number | null {
-  for (let i = 0; i < entries.length; i++) {
-    if (doneIndices.has(i)) continue
-    const e = entries[i]
-    if (e.exerciseDefinitionId || e.sets.length > 0) return i
-  }
-  return null
-}
-
-export function remapDoneIndices(done: Set<number>, fromIndex: number, toIndex: number): Set<number> {
-  if (fromIndex === toIndex) return done
-  const result = new Set<number>()
-  for (const idx of done) {
-    if (idx === fromIndex) {
-      result.add(toIndex)
-    } else if (fromIndex < toIndex && idx > fromIndex && idx <= toIndex) {
-      result.add(idx - 1)
-    } else if (fromIndex > toIndex && idx >= toIndex && idx < fromIndex) {
-      result.add(idx + 1)
-    } else {
-      result.add(idx)
-    }
-  }
-  return result
-}
+import { SessionHeader } from './SessionHeader'
+import { ActiveSessionEntryItem } from './ActiveSessionEntryItem'
+import { findNextIncomplete, findActiveEntry, remapDoneIndices } from './activeSessionHelpers'
 
 export function ActiveSessionScreen() {
   const navigate = useNavigate()
@@ -114,15 +82,16 @@ export function ActiveSessionScreen() {
   }
 
   function handleToggle(i: number) {
+    if (!session) return
     const isCurrentlyExpanded = expandedIndex === i
     if (isCurrentlyExpanded) {
-      const entry = session?.entries[i]
+      const entry = session.entries[i]
       const hasSets = (entry?.sets.length ?? 0) > 0
       if (hasSets) {
         const newDone = new Set(doneIndices).add(i)
-        setDone(newDone, session!.id)
+        setDone(newDone, session.id)
         setActiveEntryIndex(null)
-        expandAndPreload(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
+        expandAndPreload(findNextIncomplete(i, newDone, session.entries.length))
       } else {
         setExpandedIndex(null)
         if (activeEntryIndex === i) setActiveEntryIndex(null)
@@ -137,10 +106,11 @@ export function ActiveSessionScreen() {
   }
 
   function handleMarkDone(i: number) {
+    if (!session) return
     const newDone = new Set(doneIndices).add(i)
-    setDone(newDone, session!.id)
+    setDone(newDone, session.id)
     setActiveEntryIndex(null)
-    expandAndPreload(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
+    expandAndPreload(findNextIncomplete(i, newDone, session.entries.length))
   }
 
   function handleAssignWithActive(i: number, id: string) {
@@ -189,23 +159,13 @@ export function ActiveSessionScreen() {
 
   return (
     <div className="flex flex-col h-full">
-      <header
-        className="px-4 py-4 border-b border-gray-200 bg-white"
-        style={{ paddingTop: 'calc(env(safe-area-inset-top) + 1rem)' }}
-      >
-        <div className="flex items-center justify-between">
-          <h1 className="flex-1 min-w-0 truncate text-xl font-semibold text-gray-900">{session.planName}</h1>
-          <button
-            onClick={() => { setConfirmAbandon(true); setConfirmFinish(false) }}
-            className="ml-3 p-2 text-sm text-red-500 min-h-[44px] flex items-center"
-          >
-            Abandon
-          </button>
-        </div>
-        {!hasAnyActivity && (
-          <p className="text-sm text-gray-500 mt-0.5">Tap a slot to log sets</p>
-        )}
-      </header>
+      <SessionHeader
+        planName={session.planName}
+        doneCount={doneIndices.size}
+        totalEntries={session.entries.length}
+        hasAnyActivity={hasAnyActivity}
+        onAbandon={() => { setConfirmAbandon(true); setConfirmFinish(false) }}
+      />
 
       {confirmAbandon && (
         <ConfirmAbandonBanner
@@ -215,53 +175,34 @@ export function ActiveSessionScreen() {
       )}
 
       <div className="flex-1 overflow-y-auto">
-        {session.entries.map((entry, i) => {
-          const isDragged = dragState?.fromIndex === i
-          const isDropTarget = dragState !== null && dragState.toIndex === i && !isDragged
-
-          return (
-            <div
-              key={i}
-              ref={(el) => { entryRefs.current[i] = el }}
-              style={isDragged ? {
-                transform: `translateY(${dragState.currentY - dragState.startY}px)`,
-                position: 'relative',
-                zIndex: 10,
-                opacity: 0.85,
-                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-              } : undefined}
-            >
-              {isDropTarget && dragState && dragState.fromIndex > i && (
-                <div className="h-0.5 bg-blue-400" />
-              )}
-              <EntryRow
-                entry={entry}
-                muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
-                exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
-                exerciseData={exerciseDataMap[i] ?? null}
-                lastSets={lastSetsMap[i] ?? null}
-                done={doneIndices.has(i)}
-                isExpanded={expandedIndex === i}
-                sessionStatus={session.status}
-                isDraggable={session.status === 'in-progress'}
-                onToggle={() => handleToggle(i)}
-                onMarkDone={() => handleMarkDone(i)}
-                onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
-                onAssign={(id) => handleAssignWithActive(i, id)}
-                onClearVariation={() => { clearVariation(i); clearLastSets(i) }}
-                defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
-                onAddSet={(weight: Weight, reps: number, count: number, rpe?: number) => handleAddSetWithActive(i, weight, reps, count, rpe)}
-                onRemoveLast={() => removeLastSet(i)}
-                onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : () => removePlanSlot(i)}
-                onUpdateSetRpe={(setIndex, rpe) => updateRpe(i, setIndex, rpe)}
-                onDragHandleTouchStart={(e) => handleDragHandleTouchStart(i, e)}
-              />
-              {isDropTarget && dragState && dragState.fromIndex < i && (
-                <div className="h-0.5 bg-blue-400" />
-              )}
-            </div>
-          )
-        })}
+        {session.entries.map((entry, i) => (
+          <ActiveSessionEntryItem
+            key={i}
+            entry={entry}
+            index={i}
+            muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
+            exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
+            exerciseData={exerciseDataMap[i] ?? null}
+            lastSets={lastSetsMap[i] ?? null}
+            defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
+            done={doneIndices.has(i)}
+            isExpanded={expandedIndex === i}
+            sessionStatus={session.status}
+            dragState={dragState}
+            exerciseNames={exerciseNames}
+            setRef={(el) => { entryRefs.current[i] = el }}
+            onToggle={() => handleToggle(i)}
+            onMarkDone={() => handleMarkDone(i)}
+            onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
+            onAssign={(id) => handleAssignWithActive(i, id)}
+            onClearVariation={() => { clearVariation(i); clearLastSets(i) }}
+            onAddSet={(weight: Weight, reps: number, count: number, rpe?: number) => handleAddSetWithActive(i, weight, reps, count, rpe)}
+            onRemoveLast={() => removeLastSet(i)}
+            onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : () => removePlanSlot(i)}
+            onUpdateSetRpe={(setIndex, rpe) => updateRpe(i, setIndex, rpe)}
+            onDragHandleTouchStart={(e) => handleDragHandleTouchStart(i, e)}
+          />
+        ))}
         <SlotPickerPanel
           showMuscleGroupPicker={showMuscleGroupPicker}
           showPlanPicker={showPlanPicker}

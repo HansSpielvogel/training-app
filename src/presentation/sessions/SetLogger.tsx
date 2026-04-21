@@ -5,6 +5,7 @@ import { parseWeight } from '@application/sessions'
 import { DEFAULT_SET_COUNT } from '@application/exercises'
 import { formatLastSets } from '../shared/formatSets'
 import { SetRow } from './SetRow'
+import { SetInputForm } from './SetInputForm'
 
 interface Props {
   sets: readonly SessionSet[]
@@ -50,10 +51,6 @@ export function SetLogger({ sets, lastSets, defaultSets, exerciseName, sessionSt
     setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300)
   }
 
-  function toggleMinus() {
-    setWeightInput((prev) => prev.startsWith('-') ? prev.slice(1) : '-' + prev)
-  }
-
   function parseInputs(): { weight: Weight; reps: number; rpe?: number } | null {
     setWeightError(undefined)
     setRpeError(undefined)
@@ -79,21 +76,15 @@ export function SetLogger({ sets, lastSets, defaultSets, exerciseName, sessionSt
     return { weight, reps, rpe }
   }
 
-  function handleQuickAdd() {
+  function handleAdd() {
     const parsed = parseInputs()
     if (!parsed) return
-    onAdd(parsed.weight, parsed.reps, n, parsed.rpe)
-    setWeightInput('')
-    setAddedWeightInput('')
-    setRepsInput('')
-    setRpeInput('')
-  }
-
-  function handleIndividualAdd() {
-    const parsed = parseInputs()
-    if (!parsed) return
-    onAdd(parsed.weight, parsed.reps, 1, parsed.rpe)
-    // Retain weight and reps as prefill for the next set in individual mode
+    onAdd(parsed.weight, parsed.reps, mode === 'quick' ? n : 1, parsed.rpe)
+    if (mode === 'quick') {
+      setWeightInput('')
+      setAddedWeightInput('')
+      setRepsInput('')
+    }
     setRpeInput('')
   }
 
@@ -112,87 +103,24 @@ export function SetLogger({ sets, lastSets, defaultSets, exerciseName, sessionSt
           <span className="text-sm truncate">Last: {formatLastSets(lastSets, exerciseName)}</span>
         </button>
       )}
-      <div className="space-y-2">
-        <div className="flex gap-1">
-          <button
-            type="button"
-            onClick={toggleMinus}
-            className="px-2 py-2 text-sm border border-gray-300 rounded-md text-gray-600 select-none"
-            aria-label="Toggle negative"
-          >
-            -/+
-          </button>
-          <input
-            type="text"
-            inputMode="decimal"
-            placeholder="Weight"
-            value={weightInput}
-            onChange={(e) => { setWeightInput(e.target.value); setWeightError(undefined) }}
-            onFocus={handleFocus}
-            className={`flex-1 px-3 py-2 border rounded-md ${weightError ? 'border-red-400' : 'border-gray-300'}`}
-          />
-          <input
-            type="text"
-            inputMode="decimal"
-            placeholder="+add"
-            value={addedWeightInput}
-            onChange={(e) => { setAddedWeightInput(e.target.value); setWeightError(undefined) }}
-            onFocus={handleFocus}
-            className="w-16 px-2 py-2 border border-gray-300 rounded-md"
-          />
-        </div>
-        {weightError && <p className="mt-0.5 text-xs text-red-500">{weightError}</p>}
-        <div className="flex gap-2">
-          <input
-            type="number"
-            inputMode="numeric"
-            placeholder="Reps"
-            value={repsInput}
-            onChange={(e) => setRepsInput(e.target.value)}
-            onFocus={handleFocus}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md"
-          />
-          <div className="flex-1 flex flex-col">
-            <input
-              type="number"
-              inputMode="numeric"
-              placeholder="RPE (1-10)"
-              value={rpeInput}
-              onChange={(e) => { setRpeInput(e.target.value); setRpeError(undefined) }}
-              onFocus={handleFocus}
-              className={`w-full px-3 py-2 border rounded-md ${rpeError ? 'border-red-400' : 'border-gray-300'}`}
-            />
-            {rpeError && <p className="mt-0.5 text-xs text-red-500">{rpeError}</p>}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <button
-          onClick={mode === 'quick' ? handleQuickAdd : handleIndividualAdd}
-          disabled={!weightInput || !repsInput}
-          className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:bg-gray-200 disabled:text-gray-400 font-medium"
-        >
-          {mode === 'quick' ? `Log ${n}×` : 'Add Set'}
-        </button>
-        <div className="flex rounded-md overflow-hidden border border-gray-200 shrink-0">
-          <button
-            type="button"
-            onClick={() => setMode('quick')}
-            className={`px-3 py-2.5 text-xs font-medium ${mode === 'quick' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
-          >
-            Quick
-          </button>
-          <button
-            type="button"
-            onClick={() => setMode('individual')}
-            className={`px-3 py-2.5 text-xs font-medium ${mode === 'individual' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
-          >
-            Individual
-          </button>
-        </div>
-      </div>
-
+      <SetInputForm
+        weightInput={weightInput}
+        addedWeightInput={addedWeightInput}
+        repsInput={repsInput}
+        rpeInput={rpeInput}
+        weightError={weightError}
+        rpeError={rpeError}
+        mode={mode}
+        n={n}
+        onWeightChange={(v) => { setWeightInput(v); setWeightError(undefined) }}
+        onAddedWeightChange={(v) => { setAddedWeightInput(v); setWeightError(undefined) }}
+        onRepsChange={setRepsInput}
+        onRpeChange={(v) => { setRpeInput(v); setRpeError(undefined) }}
+        onToggleMinus={() => setWeightInput((prev) => prev.startsWith('-') ? prev.slice(1) : '-' + prev)}
+        onModeChange={setMode}
+        onAdd={handleAdd}
+        onFocus={handleFocus}
+      />
       {sets.length > 0 && (
         <div className="space-y-1">
           {sets.map((set, i) => (

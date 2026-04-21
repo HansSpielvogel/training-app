@@ -31,6 +31,7 @@ function setup(overrides: Partial<Parameters<typeof ExerciseProgressionView>[0]>
   return render(
     <ExerciseProgressionView
       exercises={[ex]}
+      muscleGroups={[]}
       getProgression={getProgression}
       getFullProgression={getFullProgression}
       {...overrides}

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { findNextIncomplete, findActiveEntry, remapDoneIndices } from './ActiveSessionScreen'
+import { findNextIncomplete, findActiveEntry, remapDoneIndices } from './activeSessionHelpers'
 
 describe('findNextIncomplete', () => {
   it('advances to next slot after finish button', () => {

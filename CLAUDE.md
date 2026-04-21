@@ -70,3 +70,5 @@ Work in small steps: implement one thing, write tests for it, run them — then 
 
 **IMPORTANT: You MUST run `/after-impl` when implementation tasks are done.** Do NOT consider the work complete until you have run it. It handles tests, UI verification, ui-review, CLAUDE.md update, commit and push.
 
+**IMPORTANT: ALL failing tests must be fixed — including pre-existing failures.** Never leave a failing test unaddressed, even if it was broken before your changes.
+

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
-import type { ExerciseDefinition } from '@application/exercises'
+import { useState, useEffect, useMemo } from 'react'
+import type { ExerciseDefinition, MuscleGroup } from '@application/exercises'
 import type { ExerciseProgressionPoint } from '@application/analytics'
 import { ProgressionChart } from './ProgressionChart'
+import { MuscleGroupFilterChips } from './MuscleGroupFilterChips'
 import { formatSets } from '../shared/formatSets'
 
 function formatDate(date: Date): string {
@@ -10,6 +11,7 @@ function formatDate(date: Date): string {
 
 interface Props {
   exercises: ExerciseDefinition[]
+  muscleGroups: MuscleGroup[]
   getProgression: (exerciseDefinitionId: string) => Promise<ExerciseProgressionPoint[]>
   getFullProgression: (exerciseDefinitionId: string) => Promise<ExerciseProgressionPoint[]>
 }
@@ -20,12 +22,22 @@ function formatVolume(p: ExerciseProgressionPoint): string {
   return p.movedSum !== undefined ? `${Math.round(p.movedSum)} kg moved` : '—'
 }
 
-export function ExerciseProgressionView({ exercises, getProgression, getFullProgression }: Props) {
+export function ExerciseProgressionView({ exercises, muscleGroups, getProgression, getFullProgression }: Props) {
   const [selected, setSelected] = useState<ExerciseDefinition | null>(null)
   const [view, setView] = useState<'chart' | 'list'>('list')
   const [chartMetric, setChartMetric] = useState<ChartMetric>('weight')
   const [chartPoints, setChartPoints] = useState<ExerciseProgressionPoint[]>([])
   const [listPoints, setListPoints] = useState<ExerciseProgressionPoint[]>([])
+  const [selectedMuscleGroupId, setSelectedMuscleGroupId] = useState<string | null>(null)
+
+  const filterableGroups = useMemo(() => {
+    const ids = new Set(exercises.flatMap(e => e.muscleGroupIds))
+    return muscleGroups.filter(mg => ids.has(mg.id))
+  }, [exercises, muscleGroups])
+
+  const filteredExercises = selectedMuscleGroupId
+    ? exercises.filter(e => e.muscleGroupIds.includes(selectedMuscleGroupId))
+    : exercises
 
   useEffect(() => {
     if (!selected) return
@@ -106,7 +118,8 @@ export function ExerciseProgressionView({ exercises, getProgression, getFullProg
 
   return (
     <div>
-      {exercises.map(ex => (
+      <MuscleGroupFilterChips groups={filterableGroups} selected={selectedMuscleGroupId} onSelect={setSelectedMuscleGroupId} />
+      {filteredExercises.map(ex => (
         <button
           key={ex.id}
           onClick={() => setSelected(ex)}

@@ -47,7 +47,7 @@ test('6.6: add temp slot, log sets, complete — temp slot in history', async ({
   await page.getByText(/Log \d+×/).last().click()
 
   // Complete the session
-  await page.getByText('Finish Workout').click()
+  await page.getByText('Finish Session').click()
   await page.getByText('Finish').click()
   await page.waitForURL('**/sessions')
 

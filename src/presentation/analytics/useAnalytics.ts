@@ -6,8 +6,9 @@ import {
   getLastUsedByExercise,
 } from '@application/analytics'
 import type { ExerciseProgressionPoint, MuscleGroupVolume, SessionSummaryItem, SessionDetailView, SessionEntryView } from '@application/analytics'
-import { listExerciseDefinitions } from '@application/exercises'
+import { listExerciseDefinitions, listMuscleGroups } from '@application/exercises'
 import type { ExerciseDefinition } from '@application/exercises'
+import type { MuscleGroup } from '@application/exercises'
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
 import { DexieExerciseDefinitionRepository } from '@infrastructure/exercises/DexieExerciseDefinitionRepository'
 import { DexieMuscleGroupRepository } from '@infrastructure/exercises/DexieMuscleGroupRepository'
@@ -21,6 +22,7 @@ export function useAnalytics() {
   const [sessionSummaries, setSessionSummaries] = useState<SessionSummaryItem[]>([])
   const [muscleGroupVolumes, setMuscleGroupVolumes] = useState<MuscleGroupVolume[]>([])
   const [exercises, setExercises] = useState<ExerciseDefinition[]>([])
+  const [muscleGroups, setMuscleGroups] = useState<MuscleGroup[]>([])
   const [exerciseIdsWithHistory, setExerciseIdsWithHistory] = useState<Set<string>>(new Set())
   const [loading, setLoading] = useState(true)
 
@@ -30,10 +32,12 @@ export function useAnalytics() {
       getMuscleGroupVolume(sessionRepo, muscleGroupRepo),
       listExerciseDefinitions(exerciseRepo),
       getLastUsedByExercise(sessionRepo),
-    ]).then(([summaries, volumes, exList, lastUsed]) => {
+      listMuscleGroups(muscleGroupRepo),
+    ]).then(([summaries, volumes, exList, lastUsed, mgs]) => {
       setSessionSummaries(summaries)
       setMuscleGroupVolumes(volumes)
       setExercises(exList)
+      setMuscleGroups(mgs)
       setExerciseIdsWithHistory(new Set(Object.keys(lastUsed)))
     }).finally(() => {
       setLoading(false)
@@ -77,5 +81,5 @@ export function useAnalytics() {
     [sessionRepo, exerciseRepo],
   )
 
-  return { sessionSummaries, muscleGroupVolumes, exercises, exerciseIdsWithHistory, loading, getProgression, getFullProgression, getSessionDetail }
+  return { sessionSummaries, muscleGroupVolumes, exercises, muscleGroups, exerciseIdsWithHistory, loading, getProgression, getFullProgression, getSessionDetail }
 }
