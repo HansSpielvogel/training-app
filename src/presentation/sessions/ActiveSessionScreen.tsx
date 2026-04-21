@@ -5,9 +5,12 @@ import type { TrainingPlan } from '@application/planning'
 import { useActiveSession } from './useActiveSession'
 import { useSessionConfirm } from './useSessionConfirm'
 import { useMuscleGroups } from '../exercises/useMuscleGroups'
+import { useEntryDoneState } from './useEntryDoneState'
+import { useDragReorder } from './useDragReorder'
 import { EntryRow } from './EntryRow'
 import { ConfirmAbandonBanner } from './ConfirmAbandonBanner'
 import { SlotPickerPanel } from './SlotPickerPanel'
+import { SessionFooter } from './SessionFooter'
 
 export function findNextIncomplete(current: number | null, doneIndices: Set<number>, total: number): number | null {
   const start = current !== null ? current + 1 : 0
@@ -26,18 +29,21 @@ export function findActiveEntry(entries: readonly { sets: readonly unknown[]; ex
   return null
 }
 
-function loadPersistedDone(sessionId: string): Set<number> {
-  try {
-    const raw = sessionStorage.getItem(`done-${sessionId}`)
-    if (!raw) return new Set()
-    return new Set(JSON.parse(raw) as number[])
-  } catch {
-    return new Set()
+export function remapDoneIndices(done: Set<number>, fromIndex: number, toIndex: number): Set<number> {
+  if (fromIndex === toIndex) return done
+  const result = new Set<number>()
+  for (const idx of done) {
+    if (idx === fromIndex) {
+      result.add(toIndex)
+    } else if (fromIndex < toIndex && idx > fromIndex && idx <= toIndex) {
+      result.add(idx - 1)
+    } else if (fromIndex > toIndex && idx >= toIndex && idx < fromIndex) {
+      result.add(idx + 1)
+    } else {
+      result.add(idx)
+    }
   }
-}
-
-function persistDone(sessionId: string, done: Set<number>) {
-  sessionStorage.setItem(`done-${sessionId}`, JSON.stringify([...done]))
+  return result
 }
 
 export function ActiveSessionScreen() {
@@ -46,21 +52,29 @@ export function ActiveSessionScreen() {
     session, loading, clearVariation, addSet, removeLastSet, complete, abandon,
     addTempSlot, removeTempSlot, addPlanSlots, listPlans, removePlanSlot,
     exerciseDataMap, exerciseNames, lastSetsMap, loadExerciseData, handleAssign, clearLastSets,
-    updateRpe,
+    updateRpe, reorderEntries,
   } = useActiveSession()
   const { muscleGroups } = useMuscleGroups()
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
   const [activeEntryIndex, setActiveEntryIndex] = useState<number | null>(null)
-  const [doneIndices, setDoneIndicesRaw] = useState<Set<number>>(new Set())
+  const { doneIndices, setDone, updateDone, initFromSession, clearSession } = useEntryDoneState()
   const [showMuscleGroupPicker, setShowMuscleGroupPicker] = useState(false)
   const [showPlanPicker, setShowPlanPicker] = useState(false)
   const [availablePlans, setAvailablePlans] = useState<TrainingPlan[]>([])
   const [planPickerMessage, setPlanPickerMessage] = useState<string>()
   const entryRefs = useRef<(HTMLDivElement | null)[]>([])
 
+  const { dragState, handleDragHandleTouchStart } = useDragReorder(
+    entryRefs,
+    reorderEntries,
+    (fromIndex, toIndex) => {
+      if (session) updateDone(prev => remapDoneIndices(prev, fromIndex, toIndex), session.id)
+    },
+  )
+
   const { confirmFinish, setConfirmFinish, confirmAbandon, setConfirmAbandon, handleComplete, handleAbandon } =
     useSessionConfirm(complete, abandon, () => {
-      if (session) sessionStorage.removeItem(`done-${session.id}`)
+      if (session) clearSession(session.id)
       navigate('/sessions', { replace: true })
     })
 
@@ -71,8 +85,7 @@ export function ActiveSessionScreen() {
   // On mount: restore doneIndices from sessionStorage and focus the active entry
   useEffect(() => {
     if (loading || !session) return
-    const persisted = loadPersistedDone(session.id)
-    setDoneIndicesRaw(persisted)
+    const persisted = initFromSession(session.id)
     const active = findActiveEntry(session.entries, persisted)
     if (active !== null) {
       setActiveEntryIndex(active)
@@ -86,11 +99,6 @@ export function ActiveSessionScreen() {
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loading])
-
-  function setDoneIndices(newDone: Set<number>) {
-    setDoneIndicesRaw(newDone)
-    if (session) persistDone(session.id, newDone)
-  }
 
   function expandAndPreload(nextIndex: number | null) {
     setExpandedIndex(nextIndex)
@@ -112,7 +120,7 @@ export function ActiveSessionScreen() {
       const hasSets = (entry?.sets.length ?? 0) > 0
       if (hasSets) {
         const newDone = new Set(doneIndices).add(i)
-        setDoneIndices(newDone)
+        setDone(newDone, session!.id)
         setActiveEntryIndex(null)
         expandAndPreload(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
       } else {
@@ -130,7 +138,7 @@ export function ActiveSessionScreen() {
 
   function handleMarkDone(i: number) {
     const newDone = new Set(doneIndices).add(i)
-    setDoneIndices(newDone)
+    setDone(newDone, session!.id)
     setActiveEntryIndex(null)
     expandAndPreload(findNextIncomplete(i, newDone, session?.entries.length ?? 0))
   }
@@ -207,30 +215,53 @@ export function ActiveSessionScreen() {
       )}
 
       <div className="flex-1 overflow-y-auto">
-        {session.entries.map((entry, i) => (
-          <EntryRow
-            key={i}
-            ref={(el) => { entryRefs.current[i] = el }}
-            entry={entry}
-            muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
-            exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
-            exerciseData={exerciseDataMap[i] ?? null}
-            lastSets={lastSetsMap[i] ?? null}
-            done={doneIndices.has(i)}
-            isExpanded={expandedIndex === i}
-            sessionStatus={session.status}
-            onToggle={() => handleToggle(i)}
-            onMarkDone={() => handleMarkDone(i)}
-            onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
-            onAssign={(id) => handleAssignWithActive(i, id)}
-            onClearVariation={() => { clearVariation(i); clearLastSets(i) }}
-            defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
-            onAddSet={(weight: Weight, reps: number, count: number, rpe?: number) => handleAddSetWithActive(i, weight, reps, count, rpe)}
-            onRemoveLast={() => removeLastSet(i)}
-            onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : () => removePlanSlot(i)}
-            onUpdateSetRpe={(setIndex, rpe) => updateRpe(i, setIndex, rpe)}
-          />
-        ))}
+        {session.entries.map((entry, i) => {
+          const isDragged = dragState?.fromIndex === i
+          const isDropTarget = dragState !== null && dragState.toIndex === i && !isDragged
+
+          return (
+            <div
+              key={i}
+              ref={(el) => { entryRefs.current[i] = el }}
+              style={isDragged ? {
+                transform: `translateY(${dragState.currentY - dragState.startY}px)`,
+                position: 'relative',
+                zIndex: 10,
+                opacity: 0.85,
+                boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+              } : undefined}
+            >
+              {isDropTarget && dragState && dragState.fromIndex > i && (
+                <div className="h-0.5 bg-blue-400" />
+              )}
+              <EntryRow
+                entry={entry}
+                muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
+                exerciseName={entry.exerciseDefinitionId ? exerciseNames[entry.exerciseDefinitionId] : undefined}
+                exerciseData={exerciseDataMap[i] ?? null}
+                lastSets={lastSetsMap[i] ?? null}
+                done={doneIndices.has(i)}
+                isExpanded={expandedIndex === i}
+                sessionStatus={session.status}
+                isDraggable={session.status === 'in-progress'}
+                onToggle={() => handleToggle(i)}
+                onMarkDone={() => handleMarkDone(i)}
+                onLoadExerciseData={() => loadExerciseData(i, entry.muscleGroupId)}
+                onAssign={(id) => handleAssignWithActive(i, id)}
+                onClearVariation={() => { clearVariation(i); clearLastSets(i) }}
+                defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
+                onAddSet={(weight: Weight, reps: number, count: number, rpe?: number) => handleAddSetWithActive(i, weight, reps, count, rpe)}
+                onRemoveLast={() => removeLastSet(i)}
+                onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : () => removePlanSlot(i)}
+                onUpdateSetRpe={(setIndex, rpe) => updateRpe(i, setIndex, rpe)}
+                onDragHandleTouchStart={(e) => handleDragHandleTouchStart(i, e)}
+              />
+              {isDropTarget && dragState && dragState.fromIndex < i && (
+                <div className="h-0.5 bg-blue-400" />
+              )}
+            </div>
+          )
+        })}
         <SlotPickerPanel
           showMuscleGroupPicker={showMuscleGroupPicker}
           showPlanPicker={showPlanPicker}
@@ -246,33 +277,12 @@ export function ActiveSessionScreen() {
         />
       </div>
 
-      <div className="border-t border-gray-200 bg-white">
-        <div className="px-4 py-2">
-          {confirmFinish ? (
-            <div className="flex gap-2">
-              <button
-                onClick={() => setConfirmFinish(false)}
-                className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium text-sm"
-              >
-                Keep Going
-              </button>
-              <button
-                onClick={handleComplete}
-                className="flex-1 py-3 bg-green-600 text-white rounded-lg font-medium text-sm"
-              >
-                Finish
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => { setConfirmFinish(true); setConfirmAbandon(false) }}
-              className="w-full py-3 bg-green-600 text-white rounded-lg font-medium text-sm"
-            >
-              Finish Workout
-            </button>
-          )}
-        </div>
-      </div>
+      <SessionFooter
+        confirmFinish={confirmFinish}
+        onKeepGoing={() => setConfirmFinish(false)}
+        onConfirmFinish={handleComplete}
+        onRequestFinish={() => { setConfirmFinish(true); setConfirmAbandon(false) }}
+      />
     </div>
   )
 }

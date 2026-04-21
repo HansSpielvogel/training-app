@@ -11,6 +11,7 @@ import {
   abandonSession,
   removePlanSlot as removePlanSlotUseCase,
   updateSetRpe,
+  reorderEntries as reorderEntriesUseCase,
 } from '@application/sessions'
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
 import { DexieTrainingPlanRepository } from '@infrastructure/planning/DexieTrainingPlanRepository'
@@ -86,6 +87,12 @@ export function useActiveSession() {
     await refresh()
   }, [session, sessionRepo, refresh])
 
+  const reorderEntries = useCallback(async (fromIndex: number, toIndex: number) => {
+    if (!session) return
+    await reorderEntriesUseCase(sessionRepo, session.id, fromIndex, toIndex)
+    await refresh()
+  }, [session, sessionRepo, refresh])
+
   const slotActions = useSessionSlotActions(session, sessionRepo, planRepo, refresh)
   const exerciseData = useSessionExerciseData(session, assign)
 
@@ -94,6 +101,7 @@ export function useActiveSession() {
     loading,
     removePlanSlot,
     updateRpe,
+    reorderEntries,
     start,
     assign,
     clearVariation: clearVariationFn,

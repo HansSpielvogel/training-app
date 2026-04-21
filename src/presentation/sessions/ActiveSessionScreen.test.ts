@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { findNextIncomplete, findActiveEntry } from './ActiveSessionScreen'
+import { findNextIncomplete, findActiveEntry, remapDoneIndices } from './ActiveSessionScreen'
 
 describe('findNextIncomplete', () => {
   it('advances to next slot after finish button', () => {
@@ -55,5 +55,42 @@ describe('findActiveEntry', () => {
   it('returns null when no entries have been started', () => {
     const entries = [entry(0), entry(0), entry(0)]
     expect(findActiveEntry(entries, new Set())).toBeNull()
+  })
+})
+
+describe('remapDoneIndices', () => {
+  it('returns same set when fromIndex equals toIndex', () => {
+    const done = new Set([0, 2])
+    expect(remapDoneIndices(done, 1, 1)).toBe(done)
+  })
+
+  it('remaps the moved entry index', () => {
+    const done = new Set([0])
+    expect(remapDoneIndices(done, 0, 2)).toEqual(new Set([2]))
+  })
+
+  it('shifts indices down when moving item down (from < to)', () => {
+    // moving index 0 to index 2: entries [A,B,C,D] → [B,C,A,D]
+    // done=[1] (B) → B was at 1, now at 0 (shifted down)
+    const done = new Set([1])
+    expect(remapDoneIndices(done, 0, 2)).toEqual(new Set([0]))
+  })
+
+  it('shifts indices up when moving item up (from > to)', () => {
+    // moving index 2 to index 0: entries [A,B,C,D] → [C,A,B,D]
+    // done=[1] (B) → B was at 1, now at 2 (shifted up)
+    const done = new Set([1])
+    expect(remapDoneIndices(done, 2, 0)).toEqual(new Set([2]))
+  })
+
+  it('correctly handles multiple done indices', () => {
+    // moving index 0 to index 2: [A,B,C,D] → [B,C,A,D]
+    // done=[0,1,3] → A→2, B→0, D→3
+    const done = new Set([0, 1, 3])
+    expect(remapDoneIndices(done, 0, 2)).toEqual(new Set([2, 0, 3]))
+  })
+
+  it('returns empty set when no done indices', () => {
+    expect(remapDoneIndices(new Set(), 0, 2)).toEqual(new Set())
   })
 })

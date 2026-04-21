@@ -3,7 +3,8 @@ import type { SessionSet, SessionStatus } from '@application/sessions'
 import type { Weight } from '@application/sessions'
 import { parseWeight } from '@application/sessions'
 import { DEFAULT_SET_COUNT } from '@application/exercises'
-import { formatSets, formatLastSets } from '../shared/formatSets'
+import { formatLastSets } from '../shared/formatSets'
+import { SetRow } from './SetRow'
 
 interface Props {
   sets: readonly SessionSet[]
@@ -16,95 +17,6 @@ interface Props {
   onUpdateSetRpe: (setIndex: number, rpe: number | null) => void
 }
 
-interface SetRowProps {
-  set: SessionSet
-  setIndex: number
-  isLast: boolean
-  sessionStatus: SessionStatus
-  onRemoveLast: () => void
-  onUpdateRpe: (rpe: number | null) => void
-}
-
-function SetRow({ set, setIndex, isLast, sessionStatus, onRemoveLast, onUpdateRpe }: SetRowProps) {
-  const [editing, setEditing] = useState(false)
-  const [rpeInput, setRpeInput] = useState(set.rpe !== undefined ? String(set.rpe) : '')
-  const [rpeError, setRpeError] = useState<string>()
-
-  function handleEditConfirm() {
-    setRpeError(undefined)
-    if (rpeInput.trim() === '') {
-      onUpdateRpe(null)
-      setEditing(false)
-      return
-    }
-    const val = parseInt(rpeInput, 10)
-    if (!Number.isInteger(val) || val < 1 || val > 10 || String(val) !== rpeInput.trim()) {
-      setRpeError('1–10')
-      return
-    }
-    onUpdateRpe(val)
-    setEditing(false)
-  }
-
-  function handleEditCancel() {
-    setRpeInput(set.rpe !== undefined ? String(set.rpe) : '')
-    setRpeError(undefined)
-    setEditing(false)
-  }
-
-  const canEdit = sessionStatus === 'in-progress'
-
-  return (
-    <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50 rounded-md">
-      <div className="flex items-center gap-1 flex-1 min-w-0">
-        <span className="text-sm text-gray-700 flex-1 min-w-0">{`Set ${setIndex + 1}: `}{formatSets([set])}</span>
-        {canEdit && !editing && (
-          <button
-            onClick={() => { setRpeInput(set.rpe !== undefined ? String(set.rpe) : ''); setEditing(true) }}
-            className="min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-300 hover:text-gray-500 opacity-80 hover:opacity-100 transition-opacity flex-shrink-0"
-            aria-label="Edit RPE"
-          >
-            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-            </svg>
-          </button>
-        )}
-      </div>
-      {editing ? (
-        <div className="flex items-center gap-1 ml-2">
-          <div className="flex flex-col items-end">
-            <input
-              type="number"
-              inputMode="numeric"
-              value={rpeInput}
-              onChange={(e) => { setRpeInput(e.target.value); setRpeError(undefined) }}
-              placeholder="RPE"
-              autoFocus
-              className={`w-16 px-2 py-1 text-sm border rounded-md ${rpeError ? 'border-red-400' : 'border-gray-300'}`}
-            />
-            {rpeError && <p className="text-xs text-red-500 mt-0.5">{rpeError}</p>}
-          </div>
-          <button onClick={handleEditConfirm} className="px-2 py-1 text-xs bg-blue-600 text-white rounded-md">✓</button>
-          <button onClick={handleEditCancel} className="px-2 py-1 text-xs text-gray-500 border border-gray-300 rounded-md">✕</button>
-        </div>
-      ) : (
-        isLast && (
-          <button
-            onClick={onRemoveLast}
-            className="p-2 text-red-400 hover:text-red-600"
-            aria-label="Remove last set"
-            // intentionally small — reduces accidental taps on a destructive action
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        )
-      )}
-    </div>
-  )
-}
-
 export function SetLogger({ sets, lastSets, defaultSets, exerciseName, sessionStatus, onAdd, onRemoveLast, onUpdateSetRpe }: Props) {
   const n = defaultSets ?? DEFAULT_SET_COUNT
   const [mode, setMode] = useState<'quick' | 'individual'>('quick')
@@ -114,6 +26,24 @@ export function SetLogger({ sets, lastSets, defaultSets, exerciseName, sessionSt
   const [rpeInput, setRpeInput] = useState('')
   const [weightError, setWeightError] = useState<string>()
   const [rpeError, setRpeError] = useState<string>()
+
+  function applyPreset(set: SessionSet) {
+    const w = set.weight
+    if (w.kind === 'bilateral') {
+      setWeightInput(`2x${w.perSide}`)
+      setAddedWeightInput('')
+    } else if (w.kind === 'stacked') {
+      setWeightInput(String(w.base))
+      setAddedWeightInput(String(w.added))
+    } else {
+      setWeightInput(String(w.value))
+      setAddedWeightInput('')
+    }
+    setRepsInput(String(set.reps))
+    setRpeInput(set.rpe !== undefined ? String(set.rpe) : '')
+    setWeightError(undefined)
+    setRpeError(undefined)
+  }
 
   function handleFocus(e: React.FocusEvent<HTMLInputElement>) {
     const el = e.currentTarget
@@ -170,7 +100,17 @@ export function SetLogger({ sets, lastSets, defaultSets, exerciseName, sessionSt
   return (
     <div className="space-y-2">
       {lastSets && lastSets.length > 0 && (
-        <p className="text-sm text-gray-500">Last: {formatLastSets(lastSets, exerciseName)}</p>
+        <button
+          type="button"
+          onClick={() => applyPreset(lastSets[0])}
+          className="flex items-center gap-1.5 min-h-[44px] text-left text-gray-500 hover:text-blue-600 w-full"
+          aria-label="Preset from last session"
+        >
+          <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span className="text-sm truncate">Last: {formatLastSets(lastSets, exerciseName)}</span>
+        </button>
       )}
       <div className="space-y-2">
         <div className="flex gap-1">

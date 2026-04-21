@@ -6,13 +6,6 @@ type: project
 
 ## Next Up
 
-### Group C: Polish & Insights (Priority 2)
-**Goal:** Better discoverability and progress metrics
-
-- **Segmented control for mode toggle**: Active session quick-sets vs individual mode toggle has low discoverability; replace with a segmented control
-- **Moved sum metric**: In stats-progression, add option to see "moved sum" (weight × reps × numOfSets) for easier progress tracking. Make available for both chart and list views. Example: 10kg × 10 × 3 = 300kg moved; 12kg × 9 × 3 = 324kg moved shows progress even when reps decreased.
-- **Analytics domain refactor**: `TrainingCalendarView` receives full `TrainingSession` via `getSessionDetail`, creating hard cross-context dependency from `analytics` → `sessions`. Define `SessionDetailView` (or `SessionCardViewModel`) type in `analytics` domain; have `useAnalytics` project `TrainingSession` into it before passing to components.
-
 ### Group B: Flexibility (Priority 3)
 **Goal:** Adapt the session on-the-fly
 
@@ -27,6 +20,7 @@ type: project
 
 ## Future (not scheduled)
 
+- Extract `getSessionDetail` use case: session→view-model mapping (joining entries with exercise names) currently lives in `useAnalytics` hook, leaking orchestration into the presentation layer. Extracting it to `application/analytics/getSessionDetail.ts` restores SRP and makes it independently testable. Acceptance: (1) `useAnalytics` delegates to the new use case with zero mapping logic remaining in the hook; (2) the use case has an integration test via `fake-indexeddb`; (3) `SessionDetailView` / `SessionEntryView` remain in `domain/analytics`.
 - Progression view: no way to compare two exercises side-by-side or overlay historical data across muscle groups; a "compare" mode would help informed weight selection
 - Active session: no progress indicator (e.g. "3 of 6 slots done") — a compact bar under the session title would reduce anxiety about how far through a workout Hans is
 - Progression tab: exercise list is a flat alphabetical scroll with no muscle-group filter or search — as the library grows this becomes slow to navigate at the gym; add muscle-group grouping or a search input

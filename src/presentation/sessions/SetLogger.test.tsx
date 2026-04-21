@@ -107,6 +107,62 @@ describe('SetLogger', () => {
     })
   })
 
+  describe('preset from last', () => {
+    const lastSets = [{ weight: { kind: 'single' as const, value: 60 }, reps: 10 }]
+
+    it('shows preset button when lastSets is non-null', () => {
+      render(<SetLogger {...defaultProps} lastSets={lastSets} />)
+      expect(screen.getByLabelText('Preset from last session')).toBeInTheDocument()
+    })
+
+    it('hides preset button when lastSets is null', () => {
+      render(<SetLogger {...defaultProps} lastSets={null} />)
+      expect(screen.queryByLabelText('Preset from last session')).not.toBeInTheDocument()
+    })
+
+    it('fills weight and reps on preset click (single weight)', () => {
+      render(<SetLogger {...defaultProps} lastSets={lastSets} />)
+      fireEvent.click(screen.getByLabelText('Preset from last session'))
+      expect(screen.getByPlaceholderText('Weight')).toHaveValue('60')
+      expect(screen.getByPlaceholderText('Reps')).toHaveValue(10)
+    })
+
+    it('fills RPE when prior set has RPE', () => {
+      const setsWithRpe = [{ weight: { kind: 'single' as const, value: 60 }, reps: 10, rpe: 8 }]
+      render(<SetLogger {...defaultProps} lastSets={setsWithRpe} />)
+      fireEvent.click(screen.getByLabelText('Preset from last session'))
+      expect(screen.getByPlaceholderText('RPE (1-10)')).toHaveValue(8)
+    })
+
+    it('leaves RPE empty when prior set has no RPE', () => {
+      render(<SetLogger {...defaultProps} lastSets={lastSets} />)
+      fireEvent.click(screen.getByLabelText('Preset from last session'))
+      expect(screen.getByPlaceholderText('RPE (1-10)')).toHaveValue(null)
+    })
+
+    it('fills stacked weight into weight and add fields', () => {
+      const stackedSets = [{ weight: { kind: 'stacked' as const, base: 40, added: 5 }, reps: 8 }]
+      render(<SetLogger {...defaultProps} lastSets={stackedSets} />)
+      fireEvent.click(screen.getByLabelText('Preset from last session'))
+      expect(screen.getByPlaceholderText('Weight')).toHaveValue('40')
+      expect(screen.getByPlaceholderText('+add')).toHaveValue('5')
+    })
+
+    it('fills bilateral weight as 2x notation', () => {
+      const bilateralSets = [{ weight: { kind: 'bilateral' as const, perSide: 15 }, reps: 12 }]
+      render(<SetLogger {...defaultProps} lastSets={bilateralSets} />)
+      fireEvent.click(screen.getByLabelText('Preset from last session'))
+      expect(screen.getByPlaceholderText('Weight')).toHaveValue('2x15')
+    })
+
+    it('does not auto-submit after preset click', () => {
+      const onAdd = vi.fn()
+      render(<SetLogger {...defaultProps} lastSets={lastSets} onAdd={onAdd} />)
+      fireEvent.click(screen.getByLabelText('Preset from last session'))
+      expect(onAdd).not.toHaveBeenCalled()
+    })
+  })
+
   describe('scroll on focus', () => {
     beforeEach(() => {
       Element.prototype.scrollIntoView = vi.fn()
