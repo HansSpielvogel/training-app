@@ -15,7 +15,7 @@ export function MuscleGroupFilterChips({ groups, selected, onSelect }: Props) {
           <button
             key={g.id}
             onClick={() => onSelect(selected === g.id ? null : g.id)}
-            className={`shrink-0 min-w-min max-w-[75px] px-2.5 py-1.5 rounded-full text-xs font-medium leading-tight border transition-colors text-center ${
+            className={`shrink-0 max-w-[102px] px-2.5 py-1.5 rounded-full text-xs font-medium leading-tight border transition-colors text-center [overflow-wrap:anywhere] ${
               selected === g.id
                 ? 'bg-blue-600 text-white border-blue-600'
                 : 'bg-white text-gray-600 border-gray-300'
