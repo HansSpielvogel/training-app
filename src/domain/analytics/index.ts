@@ -12,6 +12,7 @@ export interface ExerciseProgressionPoint {
   weightUnit: string
   avgReps?: number
   avgRpe?: number
+  movedSum?: number
   sets: readonly SetSnapshot[]
 }
 
@@ -33,4 +34,16 @@ export interface SessionSummaryItem {
   date: Date
   planName: string
   exerciseCount: number
+}
+
+export interface SessionEntryView {
+  readonly exerciseName: string
+  readonly sets: readonly SetSnapshot[]
+}
+
+export interface SessionDetailView {
+  readonly id: string
+  readonly planName: string
+  readonly date: Date
+  readonly entries: readonly SessionEntryView[]
 }

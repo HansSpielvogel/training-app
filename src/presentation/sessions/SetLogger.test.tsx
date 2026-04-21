@@ -76,6 +76,22 @@ describe('SetLogger', () => {
     })
   })
 
+  describe('segmented control', () => {
+    it('shows both Quick and Individual segments always', () => {
+      render(<SetLogger {...defaultProps} />)
+      expect(screen.getByText('Quick')).toBeInTheDocument()
+      expect(screen.getByText('Individual')).toBeInTheDocument()
+    })
+
+    it('switches to individual mode and back via segments', () => {
+      render(<SetLogger {...defaultProps} />)
+      fireEvent.click(screen.getByText('Individual'))
+      expect(screen.getByRole('button', { name: /Add Set/ })).toBeInTheDocument()
+      fireEvent.click(screen.getByText('Quick'))
+      expect(screen.getByRole('button', { name: /Log/ })).toBeInTheDocument()
+    })
+  })
+
   describe('individual mode prefill', () => {
     it('retains weight and reps after first set is logged in individual mode', () => {
       const onAdd = vi.fn()

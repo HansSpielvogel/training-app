@@ -43,7 +43,7 @@ export function AnalyticsScreen() {
       <div className="flex-1 overflow-y-auto">
         {loading ? null : (
           <>
-            {activeTab === 'calendar' && <TrainingCalendarView sessions={sessionSummaries} exercises={exercises} getSessionDetail={getSessionDetail} />}
+            {activeTab === 'calendar' && <TrainingCalendarView sessions={sessionSummaries} getSessionDetail={getSessionDetail} />}
             {activeTab === 'volume' && <MuscleGroupVolumeView volumes={muscleGroupVolumes} />}
             {activeTab === 'progression' && (
               <ExerciseProgressionView exercises={exercises.filter(e => exerciseIdsWithHistory.has(e.id))} getProgression={getProgression} getFullProgression={getFullProgression} />

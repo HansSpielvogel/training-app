@@ -189,6 +189,73 @@ describe('getExerciseProgression', () => {
     expect(result[0].avgReps).toBe(9) // round((10+8+9)/3)
   })
 
+  it('computes movedSum as sum of normalizedWeight × reps across all sets', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
+        sets: [
+          { weight: { kind: 'single', value: 80 }, reps: 10 },
+          { weight: { kind: 'single', value: 85 }, reps: 8 },
+        ],
+      }],
+    }))
+
+    const result = await getExerciseProgression(sessionRepo, 'ex-bench')
+    expect(result[0].movedSum).toBe(80 * 10 + 85 * 8) // 800 + 680 = 1480
+  })
+
+  it('computes movedSum correctly for varying set counts', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
+        sets: [
+          { weight: { kind: 'single', value: 100 }, reps: 5 },
+          { weight: { kind: 'single', value: 100 }, reps: 5 },
+          { weight: { kind: 'single', value: 100 }, reps: 5 },
+        ],
+      }],
+    }))
+
+    const result = await getExerciseProgression(sessionRepo, 'ex-bench')
+    expect(result[0].movedSum).toBe(1500)
+  })
+
+  it('normalizes bilateral weight for movedSum', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-curl',
+        sets: [{ weight: { kind: 'bilateral', perSide: 15 }, reps: 12 }],
+      }],
+    }))
+
+    const result = await getExerciseProgression(sessionRepo, 'ex-curl')
+    expect(result[0].movedSum).toBe(15 * 12) // perSide value used
+  })
+
+  it('normalizes stacked weight for movedSum', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-cable',
+        sets: [{ weight: { kind: 'stacked', base: 50, added: 10 }, reps: 15 }],
+      }],
+    }))
+
+    const result = await getExerciseProgression(sessionRepo, 'ex-cable')
+    expect(result[0].movedSum).toBe(60 * 15)
+  })
+
+  it('returns movedSum of 0 when sets have zero reps', async () => {
+    await sessionRepo.save(makeSession({
+      entries: [{
+        muscleGroupId: 'mg-1', exerciseDefinitionId: 'ex-bench',
+        sets: [{ weight: { kind: 'single', value: 80 }, reps: 0 }],
+      }],
+    }))
+
+    const result = await getExerciseProgression(sessionRepo, 'ex-bench')
+    expect(result[0].movedSum).toBe(0)
+  })
+
   it('returns all sessions when limit is Infinity', async () => {
     for (let i = 0; i < 25; i++) {
       await sessionRepo.save(makeSession({

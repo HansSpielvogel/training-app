@@ -5,7 +5,7 @@ import {
   getSessionSummaries,
   getLastUsedByExercise,
 } from '@application/analytics'
-import type { ExerciseProgressionPoint, MuscleGroupVolume, SessionSummaryItem } from '@application/analytics'
+import type { ExerciseProgressionPoint, MuscleGroupVolume, SessionSummaryItem, SessionDetailView, SessionEntryView } from '@application/analytics'
 import { listExerciseDefinitions } from '@application/exercises'
 import type { ExerciseDefinition } from '@application/exercises'
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
@@ -53,8 +53,28 @@ export function useAnalytics() {
   )
 
   const getSessionDetail = useCallback(
-    (id: string) => sessionRepo.getById(id),
-    [sessionRepo],
+    async (id: string): Promise<SessionDetailView | undefined> => {
+      const session = await sessionRepo.getById(id)
+      if (!session) return undefined
+      const entries: SessionEntryView[] = await Promise.all(
+        session.entries
+          .filter(e => e.sets.length > 0)
+          .map(async e => {
+            const exercise = e.exerciseDefinitionId ? await exerciseRepo.findById(e.exerciseDefinitionId) : undefined
+            return {
+              exerciseName: exercise?.name ?? e.exerciseDefinitionId ?? '—',
+              sets: e.sets.map(s => ({ weight: s.weight, reps: s.reps, ...(s.rpe !== undefined ? { rpe: s.rpe } : {}) })),
+            }
+          })
+      )
+      return {
+        id: session.id,
+        planName: session.planName,
+        date: new Date(session.completedAt ?? session.startedAt),
+        entries,
+      }
+    },
+    [sessionRepo, exerciseRepo],
   )
 
   return { sessionSummaries, muscleGroupVolumes, exercises, exerciseIdsWithHistory, loading, getProgression, getFullProgression, getSessionDetail }

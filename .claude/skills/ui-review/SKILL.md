@@ -50,7 +50,7 @@ Steps:
 
 ### BLOCKERS — unusable in a gym setting
 Touch & reach:
-- Touch targets smaller than ~44px or too close together for one-handed, sweaty-hand use
+- Touch targets smaller than ~38px height (Hans's preferred minimum) or too close together for one-handed, sweaty-hand use
 - Key actions not reachable with a thumb (top-left corner, center of tall screens)
 - Primary CTA not in the thumb zone (bottom half of screen)
 

@@ -31,6 +31,8 @@ export async function getExerciseProgression(
       ? Math.round(rpeSets.reduce((sum, s) => sum + s.rpe, 0) / rpeSets.length)
       : undefined
 
+    const movedSum = entry.sets.reduce((sum, s) => sum + normalizeWeight(s.weight).value * s.reps, 0)
+
     const sets: SetSnapshot[] = entry.sets.map(s => ({ weight: s.weight, reps: s.reps, ...(s.rpe !== undefined ? { rpe: s.rpe } : {}) }))
 
     points.push({
@@ -38,6 +40,7 @@ export async function getExerciseProgression(
       weight: maxWeight,
       weightUnit,
       avgReps,
+      movedSum,
       sets,
       ...(avgRpe !== undefined ? { avgRpe } : {}),
     })

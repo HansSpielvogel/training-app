@@ -14,9 +14,16 @@ interface Props {
   getFullProgression: (exerciseDefinitionId: string) => Promise<ExerciseProgressionPoint[]>
 }
 
+type ChartMetric = 'weight' | 'volume'
+
+function formatVolume(p: ExerciseProgressionPoint): string {
+  return p.movedSum !== undefined ? `${Math.round(p.movedSum)} kg moved` : '—'
+}
+
 export function ExerciseProgressionView({ exercises, getProgression, getFullProgression }: Props) {
   const [selected, setSelected] = useState<ExerciseDefinition | null>(null)
   const [view, setView] = useState<'chart' | 'list'>('list')
+  const [chartMetric, setChartMetric] = useState<ChartMetric>('weight')
   const [chartPoints, setChartPoints] = useState<ExerciseProgressionPoint[]>([])
   const [listPoints, setListPoints] = useState<ExerciseProgressionPoint[]>([])
 
@@ -33,7 +40,7 @@ export function ExerciseProgressionView({ exercises, getProgression, getFullProg
         <div className="flex items-center px-4 py-3 border-b border-gray-200">
           <button
             onClick={() => { setSelected(null); setView('list') }}
-            className="text-gray-500 text-sm mr-3"
+            className="min-h-[38px] px-2 flex items-center text-gray-500 text-sm mr-1"
           >
             ← Back
           </button>
@@ -42,13 +49,13 @@ export function ExerciseProgressionView({ exercises, getProgression, getFullProg
             <div className="flex rounded-md overflow-hidden border border-gray-200">
               <button
                 onClick={() => setView('chart')}
-                className={`px-3 py-1 text-xs font-medium ${view === 'chart' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+                className={`px-3 min-h-[38px] text-xs font-medium ${view === 'chart' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
               >
                 Chart
               </button>
               <button
                 onClick={() => setView('list')}
-                className={`px-3 py-1 text-xs font-medium ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+                className={`px-3 min-h-[38px] text-xs font-medium ${view === 'list' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
               >
                 List
               </button>
@@ -59,13 +66,27 @@ export function ExerciseProgressionView({ exercises, getProgression, getFullProg
           {noData ? (
             <p className="text-sm text-gray-400 text-center mt-8 px-4">No data for this exercise yet.</p>
           ) : view === 'chart' ? (
-            <ProgressionChart points={chartPoints} />
+            <>
+              <div className="flex gap-1 pb-3">
+                {(['weight', 'volume'] as ChartMetric[]).map(m => (
+                  <button
+                    key={m}
+                    onClick={() => setChartMetric(m)}
+                    className={`px-3 min-h-[38px] text-xs font-medium rounded-full ${chartMetric === m ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-600'}`}
+                  >
+                    {m === 'weight' ? 'Weight & Reps' : 'Volume'}
+                  </button>
+                ))}
+              </div>
+              <ProgressionChart points={chartPoints} metric={chartMetric} />
+            </>
           ) : (
             <div>
               {listPoints.map((p, i) => (
                 <div key={i} className="flex items-center px-4 py-3 border-b border-gray-100">
                   <span className="w-20 text-xs text-gray-400 shrink-0">{formatDate(p.date)}</span>
-                  <span className="text-sm text-gray-700">{formatSets(p.sets)}</span>
+                  <span className="flex-1 text-sm text-gray-700">{formatSets(p.sets)}</span>
+                  <span className="text-xs text-gray-500 ml-2 shrink-0">{formatVolume(p)}</span>
                 </div>
               ))}
             </div>

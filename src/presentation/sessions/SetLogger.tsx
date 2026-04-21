@@ -93,6 +93,7 @@ function SetRow({ set, setIndex, isLast, sessionStatus, onRemoveLast, onUpdateRp
             onClick={onRemoveLast}
             className="p-2 text-red-400 hover:text-red-600"
             aria-label="Remove last set"
+            // intentionally small — reduces accidental taps on a destructive action
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -227,29 +228,29 @@ export function SetLogger({ sets, lastSets, defaultSets, exerciseName, sessionSt
       </div>
 
       <div className="flex items-center gap-2">
-        {mode === 'quick' ? (
-          <button
-            onClick={handleQuickAdd}
-            disabled={!weightInput || !repsInput}
-            className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:bg-gray-200 disabled:text-gray-400 font-medium"
-          >
-            Log {n}×
-          </button>
-        ) : (
-          <button
-            onClick={handleIndividualAdd}
-            disabled={!weightInput || !repsInput}
-            className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:bg-gray-200 disabled:text-gray-400 font-medium"
-          >
-            Add Set
-          </button>
-        )}
         <button
-          onClick={() => setMode(mode === 'quick' ? 'individual' : 'quick')}
-          className="px-3 py-2.5 text-sm text-gray-600 border border-gray-300 rounded-md"
+          onClick={mode === 'quick' ? handleQuickAdd : handleIndividualAdd}
+          disabled={!weightInput || !repsInput}
+          className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:bg-gray-200 disabled:text-gray-400 font-medium"
         >
-          {mode === 'quick' ? 'Individual' : 'Quick sets'}
+          {mode === 'quick' ? `Log ${n}×` : 'Add Set'}
         </button>
+        <div className="flex rounded-md overflow-hidden border border-gray-200 shrink-0">
+          <button
+            type="button"
+            onClick={() => setMode('quick')}
+            className={`px-3 py-2.5 text-xs font-medium ${mode === 'quick' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+          >
+            Quick
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode('individual')}
+            className={`px-3 py-2.5 text-xs font-medium ${mode === 'individual' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+          >
+            Individual
+          </button>
+        </div>
       </div>
 
       {sets.length > 0 && (

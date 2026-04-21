@@ -1,18 +1,15 @@
 import { useState } from 'react'
-import type { SessionSummaryItem } from '@application/analytics'
-import type { TrainingSession } from '@application/sessions'
-import type { ExerciseDefinition } from '@application/exercises'
+import type { SessionSummaryItem, SessionDetailView } from '@application/analytics'
 import { formatSets } from '../shared/formatSets'
 
 interface Props {
   sessions: SessionSummaryItem[]
-  exercises: ExerciseDefinition[]
-  getSessionDetail: (id: string) => Promise<TrainingSession | undefined>
+  getSessionDetail: (id: string) => Promise<SessionDetailView | undefined>
 }
 
-export function TrainingCalendarView({ sessions, exercises, getSessionDetail }: Props) {
+export function TrainingCalendarView({ sessions, getSessionDetail }: Props) {
   const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [detailCache, setDetailCache] = useState<Record<string, TrainingSession>>({})
+  const [detailCache, setDetailCache] = useState<Record<string, SessionDetailView>>({})
 
   async function handleToggle(id: string) {
     if (expandedId === id) {
@@ -25,8 +22,6 @@ export function TrainingCalendarView({ sessions, exercises, getSessionDetail }: 
       if (detail) setDetailCache(prev => ({ ...prev, [id]: detail }))
     }
   }
-
-  const exerciseNameMap = new Map(exercises.map(e => [e.id, e.name]))
 
   if (sessions.length === 0) {
     return (
@@ -58,11 +53,9 @@ export function TrainingCalendarView({ sessions, exercises, getSessionDetail }: 
             </button>
             {isExpanded && detail && (
               <div className="px-4 pb-3">
-                {detail.entries.filter(e => e.sets.length > 0).map((entry, i) => (
+                {detail.entries.map((entry, i) => (
                   <div key={i} className="mb-2">
-                    <p className="text-xs font-medium text-gray-700">
-                      {entry.exerciseDefinitionId ? (exerciseNameMap.get(entry.exerciseDefinitionId) ?? entry.exerciseDefinitionId) : '—'}
-                    </p>
+                    <p className="text-xs font-medium text-gray-700">{entry.exerciseName}</p>
                     <p className="text-xs text-gray-400">{formatSets(entry.sets)}</p>
                   </div>
                 ))}

@@ -27,17 +27,13 @@ type: project
 
 ## Future (not scheduled)
 
-- Analytics bounded context: `TrainingCalendarView` receives a full `TrainingSession` object via `getSessionDetail`, creating a hard cross-context dependency from `analytics` back into `sessions`. As analytics grows (more views that need session detail), this will widen. Define a `SessionDetailView` (or `SessionCardViewModel`) type in the `analytics` domain and have `useAnalytics` project the `TrainingSession` into it before passing it to components.
-
-- Active session: temp slot with logged sets cannot be removed (use case throws on `entry.sets.length > 0`); add a confirmation-then-delete flow for this case
-- Stats / Calendar tab: replace session list with a real calendar heat-map for training frequency at a glance
-- Progression chart: show mini sparkline on the exercise list row so trend is visible without drilling in
-- Active session: quick-sets vs individual mode toggle has low discoverability; replace with a segmented control
-- add a possibility to change the RPE on a logged set (I reflect after doing the set: "that was tough i should mark the RPE as high")
-- add a drag gesture for deleting the training plan slots in the active session, with a red trash indicator appearing while dragging as a feedback
-- add a way to be able to change training entries order (reordering) in an active session, maybe a drag and drop gesture?
-- AI suggestions based on history
-- Other sports (new bounded context, see extensibility rule in CLAUDE.md)
+- Progression view: no way to compare two exercises side-by-side or overlay historical data across muscle groups; a "compare" mode would help informed weight selection
+- Active session: no progress indicator (e.g. "3 of 6 slots done") — a compact bar under the session title would reduce anxiety about how far through a workout Hans is
+- Progression tab: exercise list is a flat alphabetical scroll with no muscle-group filter or search — as the library grows this becomes slow to navigate at the gym; add muscle-group grouping or a search input
+- p3: Stats / Calendar tab: add additionally to the session list a real calendar heat-map for training frequency at a glance
+- p3: Progression chart: show mini sparkline on the exercise list row so trend is visible without drilling in
+- Future: AI suggestions based on history
+- Future: Other sports (new bounded context, see extensibility rule in CLAUDE.md)
 
 ## Seeding
 

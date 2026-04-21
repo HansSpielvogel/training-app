@@ -32,7 +32,7 @@ Ask yourself: Did this change affect the UI significantly?
 
 After the review returns:
 1. Fix all **Blockers** directly without asking.
-2. Enumerate **Improvements** and **Polish** findings to the user in a table, then ask: *"Which of these do you want to fix now?"* Wait for their answer before doing anything.
+2. **STOP. Do NOT proceed to step 3.** Present the Improvements and Polish findings to the user in a table and ask: *"Which of these do you want to fix now?"* Wait for their explicit answer before doing anything else — including the architecture review.
 
 ### 3. Architecture review
 

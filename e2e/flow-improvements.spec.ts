@@ -32,6 +32,7 @@ test('complete exercise, verify next one auto-opens', async ({ page }) => {
   await firstChip.click()
 
   // Log a set
+  await expect(page.getByPlaceholder('Weight')).toBeVisible({ timeout: 3000 })
   await page.getByPlaceholder('Weight').fill('15')
   await page.getByPlaceholder('Reps').fill('12')
   await page.getByText(/Log \d+×/).click()

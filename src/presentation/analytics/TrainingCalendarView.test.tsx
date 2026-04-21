@@ -2,9 +2,7 @@ import '@testing-library/jest-dom'
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor } from '@testing-library/react'
 import { TrainingCalendarView } from './TrainingCalendarView'
-import type { SessionSummaryItem } from '@application/analytics'
-import type { TrainingSession } from '@application/sessions'
-import type { ExerciseDefinition } from '@application/exercises'
+import type { SessionSummaryItem, SessionDetailView } from '@application/analytics'
 
 const session: SessionSummaryItem = {
   id: 's1',
@@ -13,16 +11,12 @@ const session: SessionSummaryItem = {
   exerciseCount: 1,
 }
 
-const fullSession: TrainingSession = {
+const fullSession: SessionDetailView = {
   id: 's1',
-  planId: 'p1',
   planName: 'Push',
-  status: 'completed',
-  startedAt: new Date('2024-03-01'),
-  completedAt: new Date('2024-03-01'),
+  date: new Date('2024-03-01'),
   entries: [{
-    muscleGroupId: 'mg-1',
-    exerciseDefinitionId: 'ex-bench',
+    exerciseName: 'Bench Press',
     sets: [
       { weight: { kind: 'single', value: 80 }, reps: 10 },
       { weight: { kind: 'single', value: 85 }, reps: 8 },
@@ -30,13 +24,9 @@ const fullSession: TrainingSession = {
   }],
 }
 
-const exercises: ExerciseDefinition[] = [
-  { id: 'ex-bench', name: 'Bench Press', muscleGroupIds: ['mg-1'], defaultSets: 3 },
-]
-
 function setup(getSessionDetail = vi.fn().mockResolvedValue(fullSession)) {
   return render(
-    <TrainingCalendarView sessions={[session]} exercises={exercises} getSessionDetail={getSessionDetail} />
+    <TrainingCalendarView sessions={[session]} getSessionDetail={getSessionDetail} />
   )
 }
 
@@ -48,7 +38,7 @@ describe('TrainingCalendarView', () => {
   })
 
   it('shows empty state when no sessions', () => {
-    render(<TrainingCalendarView sessions={[]} exercises={[]} getSessionDetail={vi.fn()} />)
+    render(<TrainingCalendarView sessions={[]} getSessionDetail={vi.fn()} />)
     expect(screen.getByText('No sessions yet.')).toBeInTheDocument()
   })
 
