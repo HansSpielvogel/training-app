@@ -8,8 +8,10 @@ const noop = () => {}
 const defaultProps = {
   sets: [],
   lastSets: null,
+  sessionStatus: 'in-progress' as const,
   onAdd: noop,
   onRemoveLast: noop,
+  onUpdateSetRpe: noop,
 }
 
 describe('SetLogger', () => {

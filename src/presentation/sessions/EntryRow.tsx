@@ -1,5 +1,6 @@
+import { forwardRef } from 'react'
 import type { ExerciseDefinition } from '@application/exercises'
-import type { SessionEntry, SessionSet, Weight } from '@application/sessions'
+import type { SessionEntry, SessionSet, SessionStatus, Weight } from '@application/sessions'
 import { VariationPicker } from './VariationPicker'
 import { SetLogger } from './SetLogger'
 
@@ -18,6 +19,7 @@ interface EntryRowProps {
   defaultSets?: number
   done: boolean
   isExpanded: boolean
+  sessionStatus: SessionStatus
   onToggle: () => void
   onMarkDone: () => void
   onLoadExerciseData: () => void
@@ -26,9 +28,10 @@ interface EntryRowProps {
   onAddSet: (weight: Weight, reps: number, count: number, rpe?: number) => void
   onRemoveLast: () => void
   onRemoveEntry?: () => void
+  onUpdateSetRpe: (setIndex: number, rpe: number | null) => void
 }
 
-export function EntryRow({
+export const EntryRow = forwardRef<HTMLDivElement, EntryRowProps>(function EntryRow({
   entry,
   muscleGroupName,
   exerciseName,
@@ -37,6 +40,7 @@ export function EntryRow({
   defaultSets,
   done,
   isExpanded,
+  sessionStatus,
   onToggle,
   onMarkDone,
   onLoadExerciseData,
@@ -45,7 +49,8 @@ export function EntryRow({
   onAddSet,
   onRemoveLast,
   onRemoveEntry,
-}: EntryRowProps) {
+  onUpdateSetRpe,
+}, ref) {
   const setCount = entry.sets.length
 
   function handleToggle() {
@@ -54,7 +59,7 @@ export function EntryRow({
   }
 
   return (
-    <div className={`border-b border-gray-100 ${setCount > 0 ? 'border-l-2 border-l-blue-400' : ''}`}>
+    <div ref={ref} className={`border-b border-gray-100 ${setCount > 0 ? 'border-l-2 border-l-blue-400' : ''}`}>
       <div
         className="flex items-center justify-between px-4 py-3 cursor-pointer active:bg-gray-50"
         onClick={handleToggle}
@@ -121,8 +126,10 @@ export function EntryRow({
                 lastSets={lastSets}
                 defaultSets={defaultSets}
                 exerciseName={exerciseName}
+                sessionStatus={sessionStatus}
                 onAdd={(weight, reps, count, rpe) => onAddSet(weight, reps, count, rpe)}
                 onRemoveLast={onRemoveLast}
+                onUpdateSetRpe={onUpdateSetRpe}
               />
             </div>
           )}
@@ -130,7 +137,7 @@ export function EntryRow({
             <button
               onClick={onMarkDone}
               disabled={done}
-              className="w-full py-2 bg-green-600 text-white text-sm rounded-md font-medium disabled:opacity-40"
+              className="w-full py-2 min-h-[44px] bg-green-600 text-white text-sm rounded-md font-medium disabled:opacity-40"
             >
               Done
             </button>
@@ -147,4 +154,4 @@ export function EntryRow({
       )}
     </div>
   )
-}
+})

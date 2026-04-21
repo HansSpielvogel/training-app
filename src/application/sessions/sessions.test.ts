@@ -13,6 +13,7 @@ import { completeSession } from './completeSession'
 import { getLastVariationsForMuscleGroup } from './getLastVariationsForMuscleGroup'
 import { computeRotationSuggestion } from './computeRotationSuggestion'
 import { addPlanSlot, updateSlotOptional } from '@application/planning'
+import { updateSetRpe } from './updateSetRpe'
 
 let sessionRepo: DexieTrainingSessionRepository
 let planRepo: DexieTrainingPlanRepository
@@ -277,5 +278,71 @@ describe('computeRotationSuggestion (integration)', () => {
 
     const sessions = await sessionRepo.listCompleted()
     expect(computeRotationSuggestion('mg-chest', sessions)).toBeNull()
+  })
+})
+
+describe('updateSetRpe', () => {
+  it('updates rpe on the specified set', async () => {
+    const plan = await seedPlanWithSlots()
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+    await addSet(sessionRepo, session.id, 0, { kind: 'single', value: 80 }, 10, 7)
+
+    await updateSetRpe(sessionRepo, session.id, 0, 0, 8)
+
+    const loaded = await sessionRepo.getById(session.id)
+    expect(loaded?.entries[0].sets[0].rpe).toBe(8)
+  })
+
+  it('preserves weight and reps when updating rpe', async () => {
+    const plan = await seedPlanWithSlots()
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+    await addSet(sessionRepo, session.id, 0, { kind: 'single', value: 80 }, 10, 7)
+
+    await updateSetRpe(sessionRepo, session.id, 0, 0, 9)
+
+    const loaded = await sessionRepo.getById(session.id)
+    const set = loaded?.entries[0].sets[0]
+    expect(set?.weight).toEqual({ kind: 'single', value: 80 })
+    expect(set?.reps).toBe(10)
+    expect(set?.rpe).toBe(9)
+  })
+
+  it('sets rpe on a set that had no rpe', async () => {
+    const plan = await seedPlanWithSlots()
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+    await addSet(sessionRepo, session.id, 0, { kind: 'single', value: 80 }, 10)
+
+    await updateSetRpe(sessionRepo, session.id, 0, 0, 7)
+
+    const loaded = await sessionRepo.getById(session.id)
+    expect(loaded?.entries[0].sets[0].rpe).toBe(7)
+  })
+
+  it('clears rpe when null is passed', async () => {
+    const plan = await seedPlanWithSlots()
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+    await addSet(sessionRepo, session.id, 0, { kind: 'single', value: 80 }, 10, 8)
+
+    await updateSetRpe(sessionRepo, session.id, 0, 0, null)
+
+    const loaded = await sessionRepo.getById(session.id)
+    expect(loaded?.entries[0].sets[0].rpe).toBeUndefined()
+  })
+
+  it('only updates the specified set index', async () => {
+    const plan = await seedPlanWithSlots()
+    const session = await startSession(sessionRepo, planRepo, plan.id)
+    await addSet(sessionRepo, session.id, 0, { kind: 'single', value: 80 }, 10, 7)
+    await addSet(sessionRepo, session.id, 0, { kind: 'single', value: 80 }, 10, 8)
+
+    await updateSetRpe(sessionRepo, session.id, 0, 0, 9)
+
+    const loaded = await sessionRepo.getById(session.id)
+    expect(loaded?.entries[0].sets[0].rpe).toBe(9)
+    expect(loaded?.entries[0].sets[1].rpe).toBe(8)
+  })
+
+  it('throws for unknown session', async () => {
+    await expect(updateSetRpe(sessionRepo, 'unknown', 0, 0, 7)).rejects.toThrow('Session not found')
   })
 })

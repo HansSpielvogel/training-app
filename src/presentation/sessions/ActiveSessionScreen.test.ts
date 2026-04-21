@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { findNextIncomplete } from './ActiveSessionScreen'
+import { findNextIncomplete, findActiveEntry } from './ActiveSessionScreen'
 
 describe('findNextIncomplete', () => {
   it('advances to next slot after finish button', () => {
@@ -23,5 +23,37 @@ describe('findNextIncomplete', () => {
 
   it('returns null when no remaining slots after current', () => {
     expect(findNextIncomplete(2, new Set([2]), 3)).toBeNull()
+  })
+})
+
+describe('findActiveEntry', () => {
+  const entry = (sets: number, exId?: string) => ({
+    sets: Array(sets).fill({}),
+    exerciseDefinitionId: exId,
+  })
+
+  it('returns first entry with sets that is not done', () => {
+    const entries = [entry(0), entry(2, 'ex-1'), entry(0)]
+    expect(findActiveEntry(entries, new Set())).toBe(1)
+  })
+
+  it('returns first entry with exercise assigned that is not done', () => {
+    const entries = [entry(0), entry(0, 'ex-1'), entry(0)]
+    expect(findActiveEntry(entries, new Set())).toBe(1)
+  })
+
+  it('skips done entries', () => {
+    const entries = [entry(2, 'ex-1'), entry(3, 'ex-2'), entry(0)]
+    expect(findActiveEntry(entries, new Set([0]))).toBe(1)
+  })
+
+  it('returns null when all started entries are done', () => {
+    const entries = [entry(2, 'ex-1'), entry(3, 'ex-2')]
+    expect(findActiveEntry(entries, new Set([0, 1]))).toBeNull()
+  })
+
+  it('returns null when no entries have been started', () => {
+    const entries = [entry(0), entry(0), entry(0)]
+    expect(findActiveEntry(entries, new Set())).toBeNull()
   })
 })

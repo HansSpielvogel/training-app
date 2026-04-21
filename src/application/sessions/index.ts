@@ -13,6 +13,7 @@ export { addTempSlot } from './addTempSlot'
 export { removeTempSlot } from './removeTempSlot'
 export { removePlanSlot } from './removePlanSlot'
 export { addPlanSlotsToSession } from './addPlanSlotsToSession'
+export { updateSetRpe } from './updateSetRpe'
 
 export type { TrainingSession, SessionEntry, SessionSet, SessionStatus } from '@domain/sessions/TrainingSession'
 export type { ITrainingSessionRepository } from '@domain/sessions/ITrainingSessionRepository'

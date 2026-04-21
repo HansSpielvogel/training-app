@@ -10,6 +10,7 @@ import {
   completeSession,
   abandonSession,
   removePlanSlot as removePlanSlotUseCase,
+  updateSetRpe,
 } from '@application/sessions'
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
 import { DexieTrainingPlanRepository } from '@infrastructure/planning/DexieTrainingPlanRepository'
@@ -79,6 +80,12 @@ export function useActiveSession() {
     await refresh()
   }, [session, sessionRepo, refresh])
 
+  const updateRpe = useCallback(async (entryIndex: number, setIndex: number, newRpe: number | null) => {
+    if (!session) return
+    await updateSetRpe(sessionRepo, session.id, entryIndex, setIndex, newRpe)
+    await refresh()
+  }, [session, sessionRepo, refresh])
+
   const slotActions = useSessionSlotActions(session, sessionRepo, planRepo, refresh)
   const exerciseData = useSessionExerciseData(session, assign)
 
@@ -86,6 +93,7 @@ export function useActiveSession() {
     session,
     loading,
     removePlanSlot,
+    updateRpe,
     start,
     assign,
     clearVariation: clearVariationFn,
