@@ -36,7 +36,7 @@ Steps:
    g. **Repository contracts**: repository interfaces in domain/ must expose only aggregate-root operations. No sub-entity queries.
    h. **Use case SRP**: each use case file does exactly one thing. Flag files that contain two distinct operations.
    i. **Bigger picture**: flag growing coupling that will become a structural problem — hooks doing too much orchestration, use cases growing beyond their scope, bounded contexts bleeding into each other, presentation importing domain objects as props.
-6. For large structural problems that would take significant effort (e.g. introducing domain events, reshaping a bounded context boundary, extracting a sub-domain): append a bullet to the `## Future` section of `openspec/memory/project_roadmap.md` and include it in the ### New Features output section.
+6. For large structural problems that would take significant effort (e.g. introducing domain events, reshaping a bounded context boundary, extracting a sub-domain): append a bullet to the `## Future` section of `openspec/memory/project_roadmap.md` and include it in the ### New Features output section. Add the why and acceptance criterias.
 7. Report all findings — from the script and all manual review steps — using the output format below.
 
 Output format — return ONLY this, no preamble:

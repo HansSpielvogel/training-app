@@ -20,7 +20,7 @@ Then spawn with the prompt template below, substituting `{{CHANGED_ROUTES}}`, `{
 
 If the dev server is not running on `http://localhost:5173`, ask the user to run `npm run dev` first.
 
-**After the subagent returns:** scan findings for anything too large to fix in the current session (new bounded context, multi-screen redesign, new interaction pattern). Add those to `openspec/memory/project_roadmap.md` under `## Future (not scheduled)` as a brief bullet.
+**After the subagent returns:** scan findings for anything too large to fix in the current session (new bounded context, multi-screen redesign, new interaction pattern). Add those to `openspec/memory/project_roadmap.md` under `## Future (not scheduled)` as a brief bullet with the why and acceptance criteria.
 
 ## Subagent prompt template
 
