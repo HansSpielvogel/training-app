@@ -23,7 +23,11 @@ Also run E2E if changes touch flows covered by Playwright:
 npm run test:e2e
 ```
 
-### 2. UI review (if applicable)
+### 2. Compact context
+
+Run `/compact` to compress the conversation context before the UI review.
+
+### 3. UI review (if applicable)
 
 Ask yourself: Did this change affect the UI significantly?
 
@@ -34,7 +38,7 @@ After the review returns:
 1. Fix all **Blockers** directly without asking.
 2. **STOP. Do NOT proceed to step 3.** Present the Improvements and Polish findings to the user in a table and ask: *"Which of these do you want to fix now?"* Wait for their explicit answer before doing anything else — including the architecture review.
 
-### 3. Architecture review
+### 4. Architecture review
 
 Invoke the `arch-review` skill.
 
@@ -42,13 +46,13 @@ After the review returns:
 1. Fix all **Critical** findings directly without asking.
 2. Enumerate **Warnings** and **Style** findings to the user in a table, then ask: *"Fix any of these now, or continue to CLAUDE.md update?"* Wait for their answer before doing anything.
 
-### 4. Update CLAUDE.md
+### 5. Update CLAUDE.md
 
 Read `/home/hans/src/training-app/CLAUDE.md` and consider whether anything learned during this implementation should be added — new conventions, constraints, architectural decisions, or insights that future developers (and Claude) should know.
 
 Only update if there is something genuinely new and non-obvious. Do not pad.
 
-### 5. Commit and push
+### 6. Commit and push
 
 Stage changed files, create a commit following the project format:
 
