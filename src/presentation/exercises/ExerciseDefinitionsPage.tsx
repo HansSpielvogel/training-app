@@ -6,6 +6,7 @@ import { useExerciseDefinitions } from './useExerciseDefinitions'
 import { ExerciseForm } from './ExerciseForm'
 import { ExerciseRow } from './ExerciseRow'
 import { ConfirmDeleteDialog } from '../shared/ConfirmDeleteDialog'
+import { MuscleGroupFilterChips } from '../shared/MuscleGroupFilterChips'
 import { ExerciseImportExport } from './ExerciseImportExport'
 
 type Mode =
@@ -69,17 +70,12 @@ export function ExerciseDefinitionsPage() {
         </div>
       </header>
 
-      <div className="px-4 py-2 bg-white border-b border-gray-100">
-        <select
-          value={filterMuscleGroupId ?? ''}
-          onChange={(e) => setFilterMuscleGroupId(e.target.value || undefined)}
-          className="w-full text-sm px-3 py-2 border border-gray-200 rounded-md bg-white"
-        >
-          <option value="">All muscle groups</option>
-          {muscleGroups.map((mg) => (
-            <option key={mg.id} value={mg.id}>{mg.name}</option>
-          ))}
-        </select>
+      <div className="bg-white border-b border-gray-100">
+        <MuscleGroupFilterChips
+          groups={muscleGroups}
+          selected={filterMuscleGroupId ?? null}
+          onSelect={(id) => setFilterMuscleGroupId(id ?? undefined)}
+        />
       </div>
 
       <div className="flex-1 overflow-y-auto">

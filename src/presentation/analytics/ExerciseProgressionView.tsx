@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import type { ExerciseDefinition, MuscleGroup } from '@application/exercises'
 import type { ExerciseProgressionPoint } from '@application/analytics'
 import { ProgressionChart } from './ProgressionChart'
-import { MuscleGroupFilterChips } from './MuscleGroupFilterChips'
+import { MuscleGroupFilterChips } from '../shared/MuscleGroupFilterChips'
 import { formatSets } from '../shared/formatSets'
 
 function formatDate(date: Date): string {

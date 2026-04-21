@@ -88,6 +88,7 @@ Consistency:
 - Inconsistent spacing, font sizes, colors, or component styles across routes (different button styles, different card padding)
 - Icons used differently in different places (same icon, different meaning)
 - Color used without semantic meaning (e.g. red used for both errors and delete buttons and highlights)
+- Same UI pattern implemented twice in different parts of the app instead of using a shared component (e.g. two different filter controls doing the same job) — flag for consolidation into `src/presentation/shared/`
 
 Layout & density:
 - Unnecessary whitespace that pushes content off-screen on a small phone

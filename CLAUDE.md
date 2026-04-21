@@ -55,6 +55,16 @@ presentation/   ← React components and hooks
 Do NOT make the Exercise model generic. Extensibility comes from bounded context architecture.
 When building session-tracking or analytics, define `SessionSummary` as a shared interface. Strength training entities implement it. Do not add `sportType` enums or generic fields to `ExerciseDefinition`. Adding a new sport = new bounded context, no rewrite of the strength domain.
 
+## Shared UI Components
+
+Reusable UI lives in `src/presentation/shared/`. Before building a filter, list, or interactive control, check if one already exists there. If you build something that could apply in more than one place, put it in `shared/` from the start.
+
+**Current shared components:**
+- `MuscleGroupFilterChips` — horizontal scrollable chip row for filtering by muscle group. Used in Exercises and Analytics tabs.
+- `ConfirmDeleteDialog`, `ErrorBoundary`, `InlineEditForm`, `UpdateBanner`
+
+If you see the same UI pattern implemented twice in different bounded contexts, consolidate it into `shared/` immediately.
+
 ## Seed Data Consistency
 
 `openspec/seed/exercise-library.json` and `openspec/seed/sessions-seed.json` must stay in sync. When changing `muscleGroupIds` on an exercise, also audit `sessions-seed.json` for entries referencing that exercise — their `muscleGroupId` must still be one of the exercise's groups.
