@@ -1,3 +1,12 @@
+### Requirement: Session progress indicator in active session header
+The active session view SHALL include the session progress indicator as defined in the `session-progress-indicator` capability, positioned below the session title and above the slot list.
+
+#### Scenario: Progress indicator visible during session
+- **WHEN** the user is in an active session
+- **THEN** the progress indicator is visible below the session title without requiring any scrolling
+
+---
+
 ### Requirement: Start session from plan
 The system SHALL allow the user to start a new training session by selecting a training plan. Starting a session SHALL create a `TrainingSession` with status `in-progress`, recording the plan ID, plan name (snapshot), and start timestamp. The session SHALL contain one `SessionEntry` slot per `PlanSlot` in the plan, pre-populated with the plan slot's muscle group ID, but with no exercise or sets yet.
 
