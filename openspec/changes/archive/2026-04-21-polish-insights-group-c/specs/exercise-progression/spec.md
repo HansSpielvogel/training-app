@@ -1,3 +1,5 @@
+## MODIFIED Requirements
+
 ### Requirement: Exercise progression chart
 The system SHALL display a line chart for a selected ExerciseDefinition, limited to the most recent 20 sessions that include that exercise. The chart view SHALL display data for the currently selected metric (Weight, Reps, or Volume — see `moved-sum-metric` capability). 
 
@@ -60,14 +62,3 @@ The Chart/List toggle switches to the chart view. Exercises with no history are 
 #### Scenario: List with no history
 - **WHEN** the selected exercise has no logged sessions
 - **THEN** the system SHALL display the same no-data message as the chart view
-
-### Requirement: Exercise selection
-The system SHALL provide a list of all ExerciseDefinitions that have session history, allowing the user to select one to view its progression.
-
-#### Scenario: Selecting an exercise
-- **WHEN** the user taps an exercise name in the exercise list
-- **THEN** the system SHALL display the progression list view for that exercise
-
-#### Scenario: Navigating back
-- **WHEN** the user taps the back control from the progression view
-- **THEN** the system SHALL return to the exercise selection list
