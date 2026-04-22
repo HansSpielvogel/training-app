@@ -200,6 +200,7 @@ export function ActiveSessionScreen() {
             defaultSets={exerciseDataMap[i]?.all.find((e) => e.id === entry.exerciseDefinitionId)?.defaultSets}
             done={doneIndices.has(i)}
             isExpanded={expandedIndex === i}
+            anyExpanded={expandedIndex !== null}
             sessionStatus={session.status}
             dragState={dragState}
             exerciseNames={exerciseNames}

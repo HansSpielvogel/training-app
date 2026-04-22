@@ -20,6 +20,7 @@ interface Props {
   defaultSets?: number
   done: boolean
   isExpanded: boolean
+  anyExpanded: boolean
   sessionStatus: SessionStatus
   dragState: DragState | null
   exerciseNames: Record<string, string>
@@ -38,16 +39,22 @@ interface Props {
 
 export function ActiveSessionEntryItem({
   entry, index: i, muscleGroupName, exerciseName, exerciseData, lastSets, defaultSets,
-  done, isExpanded, sessionStatus, dragState, setRef,
+  done, isExpanded, anyExpanded, sessionStatus, dragState, setRef,
   onToggle, onMarkDone, onLoadExerciseData, onAssign, onClearVariation,
   onAddSet, onRemoveLast, onRemoveEntry, onUpdateSetRpe, onDragHandleTouchStart,
 }: Props) {
   const isDragged = dragState?.fromIndex === i
   const isDropTarget = dragState !== null && dragState.toIndex === i && !isDragged
+  const dimmed = !isExpanded && anyExpanded && !isDragged
 
   return (
     <div
       ref={setRef}
+      className={[
+        'transition-all duration-200',
+        isExpanded ? 'mx-2 z-10 shadow-md' : '',
+        dimmed ? 'opacity-50' : '',
+      ].join(' ')}
       style={isDragged ? {
         transform: `translateY(${dragState.currentY - dragState.startY}px)`,
         position: 'relative',

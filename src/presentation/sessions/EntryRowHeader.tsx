@@ -19,7 +19,7 @@ export function EntryRowHeader({
   const hasExercise = !!exerciseName
   return (
     <div
-      className="flex items-center justify-between px-4 py-2 cursor-pointer active:bg-gray-50"
+      className="flex items-center justify-between px-4 py-2.5 cursor-pointer active:bg-gray-50"
       onClick={onToggle}
     >
       {isDraggable && (
