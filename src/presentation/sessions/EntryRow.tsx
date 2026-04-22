@@ -77,7 +77,7 @@ export const EntryRow = forwardRef<HTMLDivElement, EntryRowProps>(function Entry
         </button>
       )}
       <div
-        className={`border-b border-gray-200 bg-white ${isExpanded && entry.exerciseDefinitionId ? 'border-l-4 border-l-blue-500' : setCount > 0 ? 'border-l-2 border-l-blue-400' : ''}`}
+        className={`border-b border-gray-200 bg-white ${isExpanded ? 'border-l-4 border-l-blue-500' : setCount > 0 ? 'border-l-2 border-l-blue-400' : ''}`}
         style={{
           transform: `translateX(-${swipeX}px)`,
           transition: swiping ? 'none' : 'transform 0.2s ease-out',

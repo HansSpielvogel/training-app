@@ -53,7 +53,8 @@ export function ActiveSessionEntryItem({
       ref={setRef}
       className={[
         'transition-all duration-200',
-        spotlight ? 'mx-1 z-10 shadow-md' : '',
+        isExpanded ? 'mx-1' : '',
+        spotlight ? 'z-10 shadow-md' : '',
         dimmed ? 'opacity-50' : '',
       ].join(' ')}
       style={isDragged ? {
