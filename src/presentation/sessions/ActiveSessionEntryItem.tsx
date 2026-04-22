@@ -45,6 +45,7 @@ export function ActiveSessionEntryItem({
 }: Props) {
   const isDragged = dragState?.fromIndex === i
   const isDropTarget = dragState !== null && dragState.toIndex === i && !isDragged
+  const spotlight = isExpanded && !!entry.exerciseDefinitionId
   const dimmed = !isExpanded && anyExpanded && !isDragged
 
   return (
@@ -52,7 +53,7 @@ export function ActiveSessionEntryItem({
       ref={setRef}
       className={[
         'transition-all duration-200',
-        isExpanded ? 'mx-2 z-10 shadow-md' : '',
+        spotlight ? 'mx-1 z-10 shadow-md' : '',
         dimmed ? 'opacity-50' : '',
       ].join(' ')}
       style={isDragged ? {
