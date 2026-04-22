@@ -99,8 +99,8 @@ export const EntryRow = forwardRef<HTMLDivElement, EntryRowProps>(function Entry
 
         {isExpanded && (
           <div
-            className="px-4 pb-4 space-y-3 transition-[min-height] duration-200 ease-out"
-            style={{ minHeight: entry.exerciseDefinitionId ? '200px' : '0' }}
+            className="px-4 pb-3 space-y-2 transition-[min-height] duration-200 ease-out"
+            style={{ minHeight: entry.exerciseDefinitionId ? '160px' : '0' }}
           >
             {!entry.exerciseDefinitionId ? (
               exerciseData ? (

@@ -83,7 +83,7 @@ export function SetInputForm({
         <button
           onClick={onAdd}
           disabled={!weightInput || !repsInput}
-          className="flex-1 py-2.5 text-sm bg-blue-600 text-white rounded-md disabled:bg-gray-200 disabled:text-gray-400 font-medium"
+          className="flex-1 py-2 text-sm bg-blue-600 text-white rounded-md disabled:bg-gray-200 disabled:text-gray-400 font-medium"
         >
           {mode === 'quick' ? `Log ${n}×` : 'Add Set'}
         </button>
@@ -91,14 +91,14 @@ export function SetInputForm({
           <button
             type="button"
             onClick={() => onModeChange('quick')}
-            className={`px-3 py-2.5 text-xs font-medium ${mode === 'quick' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+            className={`px-3 py-2 text-xs font-medium ${mode === 'quick' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
           >
             Quick
           </button>
           <button
             type="button"
             onClick={() => onModeChange('individual')}
-            className={`px-3 py-2.5 text-xs font-medium ${mode === 'individual' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
+            className={`px-3 py-2 text-xs font-medium ${mode === 'individual' ? 'bg-blue-600 text-white' : 'bg-white text-gray-600'}`}
           >
             Individual
           </button>

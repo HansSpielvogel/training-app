@@ -65,6 +65,14 @@ Reusable UI lives in `src/presentation/shared/`. Before building a filter, list,
 
 If you see the same UI pattern implemented twice in different bounded contexts, consolidate it into `shared/` immediately.
 
+## Session UI Density
+
+The active session screen is used one-handed at the machine on a small phone. Vertical space is critical — the "Done" button must remain visible without scrolling after sets are logged.
+
+- Prefer `py-1`/`py-2` padding in session entry rows and set rows; avoid `py-3` or higher
+- Keep `min-h-[44px]` on interactive touch targets (never remove these)
+- Do not increase `minHeight` reservations on expanded entry rows beyond 160px
+
 ## Seed Data Consistency
 
 `openspec/seed/exercise-library.json` and `openspec/seed/sessions-seed.json` must stay in sync. When changing `muscleGroupIds` on an exercise, also audit `sessions-seed.json` for entries referencing that exercise — their `muscleGroupId` must still be one of the exercise's groups.

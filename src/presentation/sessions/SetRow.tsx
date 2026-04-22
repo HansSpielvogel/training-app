@@ -41,7 +41,7 @@ export function SetRow({ set, setIndex, isLast, sessionStatus, onRemoveLast, onU
   const canEdit = sessionStatus === 'in-progress'
 
   return (
-    <div className="flex items-center justify-between px-3 py-1.5 bg-gray-50 rounded-md">
+    <div className="flex items-center justify-between px-3 py-1 bg-gray-50 rounded-md">
       <div className="flex items-center gap-1 flex-1 min-w-0">
         <span className="text-sm text-gray-700 flex-1 min-w-0">{`Set ${setIndex + 1}: `}{formatSets([set])}</span>
         {canEdit && !editing && (

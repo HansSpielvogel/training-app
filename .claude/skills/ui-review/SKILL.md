@@ -63,6 +63,7 @@ Flow blockers:
 - Wrong navigation after an action (lands on unexpected screen)
 - A flow has a dead end: no way to go back, cancel, or proceed
 - Required data missing with no indication of what to do
+- Active session: "Done" button not visible on screen after sets are logged (pushed off by entry row height) — open an entry with 2–3 logged sets and verify Done is in view without scrolling
 
 ### IMPROVEMENTS — daily friction
 Affordance & feedback:
