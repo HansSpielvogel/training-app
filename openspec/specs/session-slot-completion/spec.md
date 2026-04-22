@@ -7,6 +7,10 @@ Collapsing an expanded slot that has at least one logged set also marks it as do
 - **WHEN** the user taps the "Done" button on an expanded slot (requires at least one set logged)
 - **THEN** the slot shows a green done indicator, the clear-exercise button is hidden, and the done callback fires
 
+#### Scenario: Done button visible without scrolling
+- **WHEN** at least one set has been logged and the slot is expanded
+- **THEN** the Done button is visible on screen without requiring the user to scroll (vertical density of the slot content must accommodate this on a standard iPhone screen)
+
 #### Scenario: Done button hidden until sets are logged
 - **WHEN** a slot is expanded but no sets have been logged yet
 - **THEN** the Done button is not shown

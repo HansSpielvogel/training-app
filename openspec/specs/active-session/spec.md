@@ -55,6 +55,29 @@ The rotation suggestion is derived from the last 5 completed sessions containing
 
 ---
 
+### Requirement: Progressive focus on active slot
+The active session view SHALL use a three-stage progressive focus to guide the user through the logging workflow:
+
+1. **Collapsed** — all slots render flat in the list with no visual emphasis.
+2. **Expanded, no exercise selected** — the expanded slot gains a `mx-1` inset and a thick blue left border (`border-l-4`), signalling "you are here, pick an exercise". Other slots are unaffected.
+3. **Exercise selected** — once an exercise is assigned to the expanded slot, a drop shadow is added and all other slots are dimmed to 50% opacity, creating a spotlight on the active logging context. The inset and border remain.
+
+The transition between stages SHALL be animated (200 ms). Dimming SHALL not prevent the user from tapping another slot to switch focus.
+
+#### Scenario: Expand slot — stage 2 visual
+- **WHEN** the user expands a slot that has no exercise assigned
+- **THEN** that slot gains a left blue border and inset; other slots are unchanged
+
+#### Scenario: Select exercise — stage 3 spotlight
+- **WHEN** the user assigns an exercise to the expanded slot
+- **THEN** the slot gains a drop shadow and all other slots are dimmed to 50% opacity
+
+#### Scenario: Tap dimmed slot to switch
+- **WHEN** the user taps a dimmed (inactive) slot while another is in spotlight mode
+- **THEN** that slot becomes the new active slot and the spotlight transitions to it
+
+---
+
 ### Requirement: Log sets
 Once an exercise variation is assigned to a session entry, the user SHALL be able to log sets in one of two modes. The default mode is **quick mode**: the user enters weight, reps, and an optional RPE (1–10) once and taps "Log N sets" to add N identical sets at once, where N is the `defaultSets` value of the assigned exercise (defaulting to 3 if not set). A **segmented control** with two labelled segments — "Quick" and "Individual" — SHALL be displayed above the input fields, allowing the user to switch between modes. The mode toggle is available at any time and does not affect already-logged sets. Sets SHALL be displayed in the order they were added. The user SHALL be able to remove the last added set. When a set is logged, that entry SHALL become the active entry if it is not already active.
 
