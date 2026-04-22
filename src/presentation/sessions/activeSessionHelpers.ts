@@ -31,3 +31,39 @@ export function remapDoneIndices(done: Set<number>, fromIndex: number, toIndex: 
   }
   return result
 }
+
+export function remapSingleIndex(idx: number, fromIndex: number, toIndex: number): number {
+  if (idx === fromIndex) return toIndex
+  if (fromIndex < toIndex && idx > fromIndex && idx <= toIndex) return idx - 1
+  if (fromIndex > toIndex && idx >= toIndex && idx < fromIndex) return idx + 1
+  return idx
+}
+
+export function remapIndexedMap<T>(map: Record<number, T>, fromIndex: number, toIndex: number): Record<number, T> {
+  if (fromIndex === toIndex) return map
+  const result: Record<number, T> = {}
+  for (const key of Object.keys(map)) {
+    const idx = Number(key)
+    result[remapSingleIndex(idx, fromIndex, toIndex)] = map[idx]
+  }
+  return result
+}
+
+export function shiftIndexedMapAfterRemoval<T>(map: Record<number, T>, removedIndex: number): Record<number, T> {
+  const result: Record<number, T> = {}
+  for (const key of Object.keys(map)) {
+    const idx = Number(key)
+    if (idx === removedIndex) continue
+    result[idx > removedIndex ? idx - 1 : idx] = map[idx]
+  }
+  return result
+}
+
+export function shiftSetAfterRemoval(set: Set<number>, removedIndex: number): Set<number> {
+  const result = new Set<number>()
+  for (const idx of set) {
+    if (idx === removedIndex) continue
+    result.add(idx > removedIndex ? idx - 1 : idx)
+  }
+  return result
+}

@@ -26,3 +26,11 @@ Removal is triggered by a swipe-left gesture on the entry row. Swiping left SHAL
 #### Scenario: Removed slot is not logged
 - **WHEN** a plan slot is removed from the session before any sets are logged
 - **THEN** no session entry for that slot is created on session completion
+
+#### Scenario: Remaining slots show correct exercise data after removal
+- **WHEN** a slot is removed and a remaining slot shifts to a lower index
+- **THEN** the shifted slot's exercise picker shows exercises for its own muscle group, not stale data cached for the index it now occupies
+
+#### Scenario: Done state is consistent after removal
+- **WHEN** a slot is removed and remaining slots shift indices
+- **THEN** the done indicators remain associated with the correct remaining entries

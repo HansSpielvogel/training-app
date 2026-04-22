@@ -12,7 +12,7 @@ import { SlotPickerPanel } from './SlotPickerPanel'
 import { SessionFooter } from './SessionFooter'
 import { SessionHeader } from './SessionHeader'
 import { ActiveSessionEntryItem } from './ActiveSessionEntryItem'
-import { findNextIncomplete, findActiveEntry, remapDoneIndices } from './activeSessionHelpers'
+import { findNextIncomplete, findActiveEntry, remapDoneIndices, remapSingleIndex, shiftSetAfterRemoval } from './activeSessionHelpers'
 
 export function ActiveSessionScreen() {
   const navigate = useNavigate()
@@ -20,6 +20,7 @@ export function ActiveSessionScreen() {
     session, loading, clearVariation, addSet, removeLastSet, complete, abandon,
     addTempSlot, removeTempSlot, addPlanSlots, listPlans, removePlanSlot,
     exerciseDataMap, exerciseNames, lastSetsMap, loadExerciseData, handleAssign, clearLastSets,
+    remapExerciseMaps, shiftExerciseMapsAfterRemoval,
     updateRpe, reorderEntries,
   } = useActiveSession()
   const { muscleGroups } = useMuscleGroups()
@@ -37,6 +38,9 @@ export function ActiveSessionScreen() {
     reorderEntries,
     (fromIndex, toIndex) => {
       if (session) updateDone(prev => remapDoneIndices(prev, fromIndex, toIndex), session.id)
+      remapExerciseMaps(fromIndex, toIndex)
+      if (expandedIndex !== null) setExpandedIndex(remapSingleIndex(expandedIndex, fromIndex, toIndex))
+      if (activeEntryIndex !== null) setActiveEntryIndex(remapSingleIndex(activeEntryIndex, fromIndex, toIndex))
     },
   )
 
@@ -123,6 +127,15 @@ export function ActiveSessionScreen() {
     addSet(i, weight, reps, count, rpe)
   }
 
+  async function handleRemoveEntry(i: number, isTemp: boolean) {
+    shiftExerciseMapsAfterRemoval(i)
+    if (session) updateDone(prev => shiftSetAfterRemoval(prev, i), session.id)
+    setExpandedIndex(prev => prev === null ? null : prev === i ? null : prev > i ? prev - 1 : prev)
+    setActiveEntryIndex(prev => prev === null ? null : prev === i ? null : prev > i ? prev - 1 : prev)
+    if (isTemp) await removeTempSlot(i)
+    else await removePlanSlot(i)
+  }
+
   async function handleAddTempSlot(muscleGroupId: string) {
     setShowMuscleGroupPicker(false)
     await addTempSlot(muscleGroupId)
@@ -177,7 +190,7 @@ export function ActiveSessionScreen() {
       <div className="flex-1 overflow-y-auto">
         {session.entries.map((entry, i) => (
           <ActiveSessionEntryItem
-            key={`${entry.muscleGroupId}-${entry.exerciseDefinitionId ?? 'none'}`}
+            key={`entry-${i}`}
             entry={entry}
             index={i}
             muscleGroupName={muscleGroupMap[entry.muscleGroupId] ?? entry.muscleGroupId}
@@ -198,7 +211,7 @@ export function ActiveSessionScreen() {
             onClearVariation={() => { clearVariation(i); clearLastSets(i) }}
             onAddSet={(weight: Weight, reps: number, count: number, rpe?: number) => handleAddSetWithActive(i, weight, reps, count, rpe)}
             onRemoveLast={() => removeLastSet(i)}
-            onRemoveEntry={entry.isTemp ? () => removeTempSlot(i) : () => removePlanSlot(i)}
+            onRemoveEntry={() => handleRemoveEntry(i, !!entry.isTemp)}
             onUpdateSetRpe={(setIndex, rpe) => updateRpe(i, setIndex, rpe)}
             onDragHandleTouchStart={(e) => handleDragHandleTouchStart(i, e)}
           />

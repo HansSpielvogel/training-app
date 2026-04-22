@@ -9,6 +9,7 @@ import type { ExerciseDefinition } from '@application/exercises'
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
 import { DexieExerciseDefinitionRepository } from '@infrastructure/exercises/DexieExerciseDefinitionRepository'
 import type { EntryExerciseData } from './EntryRow'
+import { remapIndexedMap, shiftIndexedMapAfterRemoval } from './activeSessionHelpers'
 
 export function useSessionExerciseData(
   session: TrainingSession | null,
@@ -79,6 +80,16 @@ export function useSessionExerciseData(
     setLastSetsMap((prev) => ({ ...prev, [entryIndex]: null }))
   }, [])
 
+  const remapExerciseMaps = useCallback((fromIndex: number, toIndex: number) => {
+    setExerciseDataMap((prev) => remapIndexedMap(prev, fromIndex, toIndex))
+    setLastSetsMap((prev) => remapIndexedMap(prev, fromIndex, toIndex))
+  }, [])
+
+  const shiftExerciseMapsAfterRemoval = useCallback((removedIndex: number) => {
+    setExerciseDataMap((prev) => shiftIndexedMapAfterRemoval(prev, removedIndex))
+    setLastSetsMap((prev) => shiftIndexedMapAfterRemoval(prev, removedIndex))
+  }, [])
+
   return {
     exerciseDataMap,
     exerciseNames,
@@ -86,5 +97,7 @@ export function useSessionExerciseData(
     loadExerciseData,
     handleAssign,
     clearLastSets,
+    remapExerciseMaps,
+    shiftExerciseMapsAfterRemoval,
   }
 }
