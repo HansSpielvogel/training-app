@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Weight } from '@application/sessions'
 import { useActiveSession } from './useActiveSession'
@@ -28,7 +28,7 @@ export function ActiveSessionScreen() {
   const { doneIndices, setDone, updateDone, initFromSession, clearSession } = useEntryDoneState()
   const {
     expandedIndex, activeEntryIndex, setExpandedIndex, setActiveEntryIndex, entryRefs,
-    expandAndPreload, handleToggle, handleMarkDone,
+    handleToggle, handleMarkDone,
   } = useEntryExpansion(session, loading, exerciseDataMap, loadExerciseData, doneIndices, setDone, initFromSession)
   const {
     showMuscleGroupPicker, setShowMuscleGroupPicker, showPlanPicker, setShowPlanPicker,
