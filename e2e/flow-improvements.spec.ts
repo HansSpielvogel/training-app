@@ -27,7 +27,7 @@ test('complete exercise, verify next one auto-opens', async ({ page }) => {
 
   // Open first slot (Hintere Schulter) and pick an exercise
   await page.getByText('Hintere Schulter').click()
-  const firstChip = page.locator('button.rounded-full').first()
+  const firstChip = page.locator('div.rounded-full button').first()
   await expect(firstChip).toBeVisible({ timeout: 3000 })
   await firstChip.click()
 
@@ -41,7 +41,7 @@ test('complete exercise, verify next one auto-opens', async ({ page }) => {
   await page.getByRole('button', { name: 'Done' }).click()
 
   // Second slot must auto-expand (shows exercise chips or loading)
-  await expect(page.locator('button.rounded-full').first()).toBeVisible({ timeout: 5000 })
+  await expect(page.locator('div.rounded-full button').first()).toBeVisible({ timeout: 5000 })
   await expect(page.getByText('Loading exercises…')).toHaveCount(0)
 })
 
@@ -52,10 +52,11 @@ test('log sets, switch to Stats, return, active exercise is focused', async ({ p
 
   // Open first slot and pick an exercise, log a set
   await page.getByText('Hintere Schulter').click()
-  const firstChip = page.locator('button.rounded-full').first()
+  const firstChip = page.locator('div.rounded-full button').first()
   await expect(firstChip).toBeVisible({ timeout: 3000 })
   await firstChip.click()
 
+  await expect(page.getByPlaceholder('Weight')).toBeVisible({ timeout: 3000 })
   await page.getByPlaceholder('Weight').fill('15')
   await page.getByPlaceholder('Reps').fill('12')
   await page.getByText(/Log \d+×/).click()
@@ -82,11 +83,12 @@ test('log set with RPE 7, edit to RPE 8, verify persistence', async ({ page }) =
 
   // Open first slot and pick an exercise
   await page.getByText('Hintere Schulter').click()
-  const firstChip = page.locator('button.rounded-full').first()
+  const firstChip = page.locator('div.rounded-full button').first()
   await expect(firstChip).toBeVisible({ timeout: 3000 })
   await firstChip.click()
 
   // Log a set with RPE 7
+  await expect(page.getByPlaceholder('Weight')).toBeVisible({ timeout: 3000 })
   await page.getByPlaceholder('Weight').fill('15')
   await page.getByPlaceholder('Reps').fill('12')
   await page.getByPlaceholder('RPE (1-10)').fill('7')

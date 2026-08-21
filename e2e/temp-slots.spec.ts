@@ -37,11 +37,12 @@ test('6.6: add temp slot, log sets, complete — temp slot in history', async ({
   // Expand the temp slot (last entry) and pick an exercise
   const tempRow = page.locator('div').filter({ hasText: /^BauchTemp/ }).first()
   await tempRow.click()
-  const chip = page.locator('button.rounded-full').first()
+  const chip = page.locator('div.rounded-full button').first()
   await expect(chip).toBeVisible({ timeout: 3000 })
   await chip.click()
 
   // Log a set
+  await expect(page.getByPlaceholder('Weight').last()).toBeVisible({ timeout: 3000 })
   await page.getByPlaceholder('Weight').last().fill('50')
   await page.getByPlaceholder('Reps').last().fill('15')
   await page.getByText(/Log \d+×/).last().click()

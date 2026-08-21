@@ -32,11 +32,12 @@ test('finishing a slot auto-expands the next one with exercises loaded', async (
 
   // Open first slot and pick an exercise (click first available chip)
   await page.getByText('Hintere Schulter').click()
-  const firstChip = page.locator('button.rounded-full').first()
+  const firstChip = page.locator('div.rounded-full button').first()
   await expect(firstChip).toBeVisible({ timeout: 3000 })
   await firstChip.click()
 
   // Log a set
+  await expect(page.getByPlaceholder('Weight')).toBeVisible({ timeout: 3000 })
   await page.getByPlaceholder('Weight').fill('15')
   await page.getByPlaceholder('Reps').fill('12')
   await page.getByText(/Log \d+×/).click()
@@ -46,6 +47,6 @@ test('finishing a slot auto-expands the next one with exercises loaded', async (
 
   // Slot 2 (Rücken Breite) must auto-expand and show exercises — not stuck on "Loading exercises..."
   // The VariationPicker loads and renders exercise chips for the next muscle group
-  await expect(page.locator('button.rounded-full').first()).toBeVisible({ timeout: 5000 })
+  await expect(page.locator('div.rounded-full button').first()).toBeVisible({ timeout: 5000 })
   await expect(page.getByText('Loading exercises…')).toHaveCount(0)
 })
