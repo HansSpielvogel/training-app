@@ -1,22 +1,18 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import type { TrainingSession } from '@application/sessions'
-import type { Weight } from '@application/sessions'
 import {
   startSession,
   assignVariation,
   clearVariation,
-  addSet,
-  removeLastSet,
   completeSession,
   abandonSession,
   removePlanSlot as removePlanSlotUseCase,
-  updateSetRpe,
-  reorderEntries as reorderEntriesUseCase,
 } from '@application/sessions'
 import { DexieTrainingSessionRepository } from '@infrastructure/sessions/DexieTrainingSessionRepository'
 import { DexieTrainingPlanRepository } from '@infrastructure/planning/DexieTrainingPlanRepository'
 import { useSessionSlotActions } from './useSessionSlotActions'
 import { useSessionExerciseData } from './useSessionExerciseData'
+import { useSessionSetActions } from './useSessionSetActions'
 
 // Hooks are the composition root — they wire use cases to repositories
 export function useActiveSession() {
@@ -51,18 +47,6 @@ export function useActiveSession() {
     await refresh()
   }, [session, sessionRepo, refresh])
 
-  const addSetFn = useCallback(async (entryIndex: number, weight: Weight, reps: number, count: number = 1, rpe?: number) => {
-    if (!session) return
-    for (let i = 0; i < count; i++) await addSet(sessionRepo, session.id, entryIndex, weight, reps, rpe)
-    await refresh()
-  }, [session, sessionRepo, refresh])
-
-  const removeLastSetFn = useCallback(async (entryIndex: number) => {
-    if (!session) return
-    await removeLastSet(sessionRepo, session.id, entryIndex)
-    await refresh()
-  }, [session, sessionRepo, refresh])
-
   const complete = useCallback(async () => {
     if (!session) return
     await completeSession(sessionRepo, session.id)
@@ -81,18 +65,7 @@ export function useActiveSession() {
     await refresh()
   }, [session, sessionRepo, refresh])
 
-  const updateRpe = useCallback(async (entryIndex: number, setIndex: number, newRpe: number | null) => {
-    if (!session) return
-    await updateSetRpe(sessionRepo, session.id, entryIndex, setIndex, newRpe)
-    await refresh()
-  }, [session, sessionRepo, refresh])
-
-  const reorderEntries = useCallback(async (fromIndex: number, toIndex: number) => {
-    if (!session) return
-    await reorderEntriesUseCase(sessionRepo, session.id, fromIndex, toIndex)
-    await refresh()
-  }, [session, sessionRepo, refresh])
-
+  const setActions = useSessionSetActions(session, sessionRepo, refresh)
   const slotActions = useSessionSlotActions(session, sessionRepo, planRepo, refresh)
   const exerciseData = useSessionExerciseData(session, assign)
 
@@ -100,15 +73,12 @@ export function useActiveSession() {
     session,
     loading,
     removePlanSlot,
-    updateRpe,
-    reorderEntries,
     start,
     assign,
     clearVariation: clearVariationFn,
-    addSet: addSetFn,
-    removeLastSet: removeLastSetFn,
     complete,
     abandon,
+    ...setActions,
     ...slotActions,
     ...exerciseData,
   }

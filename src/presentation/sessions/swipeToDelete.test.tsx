@@ -18,6 +18,7 @@ const defaultProps = {
   done: false,
   isExpanded: false,
   sessionStatus: 'in-progress' as const,
+  entryCount: 3,
   onToggle: vi.fn(),
   onMarkDone: vi.fn(),
   onLoadExerciseData: vi.fn(),
@@ -97,5 +98,42 @@ describe('EntryRow swipe-to-delete', () => {
     fireEvent.touchEnd(row)
 
     expect(onRemoveEntry).not.toHaveBeenCalled()
+  })
+
+  it('resets swipe state when entry count changes (e.g. a neighboring entry was deleted)', () => {
+    const onRemoveEntry = vi.fn()
+    const { container, rerender } = render(<EntryRow {...defaultProps} onRemoveEntry={onRemoveEntry} />)
+    const row = screen.getByText('Chest').closest('.relative') as Element
+
+    fireEvent.touchStart(row, touch(200))
+    fireEvent.touchMove(row, touch(155))  // dx=45 > 40, snaps open
+    fireEvent.touchEnd(row)
+
+    let inner = container.querySelector('[style*="translateX"]') as HTMLElement
+    expect(inner.style.transform).toBe('translateX(-80px)')
+
+    rerender(<EntryRow {...defaultProps} onRemoveEntry={onRemoveEntry} entryCount={2} />)
+
+    inner = container.querySelector('[style*="translateX"]') as HTMLElement
+    expect(inner.style.transform).toBe('translateX(-0px)')
+  })
+
+  it('does not render swiped when a swiped neighbor with logged sets shifts into this row', () => {
+    const onRemoveEntry = vi.fn()
+    const { container, rerender } = render(<EntryRow {...defaultProps} onRemoveEntry={onRemoveEntry} />)
+    const row = screen.getByText('Chest').closest('.relative') as Element
+
+    fireEvent.touchStart(row, touch(200))
+    fireEvent.touchMove(row, touch(155))
+    fireEvent.touchEnd(row)
+
+    const entryWithSets: SessionEntry = {
+      ...baseEntry,
+      sets: [{ weight: { kind: 'single', value: 80 }, reps: 10 }],
+    }
+    rerender(<EntryRow {...defaultProps} entry={entryWithSets} onRemoveEntry={onRemoveEntry} entryCount={2} />)
+
+    const inner = container.querySelector('[style*="translateX"]') as HTMLElement
+    expect(inner.style.transform).toBe('translateX(-0px)')
   })
 })

@@ -23,6 +23,7 @@ interface EntryRowProps {
   isExpanded: boolean
   sessionStatus: SessionStatus
   isDraggable?: boolean
+  entryCount: number
   onToggle: () => void
   onMarkDone: () => void
   onLoadExerciseData: () => void
@@ -33,19 +34,20 @@ interface EntryRowProps {
   onRemoveEntry?: () => void
   onUpdateSetRpe: (setIndex: number, rpe: number | null) => void
   onDragHandleTouchStart?: (e: React.TouchEvent) => void
+  onViewStats?: (exerciseDefinitionId: string) => void
 }
 
 export const EntryRow = forwardRef<HTMLDivElement, EntryRowProps>(function EntryRow({
   entry, muscleGroupName, exerciseName, exerciseData, lastSets, defaultSets,
-  done, isExpanded, sessionStatus, isDraggable,
+  done, isExpanded, sessionStatus, isDraggable, entryCount,
   onToggle, onMarkDone, onLoadExerciseData, onAssign, onClearVariation,
-  onAddSet, onRemoveLast, onRemoveEntry, onUpdateSetRpe, onDragHandleTouchStart,
+  onAddSet, onRemoveLast, onRemoveEntry, onUpdateSetRpe, onDragHandleTouchStart, onViewStats,
 }, ref) {
   const setCount = entry.sets.length
   const canSwipe = setCount === 0 && !!onRemoveEntry
 
   const { swipeX, swiping, swipeBlocked, handleTouchStart, handleTouchMove, handleTouchEnd } =
-    useSwipeToDelete({ canSwipe, setCount })
+    useSwipeToDelete({ canSwipe, setCount, resetKey: entryCount })
 
   function handleToggle() {
     if (!isExpanded && !exerciseData) onLoadExerciseData()
@@ -109,6 +111,7 @@ export const EntryRow = forwardRef<HTMLDivElement, EntryRowProps>(function Entry
                   recentVariations={exerciseData.recent}
                   allExercises={exerciseData.all}
                   onSelect={(id) => { onAssign(id) }}
+                  onViewStats={onViewStats}
                 />
               ) : (
                 <p className="text-sm text-gray-400">Loading exercises…</p>

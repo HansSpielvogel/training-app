@@ -25,6 +25,10 @@ type: project
 - p3: Progression chart: show mini sparkline on the exercise list row so trend is visible without drilling in
 - Future: AI suggestions based on history
 - Future: Other sports (new bounded context, see extensibility rule in CLAUDE.md)
+- Active session bug: when a later entry is expanded while an earlier one is already done/collapsed above it, that entry's own "Done" button can render underneath the sticky "Finish Session" footer with no scroll available to reveal it — violates the CLAUDE.md rule that Done must stay visible without scrolling. Needs layout investigation (footer/entry-list height budget), pre-existing, not caused by the group1-fixes change. Acceptance: expand any entry with 2-3 logged sets, in any list position, and confirm Done is reachable without scrolling.
+- Active session UX: on an entry with logged sets, tapping the row body marks it Done/collapses/auto-advances, but tapping the small chevron icon instead reopens the variation picker and discards the "assigned exercise" view — two adjacent controls with very different, non-obvious effects. Acceptance: chevron either mirrors row-body behavior or gets a visually distinct "change exercise" affordance.
+- Seed data: no exercise in `sessions-seed.json` has more than one logged data point across sessions, so the Progression chart's "trend over time" can't be demoed/verified with seed data as shipped. Acceptance: at least one exercise has multi-session history in the seed.
+- Progression chart: when an exercise has only one logged session, the chart shows a single point with no trend and no explanation. Add an empty/low-data hint (e.g. "Log another session to see a trend"). Acceptance: chart shows this hint instead of a bare single-point line when session count for the exercise is 1.
 
 #### priority hints
 

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useLocation } from 'react-router-dom'
 import { useAnalytics } from './useAnalytics'
 import { TrainingCalendarView } from './TrainingCalendarView'
 import { MuscleGroupVolumeView } from './MuscleGroupVolumeView'
@@ -13,7 +14,9 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 export function AnalyticsScreen() {
-  const [activeTab, setActiveTab] = useState<Tab>('calendar')
+  const location = useLocation()
+  const initialExerciseDefinitionId = (location.state as { exerciseDefinitionId?: string } | null)?.exerciseDefinitionId
+  const [activeTab, setActiveTab] = useState<Tab>(initialExerciseDefinitionId ? 'progression' : 'calendar')
   const { sessionSummaries, muscleGroupVolumes, exercises, muscleGroups, exerciseIdsWithHistory, loading, getProgression, getFullProgression, getSessionDetail } = useAnalytics()
 
   return (
@@ -46,7 +49,7 @@ export function AnalyticsScreen() {
             {activeTab === 'calendar' && <TrainingCalendarView sessions={sessionSummaries} getSessionDetail={getSessionDetail} />}
             {activeTab === 'volume' && <MuscleGroupVolumeView volumes={muscleGroupVolumes} />}
             {activeTab === 'progression' && (
-              <ExerciseProgressionView exercises={exercises.filter(e => exerciseIdsWithHistory.has(e.id))} muscleGroups={muscleGroups} getProgression={getProgression} getFullProgression={getFullProgression} />
+              <ExerciseProgressionView exercises={exercises.filter(e => exerciseIdsWithHistory.has(e.id))} muscleGroups={muscleGroups} getProgression={getProgression} getFullProgression={getFullProgression} initialExerciseId={initialExerciseDefinitionId} />
             )}
           </>
         )}

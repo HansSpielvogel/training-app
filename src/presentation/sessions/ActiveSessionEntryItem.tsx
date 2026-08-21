@@ -24,6 +24,7 @@ interface Props {
   sessionStatus: SessionStatus
   dragState: DragState | null
   exerciseNames: Record<string, string>
+  entryCount: number
   setRef: RefCallback<HTMLDivElement>
   onToggle: () => void
   onMarkDone: () => void
@@ -35,13 +36,14 @@ interface Props {
   onRemoveEntry?: () => void
   onUpdateSetRpe: (setIndex: number, rpe: number | null) => void
   onDragHandleTouchStart: (e: React.TouchEvent) => void
+  onViewStats: (exerciseDefinitionId: string) => void
 }
 
 export function ActiveSessionEntryItem({
   entry, index: i, muscleGroupName, exerciseName, exerciseData, lastSets, defaultSets,
-  done, isExpanded, anyExpanded, sessionStatus, dragState, setRef,
+  done, isExpanded, anyExpanded, sessionStatus, dragState, setRef, entryCount,
   onToggle, onMarkDone, onLoadExerciseData, onAssign, onClearVariation,
-  onAddSet, onRemoveLast, onRemoveEntry, onUpdateSetRpe, onDragHandleTouchStart,
+  onAddSet, onRemoveLast, onRemoveEntry, onUpdateSetRpe, onDragHandleTouchStart, onViewStats,
 }: Props) {
   const isDragged = dragState?.fromIndex === i
   const isDropTarget = dragState !== null && dragState.toIndex === i && !isDragged
@@ -79,6 +81,7 @@ export function ActiveSessionEntryItem({
         sessionStatus={sessionStatus}
         isDraggable={sessionStatus === 'in-progress'}
         defaultSets={defaultSets}
+        entryCount={entryCount}
         onToggle={onToggle}
         onMarkDone={onMarkDone}
         onLoadExerciseData={onLoadExerciseData}
@@ -89,6 +92,7 @@ export function ActiveSessionEntryItem({
         onRemoveEntry={onRemoveEntry}
         onUpdateSetRpe={onUpdateSetRpe}
         onDragHandleTouchStart={onDragHandleTouchStart}
+        onViewStats={onViewStats}
       />
       {isDropTarget && dragState && dragState.fromIndex < i && (
         <div className="h-0.5 bg-blue-400" />

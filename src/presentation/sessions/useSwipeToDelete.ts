@@ -1,9 +1,10 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import type React from 'react'
 
 interface UseSwipeToDeleteOptions {
   canSwipe: boolean
   setCount: number
+  resetKey?: number
 }
 
 interface UseSwipeToDeleteResult {
@@ -15,13 +16,24 @@ interface UseSwipeToDeleteResult {
   handleTouchEnd: () => void
 }
 
-export function useSwipeToDelete({ canSwipe, setCount }: UseSwipeToDeleteOptions): UseSwipeToDeleteResult {
+export function useSwipeToDelete({ canSwipe, setCount, resetKey }: UseSwipeToDeleteOptions): UseSwipeToDeleteResult {
   const [swipeX, setSwipeX] = useState(0)
   const [swiping, setSwiping] = useState(false)
   const [swipeBlocked, setSwipeBlocked] = useState(false)
   const touchRef = useRef({ startX: 0, startY: 0, startSwipeX: 0, activated: false })
   const blockAttempted = useRef(false)
   const blockTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Rows are index-keyed, so deleting an entry shifts the next entry's data
+  // into this hook instance without remounting it — reset transient swipe
+  // state whenever the entry count changes so it doesn't leak into the shifted row.
+  useEffect(() => {
+    setSwipeX(0)
+    setSwiping(false)
+    setSwipeBlocked(false)
+    if (blockTimer.current) clearTimeout(blockTimer.current)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resetKey])
 
   function handleTouchStart(e: React.TouchEvent) {
     blockAttempted.current = false

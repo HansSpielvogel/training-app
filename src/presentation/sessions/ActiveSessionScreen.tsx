@@ -1,18 +1,19 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import type { Weight } from '@application/sessions'
-import type { TrainingPlan } from '@application/planning'
 import { useActiveSession } from './useActiveSession'
 import { useSessionConfirm } from './useSessionConfirm'
 import { useMuscleGroups } from '../exercises/useMuscleGroups'
 import { useEntryDoneState } from './useEntryDoneState'
 import { useDragReorder } from './useDragReorder'
+import { useEntryExpansion } from './useEntryExpansion'
+import { useSlotPicker } from './useSlotPicker'
 import { ConfirmAbandonBanner } from './ConfirmAbandonBanner'
 import { SlotPickerPanel } from './SlotPickerPanel'
 import { SessionFooter } from './SessionFooter'
 import { SessionHeader } from './SessionHeader'
 import { ActiveSessionEntryItem } from './ActiveSessionEntryItem'
-import { findNextIncomplete, findActiveEntry, remapDoneIndices, remapSingleIndex, shiftSetAfterRemoval } from './activeSessionHelpers'
+import { remapDoneIndices, remapSingleIndex, shiftSetAfterRemoval } from './activeSessionHelpers'
 
 export function ActiveSessionScreen() {
   const navigate = useNavigate()
@@ -24,14 +25,15 @@ export function ActiveSessionScreen() {
     updateRpe, reorderEntries,
   } = useActiveSession()
   const { muscleGroups } = useMuscleGroups()
-  const [expandedIndex, setExpandedIndex] = useState<number | null>(null)
-  const [activeEntryIndex, setActiveEntryIndex] = useState<number | null>(null)
   const { doneIndices, setDone, updateDone, initFromSession, clearSession } = useEntryDoneState()
-  const [showMuscleGroupPicker, setShowMuscleGroupPicker] = useState(false)
-  const [showPlanPicker, setShowPlanPicker] = useState(false)
-  const [availablePlans, setAvailablePlans] = useState<TrainingPlan[]>([])
-  const [planPickerMessage, setPlanPickerMessage] = useState<string>()
-  const entryRefs = useRef<(HTMLDivElement | null)[]>([])
+  const {
+    expandedIndex, activeEntryIndex, setExpandedIndex, setActiveEntryIndex, entryRefs,
+    expandAndPreload, handleToggle, handleMarkDone,
+  } = useEntryExpansion(session, loading, exerciseDataMap, loadExerciseData, doneIndices, setDone, initFromSession)
+  const {
+    showMuscleGroupPicker, setShowMuscleGroupPicker, showPlanPicker, setShowPlanPicker,
+    availablePlans, planPickerMessage, handleAddTempSlot, handleOpenPlanPicker, handleAddPlanSlots,
+  } = useSlotPicker(session, addTempSlot, addPlanSlots, listPlans)
 
   const { dragState, handleDragHandleTouchStart } = useDragReorder(
     entryRefs,
@@ -54,69 +56,6 @@ export function ActiveSessionScreen() {
     if (!loading && !session) navigate('/sessions', { replace: true })
   }, [session, loading, navigate])
 
-  // On mount: restore doneIndices from sessionStorage and focus the active entry
-  useEffect(() => {
-    if (loading || !session) return
-    const persisted = initFromSession(session.id)
-    const active = findActiveEntry(session.entries, persisted)
-    if (active !== null) {
-      setActiveEntryIndex(active)
-      setExpandedIndex(active)
-      if (!exerciseDataMap[active]) {
-        loadExerciseData(active, session.entries[active].muscleGroupId)
-      }
-      setTimeout(() => {
-        entryRefs.current[active]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 100)
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading])
-
-  function expandAndPreload(nextIndex: number | null) {
-    setExpandedIndex(nextIndex)
-    setActiveEntryIndex(nextIndex)
-    if (nextIndex !== null && !exerciseDataMap[nextIndex] && session) {
-      loadExerciseData(nextIndex, session.entries[nextIndex].muscleGroupId)
-    }
-    if (nextIndex !== null) {
-      setTimeout(() => {
-        entryRefs.current[nextIndex]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }, 100)
-    }
-  }
-
-  function handleToggle(i: number) {
-    if (!session) return
-    const isCurrentlyExpanded = expandedIndex === i
-    if (isCurrentlyExpanded) {
-      const entry = session.entries[i]
-      const hasSets = (entry?.sets.length ?? 0) > 0
-      if (hasSets) {
-        const newDone = new Set(doneIndices).add(i)
-        setDone(newDone, session.id)
-        setActiveEntryIndex(null)
-        expandAndPreload(findNextIncomplete(i, newDone, session.entries.length))
-      } else {
-        setExpandedIndex(null)
-        if (activeEntryIndex === i) setActiveEntryIndex(null)
-      }
-    } else {
-      setExpandedIndex(i)
-      setActiveEntryIndex(i)
-      if (!exerciseDataMap[i] && session) {
-        loadExerciseData(i, session.entries[i].muscleGroupId)
-      }
-    }
-  }
-
-  function handleMarkDone(i: number) {
-    if (!session) return
-    const newDone = new Set(doneIndices).add(i)
-    setDone(newDone, session.id)
-    setActiveEntryIndex(null)
-    expandAndPreload(findNextIncomplete(i, newDone, session.entries.length))
-  }
-
   function handleAssignWithActive(i: number, id: string) {
     setActiveEntryIndex(i)
     handleAssign(i, id)
@@ -134,27 +73,6 @@ export function ActiveSessionScreen() {
     setActiveEntryIndex(prev => prev === null ? null : prev === i ? null : prev > i ? prev - 1 : prev)
     if (isTemp) await removeTempSlot(i)
     else await removePlanSlot(i)
-  }
-
-  async function handleAddTempSlot(muscleGroupId: string) {
-    setShowMuscleGroupPicker(false)
-    await addTempSlot(muscleGroupId)
-  }
-
-  async function handleOpenPlanPicker() {
-    const plans = await listPlans()
-    setAvailablePlans(plans.filter(p => p.id !== session?.planId))
-    setShowPlanPicker(true)
-    setPlanPickerMessage(undefined)
-  }
-
-  async function handleAddPlanSlots(planId: string) {
-    const added = await addPlanSlots(planId)
-    if (added === 0) {
-      setPlanPickerMessage('All muscle groups from that plan are already in this session.')
-    } else {
-      setShowPlanPicker(false)
-    }
   }
 
   if (loading) {
@@ -204,6 +122,7 @@ export function ActiveSessionScreen() {
             sessionStatus={session.status}
             dragState={dragState}
             exerciseNames={exerciseNames}
+            entryCount={session.entries.length}
             setRef={(el) => { entryRefs.current[i] = el }}
             onToggle={() => handleToggle(i)}
             onMarkDone={() => handleMarkDone(i)}
@@ -215,6 +134,7 @@ export function ActiveSessionScreen() {
             onRemoveEntry={() => handleRemoveEntry(i, !!entry.isTemp)}
             onUpdateSetRpe={(setIndex, rpe) => updateRpe(i, setIndex, rpe)}
             onDragHandleTouchStart={(e) => handleDragHandleTouchStart(i, e)}
+            onViewStats={(exerciseDefinitionId) => navigate('/analytics', { state: { exerciseDefinitionId } })}
           />
         ))}
         <SlotPickerPanel

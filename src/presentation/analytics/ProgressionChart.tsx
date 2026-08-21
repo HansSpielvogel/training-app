@@ -1,4 +1,5 @@
 import type { ExerciseProgressionPoint } from '@application/analytics'
+import { AxisTicks as AxisTicksBase } from './AxisTicks'
 
 const WIDTH = 300
 const HEIGHT = 160
@@ -14,6 +15,10 @@ function rpeColor(rpe: number): string {
 
 function formatDate(date: Date): string {
   return `${date.getMonth() + 1}/${date.getDate()}`
+}
+
+function AxisTicks(props: { min: number; max: number; toY: (v: number) => number; color: string; side?: 'left' | 'right' }) {
+  return <AxisTicksBase {...props} chartWidth={WIDTH} chartLeftPad={PAD.left} chartRightPad={PAD.right} />
 }
 
 interface Props {
@@ -48,6 +53,7 @@ export function ProgressionChart({ points, metric = 'weight' }: Props) {
         <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} className="w-full" style={{ maxHeight: 180 }}>
           <text x={PAD.left - 4} y={PAD.top + 4} textAnchor="end" fontSize={10} fill="#f97316">{maxR}</text>
           <text x={PAD.left - 4} y={PAD.top + innerH + 4} textAnchor="end" fontSize={10} fill="#f97316">{minR}</text>
+          <AxisTicks min={minR} max={maxR} toY={toYR} color="#f97316" />
           <polyline points={polyline} fill="none" stroke="#f97316" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
           {points.map((p, i) => <circle key={i} cx={toX(i)} cy={toYR(p.avgReps ?? 0)} r={3} fill="#f97316" />)}
           {labelIndices.map(i => (
@@ -74,6 +80,7 @@ export function ProgressionChart({ points, metric = 'weight' }: Props) {
           <text x={PAD.left - 4} y={PAD.top + 4} textAnchor="end" fontSize={10} fill="#a855f7">{Math.round(maxV)}</text>
           <text x={PAD.left - 4} y={PAD.top + innerH + 4} textAnchor="end" fontSize={10} fill="#a855f7">{Math.round(minV)}</text>
           <text x={PAD.left - 4} y={PAD.top - 2} textAnchor="end" fontSize={8} fill="#a855f7">kg moved</text>
+          <AxisTicks min={minV} max={maxV} toY={toYV} color="#a855f7" />
           <polyline points={polyline} fill="none" stroke="#a855f7" strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />
           {points.map((p, i) => <circle key={i} cx={toX(i)} cy={toYV(p.movedSum ?? 0)} r={3} fill="#a855f7" />)}
           {labelIndices.map(i => (
@@ -128,6 +135,7 @@ export function ProgressionChart({ points, metric = 'weight' }: Props) {
         <text x={PAD.left - 4} y={PAD.top + innerH + 4} textAnchor="end" fontSize={10} fill="#2563eb">
           {minW}
         </text>
+        <AxisTicks min={minW} max={maxW} toY={toY} color="#2563eb" />
 
         {/* Right Y-axis labels (reps) */}
         {hasReps && (

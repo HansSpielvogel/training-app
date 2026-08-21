@@ -14,6 +14,7 @@ interface Props {
   muscleGroups: MuscleGroup[]
   getProgression: (exerciseDefinitionId: string) => Promise<ExerciseProgressionPoint[]>
   getFullProgression: (exerciseDefinitionId: string) => Promise<ExerciseProgressionPoint[]>
+  initialExerciseId?: string
 }
 
 type ChartMetric = 'weight' | 'volume'
@@ -22,8 +23,10 @@ function formatVolume(p: ExerciseProgressionPoint): string {
   return p.movedSum !== undefined ? `${Math.round(p.movedSum)} kg moved` : '—'
 }
 
-export function ExerciseProgressionView({ exercises, muscleGroups, getProgression, getFullProgression }: Props) {
-  const [selected, setSelected] = useState<ExerciseDefinition | null>(null)
+export function ExerciseProgressionView({ exercises, muscleGroups, getProgression, getFullProgression, initialExerciseId }: Props) {
+  const [selected, setSelected] = useState<ExerciseDefinition | null>(
+    () => exercises.find(e => e.id === initialExerciseId) ?? null,
+  )
   const [view, setView] = useState<'chart' | 'list'>('list')
   const [chartMetric, setChartMetric] = useState<ChartMetric>('weight')
   const [chartPoints, setChartPoints] = useState<ExerciseProgressionPoint[]>([])
